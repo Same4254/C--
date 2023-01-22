@@ -68,7 +68,7 @@
 /* First part of user prologue.  */
 #line 1 "grammar.y"
 
-	#include <math.h>
+    #include <math.h>
     #include <stdlib.h>
     #include "parser.h"
     #define YYERROR_VERBOSE
@@ -123,36 +123,36 @@ extern int yydebug;
   {
     SEMICOLON = 258,
     COMMA = 259,
-    ASSIGN = 260,
-    LESS_THAN_OR_EQUAL = 261,
-    GREATER_THAN_OR_EQUAL = 262,
-    EQUIVALENT = 263,
-    IS_NOT_EQUAL = 264,
-    LESS_THAN = 265,
-    GREATER_THAN = 266,
-    OR = 267,
-    AND = 268,
-    MINUS = 269,
-    PLUS = 270,
-    DIVIDE = 271,
-    TIMES = 272,
-    NEGATE = 273,
-    DOT = 274,
-    OPEN_SQUARE = 275,
-    CLOSE_SQUARE = 276,
-    OPEN_PARENTHESIS = 277,
-    CLOSE_PARENTHESIS = 278,
-    OPEN_BRACE = 279,
-    CLOSE_BRACE = 280,
-    SQUARE_PAIR = 281,
-    KEYWORD_WHILE = 282,
-    KEYWORD_IF = 283,
-    KEYWORD_ELSE = 284,
-    KEYWORD_THIS = 285,
-    KEYWORD_CLASS = 286,
-    KEYWORD_EXTENDS = 287,
-    KEYWORD_NEW = 288,
-    KEYWORD_RETURN = 289,
+    KEYWORD_NEW = 260,
+    KEYWORD_RETURN = 261,
+    OPEN_SQUARE = 262,
+    CLOSE_SQUARE = 263,
+    ASSIGN = 264,
+    LESS_THAN_OR_EQUAL = 265,
+    GREATER_THAN_OR_EQUAL = 266,
+    EQUIVALENT = 267,
+    IS_NOT_EQUAL = 268,
+    LESS_THAN = 269,
+    GREATER_THAN = 270,
+    OR = 271,
+    AND = 272,
+    MINUS = 273,
+    PLUS = 274,
+    DIVIDE = 275,
+    TIMES = 276,
+    NEGATE = 277,
+    DOT = 278,
+    OPEN_PARENTHESIS = 279,
+    CLOSE_PARENTHESIS = 280,
+    OPEN_BRACE = 281,
+    CLOSE_BRACE = 282,
+    SQUARE_PAIR = 283,
+    KEYWORD_WHILE = 284,
+    KEYWORD_IF = 285,
+    KEYWORD_ELSE = 286,
+    KEYWORD_THIS = 287,
+    KEYWORD_CLASS = 288,
+    KEYWORD_EXTENDS = 289,
     KEYWORD_INT = 290,
     KEYWORD_BOOL = 291,
     KEYWORD_VOID = 292,
@@ -170,13 +170,14 @@ union YYSTYPE
 {
 #line 8 "grammar.y"
 
-	int val;
+    int val;
     char *id;
 
-	ASTNode* node;
+    ASTNode* node;
     ASTNode_Actuals* actual;
+    ASTNode_Statement_Body* body;
 
-#line 180 "grammar.c"
+#line 181 "grammar.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -192,12 +193,12 @@ int yyparse (Parser *parser);
 
 
 /* Unqualified %code blocks.  */
-#line 16 "grammar.y"
+#line 17 "grammar.y"
 
-	int yyerror(Parser *p, const char *s);
+    int yyerror(Parser *p, const char *s);
     int yylex(YYSTYPE*);
 
-#line 201 "grammar.c"
+#line 202 "grammar.c"
 
 #ifdef short
 # undef short
@@ -499,18 +500,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  26
+#define YYFINAL  39
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   171
+#define YYLAST   372
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  43
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  5
+#define YYNNTS  6
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  32
+#define YYNRULES  48
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  73
+#define YYNSTATES  125
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   297
@@ -561,10 +562,11 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    90,    90,    92,    93,    94,    95,    97,    98,    99,
-     100,   117,   120,   121,   124,   125,   126,   127,   128,   129,
-     130,   131,   132,   133,   134,   135,   136,   138,   139,   141,
-     143,   144,   147
+       0,    93,    93,    95,    96,    97,    98,   100,   101,   102,
+     103,   109,   110,   112,   113,   115,   116,   119,   120,   123,
+     126,   127,   130,   131,   132,   133,   134,   135,   136,   137,
+     138,   139,   140,   141,   142,   144,   145,   147,   149,   150,
+     152,   153,   154,   156,   157,   158,   160,   161,   162
 };
 #endif
 
@@ -573,16 +575,17 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "SEMICOLON", "COMMA", "ASSIGN",
+  "$end", "error", "$undefined", "SEMICOLON", "COMMA", "KEYWORD_NEW",
+  "KEYWORD_RETURN", "OPEN_SQUARE", "CLOSE_SQUARE", "ASSIGN",
   "LESS_THAN_OR_EQUAL", "GREATER_THAN_OR_EQUAL", "EQUIVALENT",
   "IS_NOT_EQUAL", "LESS_THAN", "GREATER_THAN", "OR", "AND", "MINUS",
-  "PLUS", "DIVIDE", "TIMES", "NEGATE", "DOT", "OPEN_SQUARE",
-  "CLOSE_SQUARE", "OPEN_PARENTHESIS", "CLOSE_PARENTHESIS", "OPEN_BRACE",
-  "CLOSE_BRACE", "SQUARE_PAIR", "KEYWORD_WHILE", "KEYWORD_IF",
-  "KEYWORD_ELSE", "KEYWORD_THIS", "KEYWORD_CLASS", "KEYWORD_EXTENDS",
-  "KEYWORD_NEW", "KEYWORD_RETURN", "KEYWORD_INT", "KEYWORD_BOOL",
+  "PLUS", "DIVIDE", "TIMES", "NEGATE", "DOT", "OPEN_PARENTHESIS",
+  "CLOSE_PARENTHESIS", "OPEN_BRACE", "CLOSE_BRACE", "SQUARE_PAIR",
+  "KEYWORD_WHILE", "KEYWORD_IF", "KEYWORD_ELSE", "KEYWORD_THIS",
+  "KEYWORD_CLASS", "KEYWORD_EXTENDS", "KEYWORD_INT", "KEYWORD_BOOL",
   "KEYWORD_VOID", "KEYWORD_TRUE", "KEYWORD_FALSE", "INTEGER", "ID",
-  "UNKOWN", "$accept", "statement", "actuals", "actuals_optional", "expr", YY_NULLPTR
+  "UNKOWN", "$accept", "statement", "statement_klein", "actuals",
+  "actuals_optional", "expr", YY_NULLPTR
 };
 #endif
 
@@ -599,7 +602,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-17)
+#define YYPACT_NINF (-24)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -613,14 +616,19 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-      25,    34,    34,    34,   -16,     0,    16,    18,   -17,   -17,
-     -17,    28,    49,    72,   146,   -17,    -3,    31,     9,    48,
-      14,    67,    30,    73,    36,    88,   -17,   -17,    34,    34,
-      34,    34,    34,    34,    34,    34,    34,    34,    34,    34,
-     -17,    34,   161,   -17,   162,   -17,   163,   -17,   164,   -17,
-      98,   109,   119,   128,   136,   143,     2,     7,   146,    29,
-     151,   -17,   147,    86,   -17,   -17,   -17,   -17,   -17,    34,
-     -17,    86,   -17
+      78,   -24,   -20,    54,    54,    54,    54,    78,   -12,   -10,
+     -23,   -22,   -21,   -24,   -24,   -24,   -15,    22,   117,     2,
+       3,     4,     1,   136,   121,   -24,   148,    78,    -4,    54,
+      54,   -17,    35,    11,    72,    15,    74,    38,    77,   -24,
+     -24,    54,    54,    54,    54,    54,    54,    54,    54,    54,
+      54,    54,    54,    54,    75,    54,    79,    54,    81,    54,
+      54,    83,   -24,   -24,   -24,   -24,   164,   180,    82,   -24,
+      94,   -24,    98,   -24,   100,   -24,   306,   317,   327,   336,
+     344,   351,    16,   105,   121,    53,    84,   -24,   196,    54,
+     210,    54,   224,    54,   238,    86,    50,    54,    78,    78,
+     -24,   -24,   -24,   -24,   -24,   252,   -24,   266,   -24,   280,
+     -24,   -24,    54,   -24,   294,   -24,    90,   -24,   -24,   -24,
+      50,   -24,    78,   -24,   -24
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -628,26 +636,31 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     0,     0,     0,    30,    31,
-      29,     0,     0,     0,    27,    28,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     1,     2,     0,     0,
+       0,    16,     0,     0,     0,     0,     0,    18,     0,     0,
+       0,     0,     0,    38,    39,    37,     0,     0,     0,     0,
+       0,     0,     0,     0,    35,    36,     0,    18,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     1,
+       2,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      18,     0,     0,     3,     0,     4,     0,     5,     0,     6,
-      23,    25,    21,    22,    24,    26,    20,    19,    17,    16,
-      15,    14,     0,    13,     7,     8,     9,    10,    32,     0,
-      11,    13,    12
+       0,     0,    15,    26,    17,    14,     0,     0,     0,     3,
+       0,     4,     0,     5,     0,     6,    31,    33,    29,    30,
+      32,    34,    28,    27,    25,    24,    23,    22,     0,     0,
+       0,     0,     0,     0,     0,     0,    21,     0,     0,     0,
+       7,     8,     9,    10,    40,     0,    41,     0,    42,     0,
+      47,    46,     0,    19,     0,    13,    11,    43,    44,    45,
+      21,    48,     0,    20,    12
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -17,   -17,   -17,   100,    -1
+     -24,     0,    85,   -24,   -14,    -2
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,    12,    62,    70,    13
+      -1,    27,    28,    95,   113,    18
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -655,78 +668,125 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      14,    15,    16,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    35,    36,    37,    38,    39,
-      40,    36,    37,    38,    39,    17,    18,    50,    51,    52,
-      53,    54,    55,    56,    57,    58,    59,    60,    61,     1,
-      63,    19,    20,     2,    22,    38,    39,     3,     1,    26,
-      42,    43,     2,    41,    24,    44,     3,    21,     4,    23,
-       5,     6,     7,     8,     9,    10,    11,     4,    71,    25,
-      45,    46,     8,     9,    10,    27,    47,    48,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
-      69,    49,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    -1,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,    -1,    30,    31,    32,
-      33,    34,    35,    36,    37,    38,    39,    -1,    31,    32,
-      33,    34,    35,    36,    37,    38,    39,    -1,    32,    33,
-      34,    35,    36,    37,    38,    39,    -1,    33,    34,    35,
-      36,    37,    38,    39,    -1,    34,    35,    36,    37,    38,
-      39,    37,    38,    39,    64,    65,    66,    67,    39,     0,
-      68,    72
+      17,    23,    24,    25,    26,    31,    33,    35,    59,    53,
+      55,    57,    29,    37,    30,    19,    20,    21,    32,    34,
+      36,    22,    39,    65,    68,    60,    38,    66,    67,    61,
+      54,    56,    58,    48,    49,    50,    51,    52,    69,    76,
+      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
+      87,    88,    70,    90,   112,    92,    72,    94,    96,     2,
+      41,    42,    43,    44,    45,    46,    47,    48,    49,    50,
+      51,    52,     4,    51,    52,    71,     5,    73,     6,    74,
+      75,     1,    89,     2,     3,   100,    91,   105,    93,   107,
+      97,   109,    13,    14,    15,   114,     4,   101,   115,   116,
+       5,   102,     6,   103,     7,    52,   123,     8,     9,     0,
+     120,   111,    64,    10,    11,    12,    13,    14,    15,    16,
+      40,   122,   124,    49,    50,    51,    52,    41,    42,    43,
+      44,    45,    46,    47,    48,    49,    50,    51,    52,    62,
+      50,    51,    52,     0,     0,     0,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,    41,    42,
+      43,    44,    45,    46,    47,    48,    49,    50,    51,    52,
+       0,     0,     0,    63,    41,    42,    43,    44,    45,    46,
+      47,    48,    49,    50,    51,    52,     0,     0,     0,    98,
+      41,    42,    43,    44,    45,    46,    47,    48,    49,    50,
+      51,    52,     0,     0,   104,    99,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,   106,     0,
+      41,    42,    43,    44,    45,    46,    47,    48,    49,    50,
+      51,    52,   108,     0,    41,    42,    43,    44,    45,    46,
+      47,    48,    49,    50,    51,    52,   110,     0,    41,    42,
+      43,    44,    45,    46,    47,    48,    49,    50,    51,    52,
+     117,     0,    41,    42,    43,    44,    45,    46,    47,    48,
+      49,    50,    51,    52,   118,     0,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,   119,     0,
+      41,    42,    43,    44,    45,    46,    47,    48,    49,    50,
+      51,    52,   121,     0,    41,    42,    43,    44,    45,    46,
+      47,    48,    49,    50,    51,    52,    -1,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,    -1,    43,
+      44,    45,    46,    47,    48,    49,    50,    51,    52,    -1,
+      44,    45,    46,    47,    48,    49,    50,    51,    52,    -1,
+      45,    46,    47,    48,    49,    50,    51,    52,    -1,    46,
+      47,    48,    49,    50,    51,    52,    -1,    47,    48,    49,
+      50,    51,    52
 };
 
 static const yytype_int8 yycheck[] =
 {
-       1,     2,     3,     6,     7,     8,     9,    10,    11,    12,
-      13,    14,    15,    16,    17,    13,    14,    15,    16,    17,
-      23,    14,    15,    16,    17,    41,    26,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    37,    38,    39,    14,
-      41,    41,    26,    18,    26,    16,    17,    22,    14,     0,
-      41,     3,    18,    22,    26,    41,    22,    41,    33,    41,
-      35,    36,    37,    38,    39,    40,    41,    33,    69,    41,
-       3,    41,    38,    39,    40,     3,     3,    41,     6,     7,
-       8,     9,    10,    11,    12,    13,    14,    15,    16,    17,
-       4,     3,     6,     7,     8,     9,    10,    11,    12,    13,
-      14,    15,    16,    17,     6,     7,     8,     9,    10,    11,
-      12,    13,    14,    15,    16,    17,     7,     8,     9,    10,
-      11,    12,    13,    14,    15,    16,    17,     8,     9,    10,
-      11,    12,    13,    14,    15,    16,    17,     9,    10,    11,
-      12,    13,    14,    15,    16,    17,    10,    11,    12,    13,
-      14,    15,    16,    17,    11,    12,    13,    14,    15,    16,
-      17,    15,    16,    17,     3,     3,     3,     3,    17,    -1,
-      23,    71
+       0,     3,     4,     5,     6,    28,    28,    28,     7,     7,
+       7,     7,    24,    28,    24,    35,    36,    37,    41,    41,
+      41,    41,     0,    27,    41,    24,    41,    29,    30,    28,
+      28,    28,    28,    17,    18,    19,    20,    21,     3,    41,
+      42,    43,    44,    45,    46,    47,    48,    49,    50,    51,
+      52,    53,    41,    55,     4,    57,    41,    59,    60,     5,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,    18,    20,    21,     3,    22,     3,    24,    41,
+       3,     3,     7,     5,     6,     3,     7,    89,     7,    91,
+       7,    93,    38,    39,    40,    97,    18,     3,    98,    99,
+      22,     3,    24,     3,    26,    21,   120,    29,    30,    -1,
+     112,    25,    27,    35,    36,    37,    38,    39,    40,    41,
+       3,    31,   122,    18,    19,    20,    21,    10,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,     3,
+      19,    20,    21,    -1,    -1,    -1,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
+      -1,    -1,    -1,    25,    10,    11,    12,    13,    14,    15,
+      16,    17,    18,    19,    20,    21,    -1,    -1,    -1,    25,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,    -1,    -1,     8,    25,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,     8,    -1,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,     8,    -1,    10,    11,    12,    13,    14,    15,
+      16,    17,    18,    19,    20,    21,     8,    -1,    10,    11,
+      12,    13,    14,    15,    16,    17,    18,    19,    20,    21,
+       8,    -1,    10,    11,    12,    13,    14,    15,    16,    17,
+      18,    19,    20,    21,     8,    -1,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,     8,    -1,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,     8,    -1,    10,    11,    12,    13,    14,    15,
+      16,    17,    18,    19,    20,    21,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    11,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,    12,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    14,    15,
+      16,    17,    18,    19,    20,    21,    15,    16,    17,    18,
+      19,    20,    21
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    14,    18,    22,    33,    35,    36,    37,    38,    39,
-      40,    41,    44,    47,    47,    47,    47,    41,    26,    41,
-      26,    41,    26,    41,    26,    41,     0,     3,     6,     7,
-       8,     9,    10,    11,    12,    13,    14,    15,    16,    17,
-      23,    22,    41,     3,    41,     3,    41,     3,    41,     3,
-      47,    47,    47,    47,    47,    47,    47,    47,    47,    47,
-      47,    47,    45,    47,     3,     3,     3,     3,    23,     4,
-      46,    47,    46
+       0,     3,     5,     6,    18,    22,    24,    26,    29,    30,
+      35,    36,    37,    38,    39,    40,    41,    44,    48,    35,
+      36,    37,    41,    48,    48,    48,    48,    44,    45,    24,
+      24,    28,    41,    28,    41,    28,    41,    28,    41,     0,
+       3,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,    20,    21,     7,    28,     7,    28,     7,    28,     7,
+      24,    28,     3,    25,    45,    27,    48,    48,    41,     3,
+      41,     3,    41,     3,    41,     3,    48,    48,    48,    48,
+      48,    48,    48,    48,    48,    48,    48,    48,    48,     7,
+      48,     7,    48,     7,    48,    46,    48,     7,    25,    25,
+       3,     3,     3,     3,     8,    48,     8,    48,     8,    48,
+       8,    25,     4,    47,    48,    44,    44,     8,     8,     8,
+      48,     8,    31,    47,    44
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
        0,    43,    44,    44,    44,    44,    44,    44,    44,    44,
-      44,    45,    46,    46,    47,    47,    47,    47,    47,    47,
-      47,    47,    47,    47,    47,    47,    47,    47,    47,    47,
-      47,    47,    47
+      44,    44,    44,    44,    44,    44,    44,    45,    45,    46,
+      47,    47,    48,    48,    48,    48,    48,    48,    48,    48,
+      48,    48,    48,    48,    48,    48,    48,    48,    48,    48,
+      48,    48,    48,    48,    48,    48,    48,    48,    48
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     2,     3,     3,     3,     3,     4,     4,     4,
-       4,     2,     3,     0,     3,     3,     3,     3,     3,     3,
-       3,     3,     3,     3,     3,     3,     3,     2,     2,     1,
-       1,     1,     5
+       4,     5,     7,     5,     3,     3,     1,     2,     0,     2,
+       3,     0,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     2,     2,     1,     1,     1,
+       5,     5,     5,     6,     6,     6,     5,     5,     6
 };
 
 
@@ -1428,193 +1488,289 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 90 "grammar.y"
-                       { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_ExprOnly>((yyvsp[-1].node))); }
-#line 1434 "grammar.c"
-    break;
-
-  case 3:
-#line 92 "grammar.y"
-                               { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Int>((yyvsp[-1].id))); }
-#line 1440 "grammar.c"
-    break;
-
-  case 4:
 #line 93 "grammar.y"
-                                { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Bool>((yyvsp[-1].id))); }
-#line 1446 "grammar.c"
-    break;
-
-  case 5:
-#line 94 "grammar.y"
-                                { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Void>((yyvsp[-1].id))); }
-#line 1452 "grammar.c"
-    break;
-
-  case 6:
-#line 95 "grammar.y"
-                      { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Custom>((yyvsp[-2].id), (yyvsp[-1].id))); }
-#line 1458 "grammar.c"
-    break;
-
-  case 7:
-#line 97 "grammar.y"
-                                               { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Int_Array>((yyvsp[-1].id))); }
-#line 1464 "grammar.c"
-    break;
-
-  case 8:
-#line 98 "grammar.y"
-                                            { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Bool_Array>((yyvsp[-1].id))); }
-#line 1470 "grammar.c"
-    break;
-
-  case 9:
-#line 99 "grammar.y"
-                                            { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Void_Array>((yyvsp[-1].id))); }
-#line 1476 "grammar.c"
-    break;
-
-  case 10:
-#line 100 "grammar.y"
-                                  { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Custom_Array>((yyvsp[-3].id), (yyvsp[-1].id))); }
-#line 1482 "grammar.c"
-    break;
-
-  case 11:
-#line 117 "grammar.y"
-                              { (yyval.actual) = (yyvsp[0].actual); (yyval.actual)->AddExpression((yyvsp[-1].node)); }
-#line 1488 "grammar.c"
-    break;
-
-  case 12:
-#line 120 "grammar.y"
-                                    { (yyval.actual) = (yyvsp[0].actual); (yyval.actual)->AddExpression((yyvsp[-1].node)); }
+                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_ExprOnly>((yyvsp[-1].node))); }
 #line 1494 "grammar.c"
     break;
 
-  case 13:
-#line 121 "grammar.y"
-             { (yyval.actual) = parser->ast.AddNode(std::make_unique<ASTNode_Actuals>()); }
+  case 3:
+#line 95 "grammar.y"
+                               { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Int>((yyvsp[-1].id))); }
 #line 1500 "grammar.c"
     break;
 
-  case 14:
-#line 124 "grammar.y"
-                        { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Times>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 4:
+#line 96 "grammar.y"
+                                { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Bool>((yyvsp[-1].id))); }
 #line 1506 "grammar.c"
     break;
 
-  case 15:
-#line 125 "grammar.y"
-                       { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Divide>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 5:
+#line 97 "grammar.y"
+                                { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Void>((yyvsp[-1].id))); }
 #line 1512 "grammar.c"
     break;
 
-  case 16:
-#line 126 "grammar.y"
-                     { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Plus>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 6:
+#line 98 "grammar.y"
+                      { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Custom>((yyvsp[-2].id), (yyvsp[-1].id))); }
 #line 1518 "grammar.c"
     break;
 
-  case 17:
-#line 127 "grammar.y"
-                      { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Minus>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 7:
+#line 100 "grammar.y"
+                                           { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Int_Array>((yyvsp[-1].id))); }
 #line 1524 "grammar.c"
     break;
 
-  case 18:
-#line 128 "grammar.y"
-                                              { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Parenthesis>((yyvsp[-1].node))); }
+  case 8:
+#line 101 "grammar.y"
+                                            { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Bool_Array>((yyvsp[-1].id))); }
 #line 1530 "grammar.c"
     break;
 
-  case 19:
-#line 129 "grammar.y"
-                        { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_And>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 9:
+#line 102 "grammar.y"
+                                            { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Void_Array>((yyvsp[-1].id))); }
 #line 1536 "grammar.c"
     break;
 
-  case 20:
-#line 130 "grammar.y"
-                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Or>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 10:
+#line 103 "grammar.y"
+                                  { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Custom_Array>((yyvsp[-3].id), (yyvsp[-1].id))); }
 #line 1542 "grammar.c"
     break;
 
-  case 21:
-#line 131 "grammar.y"
-                           { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Equivalent>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 11:
+#line 109 "grammar.y"
+                                                                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_If>((yyvsp[-2].node), (yyvsp[0].node))); }
 #line 1548 "grammar.c"
     break;
 
-  case 22:
-#line 132 "grammar.y"
-                                 { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_IsNotEqual>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 12:
+#line 110 "grammar.y"
+                                                                                          { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_IfElse>((yyvsp[-4].node), (yyvsp[-2].node), (yyvsp[0].node))); }
 #line 1554 "grammar.c"
     break;
 
-  case 23:
-#line 133 "grammar.y"
-                                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_LessThanOrEqual>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 13:
+#line 112 "grammar.y"
+                                                                      { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_While>((yyvsp[-2].node), (yyvsp[0].node))); }
 #line 1560 "grammar.c"
     break;
 
-  case 24:
-#line 134 "grammar.y"
-                          { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_LessThan>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 14:
+#line 113 "grammar.y"
+                                             { (yyval.node) = (yyvsp[-1].body); }
 #line 1566 "grammar.c"
     break;
 
-  case 25:
-#line 135 "grammar.y"
-                                      { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_GreaterThanOrEqual>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 15:
+#line 115 "grammar.y"
+                                    { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Return>((yyvsp[-1].node))); }
 #line 1572 "grammar.c"
     break;
 
-  case 26:
-#line 136 "grammar.y"
-                                 { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_GreaterThan>((yyvsp[-2].node), (yyvsp[0].node))); }
+  case 16:
+#line 116 "grammar.y"
+                { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Empty>()); }
 #line 1578 "grammar.c"
     break;
 
-  case 27:
-#line 138 "grammar.y"
-                     { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_UnaryMinus>((yyvsp[0].node))); }
+  case 17:
+#line 119 "grammar.y"
+                                  { (yyval.body) = (yyvsp[0].body); (yyval.body)->AddStatement((yyvsp[-1].node)); }
 #line 1584 "grammar.c"
     break;
 
-  case 28:
-#line 139 "grammar.y"
-                  { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_BooleanNegate>((yyvsp[0].node))); }
+  case 18:
+#line 120 "grammar.y"
+             { (yyval.body) = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Body>()); }
 #line 1590 "grammar.c"
     break;
 
-  case 29:
-#line 141 "grammar.y"
-              { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Integer>((yyvsp[0].val))); }
+  case 19:
+#line 123 "grammar.y"
+                          { (yyval.actual) = (yyvsp[0].actual); (yyval.actual)->AddExpression((yyvsp[-1].node)); }
 #line 1596 "grammar.c"
     break;
 
-  case 30:
-#line 143 "grammar.y"
-                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Boolean>((yyvsp[0].val))); }
+  case 20:
+#line 126 "grammar.y"
+                                { (yyval.actual) = (yyvsp[0].actual); (yyval.actual)->AddExpression((yyvsp[-1].node)); }
 #line 1602 "grammar.c"
     break;
 
-  case 31:
-#line 144 "grammar.y"
-                    { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Boolean>((yyvsp[0].val))); }
+  case 21:
+#line 127 "grammar.y"
+             { (yyval.actual) = parser->ast.AddNode(std::make_unique<ASTNode_Actuals>()); }
 #line 1608 "grammar.c"
     break;
 
-  case 32:
-#line 147 "grammar.y"
-                                                                    { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Obj>((yyvsp[-1].actual), (yyvsp[-3].id))); }
+  case 22:
+#line 130 "grammar.y"
+                    { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Times>((yyvsp[-2].node), (yyvsp[0].node))); }
 #line 1614 "grammar.c"
     break;
 
+  case 23:
+#line 131 "grammar.y"
+                       { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Divide>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1620 "grammar.c"
+    break;
 
-#line 1618 "grammar.c"
+  case 24:
+#line 132 "grammar.y"
+                     { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Plus>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1626 "grammar.c"
+    break;
+
+  case 25:
+#line 133 "grammar.y"
+                      { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Minus>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1632 "grammar.c"
+    break;
+
+  case 26:
+#line 134 "grammar.y"
+                                              { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Parenthesis>((yyvsp[-1].node))); }
+#line 1638 "grammar.c"
+    break;
+
+  case 27:
+#line 135 "grammar.y"
+                    { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_And>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1644 "grammar.c"
+    break;
+
+  case 28:
+#line 136 "grammar.y"
+                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Or>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1650 "grammar.c"
+    break;
+
+  case 29:
+#line 137 "grammar.y"
+                           { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Equivalent>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1656 "grammar.c"
+    break;
+
+  case 30:
+#line 138 "grammar.y"
+                             { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_IsNotEqual>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1662 "grammar.c"
+    break;
+
+  case 31:
+#line 139 "grammar.y"
+                                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_LessThanOrEqual>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1668 "grammar.c"
+    break;
+
+  case 32:
+#line 140 "grammar.y"
+                          { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_LessThan>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1674 "grammar.c"
+    break;
+
+  case 33:
+#line 141 "grammar.y"
+                                      { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_GreaterThanOrEqual>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1680 "grammar.c"
+    break;
+
+  case 34:
+#line 142 "grammar.y"
+                             { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_GreaterThan>((yyvsp[-2].node), (yyvsp[0].node))); }
+#line 1686 "grammar.c"
+    break;
+
+  case 35:
+#line 144 "grammar.y"
+                 { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_UnaryMinus>((yyvsp[0].node))); }
+#line 1692 "grammar.c"
+    break;
+
+  case 36:
+#line 145 "grammar.y"
+                  { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_BooleanNegate>((yyvsp[0].node))); }
+#line 1698 "grammar.c"
+    break;
+
+  case 37:
+#line 147 "grammar.y"
+              { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Integer>((yyvsp[0].val))); }
+#line 1704 "grammar.c"
+    break;
+
+  case 38:
+#line 149 "grammar.y"
+                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Boolean>((yyvsp[0].val))); }
+#line 1710 "grammar.c"
+    break;
+
+  case 39:
+#line 150 "grammar.y"
+                    { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Boolean>((yyvsp[0].val))); }
+#line 1716 "grammar.c"
+    break;
+
+  case 40:
+#line 152 "grammar.y"
+                                                            { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Int>((yyvsp[-1].node))); }
+#line 1722 "grammar.c"
+    break;
+
+  case 41:
+#line 153 "grammar.y"
+                                                             { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Bool>((yyvsp[-1].node))); }
+#line 1728 "grammar.c"
+    break;
+
+  case 42:
+#line 154 "grammar.y"
+                                                             { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Void>((yyvsp[-1].node))); }
+#line 1734 "grammar.c"
+    break;
+
+  case 43:
+#line 156 "grammar.y"
+                                                                        { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_IntArray>((yyvsp[-1].node))); }
+#line 1740 "grammar.c"
+    break;
+
+  case 44:
+#line 157 "grammar.y"
+                                                                         { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_BoolArray>((yyvsp[-1].node))); }
+#line 1746 "grammar.c"
+    break;
+
+  case 45:
+#line 158 "grammar.y"
+                                                                         { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_VoidArray>((yyvsp[-1].node))); }
+#line 1752 "grammar.c"
+    break;
+
+  case 46:
+#line 160 "grammar.y"
+                                                                { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Obj>((yyvsp[-1].actual), (yyvsp[-3].id))); }
+#line 1758 "grammar.c"
+    break;
+
+  case 47:
+#line 161 "grammar.y"
+                                                   { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Custom>((yyvsp[-1].node), (yyvsp[-3].id))); }
+#line 1764 "grammar.c"
+    break;
+
+  case 48:
+#line 162 "grammar.y"
+                                                               { (yyval.node) = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_CustomArray>((yyvsp[-1].node), (yyvsp[-4].id))); }
+#line 1770 "grammar.c"
+    break;
+
+
+#line 1774 "grammar.c"
 
       default: break;
     }
@@ -1846,5 +2002,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 160 "grammar.y"
+#line 164 "grammar.y"
 

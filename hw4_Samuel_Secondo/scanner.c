@@ -905,7 +905,7 @@ YY_RULE_SETUP
 case 20:
 YY_RULE_SETUP
 #line 37 "scanner.lex"
-{ return OPEN_SQUARE; }
+{ return CLOSE_SQUARE; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP

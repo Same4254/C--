@@ -2,18 +2,13 @@ Terminals unused in grammar
 
     ASSIGN
     DOT
-    OPEN_SQUARE
-    CLOSE_SQUARE
-    OPEN_BRACE
-    CLOSE_BRACE
-    KEYWORD_WHILE
-    KEYWORD_IF
-    KEYWORD_ELSE
     KEYWORD_THIS
     KEYWORD_CLASS
     KEYWORD_EXTENDS
-    KEYWORD_RETURN
     UNKOWN
+
+
+State 116 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -29,76 +24,93 @@ Grammar
     7          | KEYWORD_BOOL SQUARE_PAIR ID SEMICOLON
     8          | KEYWORD_VOID SQUARE_PAIR ID SEMICOLON
     9          | ID SQUARE_PAIR ID SEMICOLON
+   10          | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement
+   11          | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement KEYWORD_ELSE statement
+   12          | KEYWORD_WHILE OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement
+   13          | OPEN_BRACE statement_klein CLOSE_BRACE
+   14          | KEYWORD_RETURN expr SEMICOLON
+   15          | SEMICOLON
 
-   10 actuals: expr actuals_optional
+   16 statement_klein: statement statement_klein
+   17                | %empty
 
-   11 actuals_optional: COMMA expr actuals_optional
-   12                 | %empty
+   18 actuals: expr actuals_optional
 
-   13 expr: expr TIMES expr
-   14     | expr DIVIDE expr
-   15     | expr PLUS expr
-   16     | expr MINUS expr
-   17     | OPEN_PARENTHESIS expr CLOSE_PARENTHESIS
-   18     | expr AND expr
-   19     | expr OR expr
-   20     | expr EQUIVALENT expr
-   21     | expr IS_NOT_EQUAL expr
-   22     | expr LESS_THAN_OR_EQUAL expr
-   23     | expr LESS_THAN expr
-   24     | expr GREATER_THAN_OR_EQUAL expr
-   25     | expr GREATER_THAN expr
-   26     | MINUS expr
-   27     | NEGATE expr
-   28     | INTEGER
-   29     | KEYWORD_TRUE
-   30     | KEYWORD_FALSE
-   31     | KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS
+   19 actuals_optional: COMMA expr actuals_optional
+   20                 | %empty
+
+   21 expr: expr TIMES expr
+   22     | expr DIVIDE expr
+   23     | expr PLUS expr
+   24     | expr MINUS expr
+   25     | OPEN_PARENTHESIS expr CLOSE_PARENTHESIS
+   26     | expr AND expr
+   27     | expr OR expr
+   28     | expr EQUIVALENT expr
+   29     | expr IS_NOT_EQUAL expr
+   30     | expr LESS_THAN_OR_EQUAL expr
+   31     | expr LESS_THAN expr
+   32     | expr GREATER_THAN_OR_EQUAL expr
+   33     | expr GREATER_THAN expr
+   34     | MINUS expr
+   35     | NEGATE expr
+   36     | INTEGER
+   37     | KEYWORD_TRUE
+   38     | KEYWORD_FALSE
+   39     | KEYWORD_NEW KEYWORD_INT OPEN_SQUARE expr CLOSE_SQUARE
+   40     | KEYWORD_NEW KEYWORD_BOOL OPEN_SQUARE expr CLOSE_SQUARE
+   41     | KEYWORD_NEW KEYWORD_VOID OPEN_SQUARE expr CLOSE_SQUARE
+   42     | KEYWORD_NEW KEYWORD_INT SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
+   43     | KEYWORD_NEW KEYWORD_BOOL SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
+   44     | KEYWORD_NEW KEYWORD_VOID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
+   45     | KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS
+   46     | KEYWORD_NEW ID OPEN_SQUARE expr CLOSE_SQUARE
+   47     | KEYWORD_NEW ID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256)
-    SEMICOLON (258) 1 2 3 4 5 6 7 8 9
-    COMMA (259) 11
-    ASSIGN (260)
-    LESS_THAN_OR_EQUAL (261) 22
-    GREATER_THAN_OR_EQUAL (262) 24
-    EQUIVALENT (263) 20
-    IS_NOT_EQUAL (264) 21
-    LESS_THAN (265) 23
-    GREATER_THAN (266) 25
-    OR (267) 19
-    AND (268) 18
-    MINUS (269) 16 26
-    PLUS (270) 15
-    DIVIDE (271) 14
-    TIMES (272) 13
-    NEGATE (273) 27
-    DOT (274)
-    OPEN_SQUARE (275)
-    CLOSE_SQUARE (276)
-    OPEN_PARENTHESIS (277) 17 31
-    CLOSE_PARENTHESIS (278) 17 31
-    OPEN_BRACE (279)
-    CLOSE_BRACE (280)
-    SQUARE_PAIR (281) 6 7 8 9
-    KEYWORD_WHILE (282)
-    KEYWORD_IF (283)
-    KEYWORD_ELSE (284)
-    KEYWORD_THIS (285)
-    KEYWORD_CLASS (286)
-    KEYWORD_EXTENDS (287)
-    KEYWORD_NEW (288) 31
-    KEYWORD_RETURN (289)
-    KEYWORD_INT (290) 2 6
-    KEYWORD_BOOL (291) 3 7
-    KEYWORD_VOID (292) 4 8
-    KEYWORD_TRUE <val> (293) 29
-    KEYWORD_FALSE <val> (294) 30
-    INTEGER <val> (295) 28
-    ID <id> (296) 2 3 4 5 6 7 8 9 31
+    SEMICOLON (258) 1 2 3 4 5 6 7 8 9 14 15
+    COMMA (259) 19
+    KEYWORD_NEW (260) 39 40 41 42 43 44 45 46 47
+    KEYWORD_RETURN (261) 14
+    OPEN_SQUARE (262) 39 40 41 42 43 44 46 47
+    CLOSE_SQUARE (263) 39 40 41 42 43 44 46 47
+    ASSIGN (264)
+    LESS_THAN_OR_EQUAL (265) 30
+    GREATER_THAN_OR_EQUAL (266) 32
+    EQUIVALENT (267) 28
+    IS_NOT_EQUAL (268) 29
+    LESS_THAN (269) 31
+    GREATER_THAN (270) 33
+    OR (271) 27
+    AND (272) 26
+    MINUS (273) 24 34
+    PLUS (274) 23
+    DIVIDE (275) 22
+    TIMES (276) 21
+    NEGATE (277) 35
+    DOT (278)
+    OPEN_PARENTHESIS (279) 10 11 12 25 45
+    CLOSE_PARENTHESIS (280) 10 11 12 25 45
+    OPEN_BRACE (281) 13
+    CLOSE_BRACE (282) 13
+    SQUARE_PAIR (283) 6 7 8 9 42 43 44 47
+    KEYWORD_WHILE (284) 12
+    KEYWORD_IF (285) 10 11
+    KEYWORD_ELSE (286) 11
+    KEYWORD_THIS (287)
+    KEYWORD_CLASS (288)
+    KEYWORD_EXTENDS (289)
+    KEYWORD_INT (290) 2 6 39 42
+    KEYWORD_BOOL (291) 3 7 40 43
+    KEYWORD_VOID (292) 4 8 41 44
+    KEYWORD_TRUE <val> (293) 37
+    KEYWORD_FALSE <val> (294) 38
+    INTEGER <val> (295) 36
+    ID <id> (296) 2 3 4 5 6 7 8 9 45 46 47
     UNKOWN (297)
 
 
@@ -107,1048 +119,1897 @@ Nonterminals, with rules where they appear
     $accept (43)
         on left: 0
     statement <node> (44)
-        on left: 1 2 3 4 5 6 7 8 9
-        on right: 0
-    actuals <actual> (45)
-        on left: 10
-        on right: 31
-    actuals_optional <actual> (46)
-        on left: 11 12
-        on right: 10 11
-    expr <node> (47)
-        on left: 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-        on right: 1 10 11 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
+        on left: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+        on right: 0 10 11 12 16
+    statement_klein <body> (45)
+        on left: 16 17
+        on right: 13 16
+    actuals <actual> (46)
+        on left: 18
+        on right: 45
+    actuals_optional <actual> (47)
+        on left: 19 20
+        on right: 18 19
+    expr <node> (48)
+        on left: 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+        on right: 1 10 11 12 14 18 19 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 39 40 41 42 43 44 46 47
 
 
 State 0
 
     0 $accept: . statement $end
 
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_INT       shift, and go to state 5
-    KEYWORD_BOOL      shift, and go to state 6
-    KEYWORD_VOID      shift, and go to state 7
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-    ID                shift, and go to state 11
+    SEMICOLON         shift, and go to state 1
+    KEYWORD_NEW       shift, and go to state 2
+    KEYWORD_RETURN    shift, and go to state 3
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    OPEN_BRACE        shift, and go to state 7
+    KEYWORD_WHILE     shift, and go to state 8
+    KEYWORD_IF        shift, and go to state 9
+    KEYWORD_INT       shift, and go to state 10
+    KEYWORD_BOOL      shift, and go to state 11
+    KEYWORD_VOID      shift, and go to state 12
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+    ID                shift, and go to state 16
 
-    statement  go to state 12
-    expr       go to state 13
+    statement  go to state 17
+    expr       go to state 18
 
 
 State 1
 
-   26 expr: MINUS . expr
+   15 statement: SEMICOLON .
 
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 14
+    $default  reduce using rule 15 (statement)
 
 
 State 2
 
-   27 expr: NEGATE . expr
+   39 expr: KEYWORD_NEW . KEYWORD_INT OPEN_SQUARE expr CLOSE_SQUARE
+   40     | KEYWORD_NEW . KEYWORD_BOOL OPEN_SQUARE expr CLOSE_SQUARE
+   41     | KEYWORD_NEW . KEYWORD_VOID OPEN_SQUARE expr CLOSE_SQUARE
+   42     | KEYWORD_NEW . KEYWORD_INT SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
+   43     | KEYWORD_NEW . KEYWORD_BOOL SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
+   44     | KEYWORD_NEW . KEYWORD_VOID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
+   45     | KEYWORD_NEW . ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS
+   46     | KEYWORD_NEW . ID OPEN_SQUARE expr CLOSE_SQUARE
+   47     | KEYWORD_NEW . ID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
 
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 15
+    KEYWORD_INT   shift, and go to state 19
+    KEYWORD_BOOL  shift, and go to state 20
+    KEYWORD_VOID  shift, and go to state 21
+    ID            shift, and go to state 22
 
 
 State 3
 
-   17 expr: OPEN_PARENTHESIS . expr CLOSE_PARENTHESIS
+   14 statement: KEYWORD_RETURN . expr SEMICOLON
 
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
 
-    expr  go to state 16
+    expr  go to state 23
 
 
 State 4
 
-   31 expr: KEYWORD_NEW . ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS
+   34 expr: MINUS . expr
 
-    ID  shift, and go to state 17
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 24
 
 
 State 5
 
-    2 statement: KEYWORD_INT . ID SEMICOLON
-    6          | KEYWORD_INT . SQUARE_PAIR ID SEMICOLON
+   35 expr: NEGATE . expr
 
-    SQUARE_PAIR  shift, and go to state 18
-    ID           shift, and go to state 19
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 25
 
 
 State 6
 
-    3 statement: KEYWORD_BOOL . ID SEMICOLON
-    7          | KEYWORD_BOOL . SQUARE_PAIR ID SEMICOLON
+   25 expr: OPEN_PARENTHESIS . expr CLOSE_PARENTHESIS
 
-    SQUARE_PAIR  shift, and go to state 20
-    ID           shift, and go to state 21
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 26
 
 
 State 7
 
-    4 statement: KEYWORD_VOID . ID SEMICOLON
-    8          | KEYWORD_VOID . SQUARE_PAIR ID SEMICOLON
+   13 statement: OPEN_BRACE . statement_klein CLOSE_BRACE
 
-    SQUARE_PAIR  shift, and go to state 22
-    ID           shift, and go to state 23
+    SEMICOLON         shift, and go to state 1
+    KEYWORD_NEW       shift, and go to state 2
+    KEYWORD_RETURN    shift, and go to state 3
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    OPEN_BRACE        shift, and go to state 7
+    KEYWORD_WHILE     shift, and go to state 8
+    KEYWORD_IF        shift, and go to state 9
+    KEYWORD_INT       shift, and go to state 10
+    KEYWORD_BOOL      shift, and go to state 11
+    KEYWORD_VOID      shift, and go to state 12
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+    ID                shift, and go to state 16
+
+    $default  reduce using rule 17 (statement_klein)
+
+    statement        go to state 27
+    statement_klein  go to state 28
+    expr             go to state 18
 
 
 State 8
 
-   29 expr: KEYWORD_TRUE .
+   12 statement: KEYWORD_WHILE . OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement
 
-    $default  reduce using rule 29 (expr)
+    OPEN_PARENTHESIS  shift, and go to state 29
 
 
 State 9
 
-   30 expr: KEYWORD_FALSE .
+   10 statement: KEYWORD_IF . OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement
+   11          | KEYWORD_IF . OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement KEYWORD_ELSE statement
 
-    $default  reduce using rule 30 (expr)
+    OPEN_PARENTHESIS  shift, and go to state 30
 
 
 State 10
 
-   28 expr: INTEGER .
+    2 statement: KEYWORD_INT . ID SEMICOLON
+    6          | KEYWORD_INT . SQUARE_PAIR ID SEMICOLON
 
-    $default  reduce using rule 28 (expr)
+    SQUARE_PAIR  shift, and go to state 31
+    ID           shift, and go to state 32
 
 
 State 11
 
-    5 statement: ID . ID SEMICOLON
-    9          | ID . SQUARE_PAIR ID SEMICOLON
+    3 statement: KEYWORD_BOOL . ID SEMICOLON
+    7          | KEYWORD_BOOL . SQUARE_PAIR ID SEMICOLON
 
-    SQUARE_PAIR  shift, and go to state 24
-    ID           shift, and go to state 25
+    SQUARE_PAIR  shift, and go to state 33
+    ID           shift, and go to state 34
 
 
 State 12
 
-    0 $accept: statement . $end
+    4 statement: KEYWORD_VOID . ID SEMICOLON
+    8          | KEYWORD_VOID . SQUARE_PAIR ID SEMICOLON
 
-    $end  shift, and go to state 26
+    SQUARE_PAIR  shift, and go to state 35
+    ID           shift, and go to state 36
 
 
 State 13
 
-    1 statement: expr . SEMICOLON
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
+   37 expr: KEYWORD_TRUE .
 
-    SEMICOLON              shift, and go to state 27
-    LESS_THAN_OR_EQUAL     shift, and go to state 28
-    GREATER_THAN_OR_EQUAL  shift, and go to state 29
-    EQUIVALENT             shift, and go to state 30
-    IS_NOT_EQUAL           shift, and go to state 31
-    LESS_THAN              shift, and go to state 32
-    GREATER_THAN           shift, and go to state 33
-    OR                     shift, and go to state 34
-    AND                    shift, and go to state 35
-    MINUS                  shift, and go to state 36
-    PLUS                   shift, and go to state 37
-    DIVIDE                 shift, and go to state 38
-    TIMES                  shift, and go to state 39
+    $default  reduce using rule 37 (expr)
 
 
 State 14
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-   26     | MINUS expr .
+   38 expr: KEYWORD_FALSE .
 
-    PLUS    shift, and go to state 37
-    DIVIDE  shift, and go to state 38
-    TIMES   shift, and go to state 39
-
-    $default  reduce using rule 26 (expr)
+    $default  reduce using rule 38 (expr)
 
 
 State 15
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-   27     | NEGATE expr .
+   36 expr: INTEGER .
 
-    $default  reduce using rule 27 (expr)
+    $default  reduce using rule 36 (expr)
 
 
 State 16
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   17     | OPEN_PARENTHESIS expr . CLOSE_PARENTHESIS
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
+    5 statement: ID . ID SEMICOLON
+    9          | ID . SQUARE_PAIR ID SEMICOLON
 
-    LESS_THAN_OR_EQUAL     shift, and go to state 28
-    GREATER_THAN_OR_EQUAL  shift, and go to state 29
-    EQUIVALENT             shift, and go to state 30
-    IS_NOT_EQUAL           shift, and go to state 31
-    LESS_THAN              shift, and go to state 32
-    GREATER_THAN           shift, and go to state 33
-    OR                     shift, and go to state 34
-    AND                    shift, and go to state 35
-    MINUS                  shift, and go to state 36
-    PLUS                   shift, and go to state 37
-    DIVIDE                 shift, and go to state 38
-    TIMES                  shift, and go to state 39
-    CLOSE_PARENTHESIS      shift, and go to state 40
+    SQUARE_PAIR  shift, and go to state 37
+    ID           shift, and go to state 38
 
 
 State 17
 
-   31 expr: KEYWORD_NEW ID . OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS
+    0 $accept: statement . $end
 
-    OPEN_PARENTHESIS  shift, and go to state 41
+    $end  shift, and go to state 39
 
 
 State 18
 
-    6 statement: KEYWORD_INT SQUARE_PAIR . ID SEMICOLON
+    1 statement: expr . SEMICOLON
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
 
-    ID  shift, and go to state 42
+    SEMICOLON              shift, and go to state 40
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
 
 
 State 19
 
-    2 statement: KEYWORD_INT ID . SEMICOLON
+   39 expr: KEYWORD_NEW KEYWORD_INT . OPEN_SQUARE expr CLOSE_SQUARE
+   42     | KEYWORD_NEW KEYWORD_INT . SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
 
-    SEMICOLON  shift, and go to state 43
+    OPEN_SQUARE  shift, and go to state 53
+    SQUARE_PAIR  shift, and go to state 54
 
 
 State 20
 
-    7 statement: KEYWORD_BOOL SQUARE_PAIR . ID SEMICOLON
+   40 expr: KEYWORD_NEW KEYWORD_BOOL . OPEN_SQUARE expr CLOSE_SQUARE
+   43     | KEYWORD_NEW KEYWORD_BOOL . SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
 
-    ID  shift, and go to state 44
+    OPEN_SQUARE  shift, and go to state 55
+    SQUARE_PAIR  shift, and go to state 56
 
 
 State 21
 
-    3 statement: KEYWORD_BOOL ID . SEMICOLON
+   41 expr: KEYWORD_NEW KEYWORD_VOID . OPEN_SQUARE expr CLOSE_SQUARE
+   44     | KEYWORD_NEW KEYWORD_VOID . SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
 
-    SEMICOLON  shift, and go to state 45
+    OPEN_SQUARE  shift, and go to state 57
+    SQUARE_PAIR  shift, and go to state 58
 
 
 State 22
 
-    8 statement: KEYWORD_VOID SQUARE_PAIR . ID SEMICOLON
+   45 expr: KEYWORD_NEW ID . OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS
+   46     | KEYWORD_NEW ID . OPEN_SQUARE expr CLOSE_SQUARE
+   47     | KEYWORD_NEW ID . SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE
 
-    ID  shift, and go to state 46
+    OPEN_SQUARE       shift, and go to state 59
+    OPEN_PARENTHESIS  shift, and go to state 60
+    SQUARE_PAIR       shift, and go to state 61
 
 
 State 23
 
-    4 statement: KEYWORD_VOID ID . SEMICOLON
+   14 statement: KEYWORD_RETURN expr . SEMICOLON
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
 
-    SEMICOLON  shift, and go to state 47
+    SEMICOLON              shift, and go to state 62
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
 
 
 State 24
 
-    9 statement: ID SQUARE_PAIR . ID SEMICOLON
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   34     | MINUS expr .
 
-    ID  shift, and go to state 48
+    PLUS    shift, and go to state 50
+    DIVIDE  shift, and go to state 51
+    TIMES   shift, and go to state 52
+
+    $default  reduce using rule 34 (expr)
 
 
 State 25
 
-    5 statement: ID ID . SEMICOLON
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   35     | NEGATE expr .
 
-    SEMICOLON  shift, and go to state 49
+    $default  reduce using rule 35 (expr)
 
 
 State 26
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   25     | OPEN_PARENTHESIS expr . CLOSE_PARENTHESIS
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+    CLOSE_PARENTHESIS      shift, and go to state 63
+
+
+State 27
+
+   16 statement_klein: statement . statement_klein
+
+    SEMICOLON         shift, and go to state 1
+    KEYWORD_NEW       shift, and go to state 2
+    KEYWORD_RETURN    shift, and go to state 3
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    OPEN_BRACE        shift, and go to state 7
+    KEYWORD_WHILE     shift, and go to state 8
+    KEYWORD_IF        shift, and go to state 9
+    KEYWORD_INT       shift, and go to state 10
+    KEYWORD_BOOL      shift, and go to state 11
+    KEYWORD_VOID      shift, and go to state 12
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+    ID                shift, and go to state 16
+
+    $default  reduce using rule 17 (statement_klein)
+
+    statement        go to state 27
+    statement_klein  go to state 64
+    expr             go to state 18
+
+
+State 28
+
+   13 statement: OPEN_BRACE statement_klein . CLOSE_BRACE
+
+    CLOSE_BRACE  shift, and go to state 65
+
+
+State 29
+
+   12 statement: KEYWORD_WHILE OPEN_PARENTHESIS . expr CLOSE_PARENTHESIS statement
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 66
+
+
+State 30
+
+   10 statement: KEYWORD_IF OPEN_PARENTHESIS . expr CLOSE_PARENTHESIS statement
+   11          | KEYWORD_IF OPEN_PARENTHESIS . expr CLOSE_PARENTHESIS statement KEYWORD_ELSE statement
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 67
+
+
+State 31
+
+    6 statement: KEYWORD_INT SQUARE_PAIR . ID SEMICOLON
+
+    ID  shift, and go to state 68
+
+
+State 32
+
+    2 statement: KEYWORD_INT ID . SEMICOLON
+
+    SEMICOLON  shift, and go to state 69
+
+
+State 33
+
+    7 statement: KEYWORD_BOOL SQUARE_PAIR . ID SEMICOLON
+
+    ID  shift, and go to state 70
+
+
+State 34
+
+    3 statement: KEYWORD_BOOL ID . SEMICOLON
+
+    SEMICOLON  shift, and go to state 71
+
+
+State 35
+
+    8 statement: KEYWORD_VOID SQUARE_PAIR . ID SEMICOLON
+
+    ID  shift, and go to state 72
+
+
+State 36
+
+    4 statement: KEYWORD_VOID ID . SEMICOLON
+
+    SEMICOLON  shift, and go to state 73
+
+
+State 37
+
+    9 statement: ID SQUARE_PAIR . ID SEMICOLON
+
+    ID  shift, and go to state 74
+
+
+State 38
+
+    5 statement: ID ID . SEMICOLON
+
+    SEMICOLON  shift, and go to state 75
+
+
+State 39
 
     0 $accept: statement $end .
 
     $default  accept
 
 
-State 27
+State 40
 
     1 statement: expr SEMICOLON .
 
     $default  reduce using rule 1 (statement)
 
 
-State 28
-
-   22 expr: expr LESS_THAN_OR_EQUAL . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 50
-
-
-State 29
-
-   24 expr: expr GREATER_THAN_OR_EQUAL . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 51
-
-
-State 30
-
-   20 expr: expr EQUIVALENT . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 52
-
-
-State 31
-
-   21 expr: expr IS_NOT_EQUAL . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 53
-
-
-State 32
-
-   23 expr: expr LESS_THAN . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 54
-
-
-State 33
-
-   25 expr: expr GREATER_THAN . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 55
-
-
-State 34
-
-   19 expr: expr OR . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 56
-
-
-State 35
-
-   18 expr: expr AND . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 57
-
-
-State 36
-
-   16 expr: expr MINUS . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 58
-
-
-State 37
-
-   15 expr: expr PLUS . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 59
-
-
-State 38
-
-   14 expr: expr DIVIDE . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 60
-
-
-State 39
-
-   13 expr: expr TIMES . expr
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 61
-
-
-State 40
-
-   17 expr: OPEN_PARENTHESIS expr CLOSE_PARENTHESIS .
-
-    $default  reduce using rule 17 (expr)
-
-
 State 41
 
-   31 expr: KEYWORD_NEW ID OPEN_PARENTHESIS . actuals CLOSE_PARENTHESIS
+   30 expr: expr LESS_THAN_OR_EQUAL . expr
 
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
 
-    actuals  go to state 62
-    expr     go to state 63
+    expr  go to state 76
 
 
 State 42
 
-    6 statement: KEYWORD_INT SQUARE_PAIR ID . SEMICOLON
+   32 expr: expr GREATER_THAN_OR_EQUAL . expr
 
-    SEMICOLON  shift, and go to state 64
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 77
 
 
 State 43
+
+   28 expr: expr EQUIVALENT . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 78
+
+
+State 44
+
+   29 expr: expr IS_NOT_EQUAL . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 79
+
+
+State 45
+
+   31 expr: expr LESS_THAN . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 80
+
+
+State 46
+
+   33 expr: expr GREATER_THAN . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 81
+
+
+State 47
+
+   27 expr: expr OR . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 82
+
+
+State 48
+
+   26 expr: expr AND . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 83
+
+
+State 49
+
+   24 expr: expr MINUS . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 84
+
+
+State 50
+
+   23 expr: expr PLUS . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 85
+
+
+State 51
+
+   22 expr: expr DIVIDE . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 86
+
+
+State 52
+
+   21 expr: expr TIMES . expr
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 87
+
+
+State 53
+
+   39 expr: KEYWORD_NEW KEYWORD_INT OPEN_SQUARE . expr CLOSE_SQUARE
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 88
+
+
+State 54
+
+   42 expr: KEYWORD_NEW KEYWORD_INT SQUARE_PAIR . OPEN_SQUARE expr CLOSE_SQUARE
+
+    OPEN_SQUARE  shift, and go to state 89
+
+
+State 55
+
+   40 expr: KEYWORD_NEW KEYWORD_BOOL OPEN_SQUARE . expr CLOSE_SQUARE
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 90
+
+
+State 56
+
+   43 expr: KEYWORD_NEW KEYWORD_BOOL SQUARE_PAIR . OPEN_SQUARE expr CLOSE_SQUARE
+
+    OPEN_SQUARE  shift, and go to state 91
+
+
+State 57
+
+   41 expr: KEYWORD_NEW KEYWORD_VOID OPEN_SQUARE . expr CLOSE_SQUARE
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 92
+
+
+State 58
+
+   44 expr: KEYWORD_NEW KEYWORD_VOID SQUARE_PAIR . OPEN_SQUARE expr CLOSE_SQUARE
+
+    OPEN_SQUARE  shift, and go to state 93
+
+
+State 59
+
+   46 expr: KEYWORD_NEW ID OPEN_SQUARE . expr CLOSE_SQUARE
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 94
+
+
+State 60
+
+   45 expr: KEYWORD_NEW ID OPEN_PARENTHESIS . actuals CLOSE_PARENTHESIS
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    actuals  go to state 95
+    expr     go to state 96
+
+
+State 61
+
+   47 expr: KEYWORD_NEW ID SQUARE_PAIR . OPEN_SQUARE expr CLOSE_SQUARE
+
+    OPEN_SQUARE  shift, and go to state 97
+
+
+State 62
+
+   14 statement: KEYWORD_RETURN expr SEMICOLON .
+
+    $default  reduce using rule 14 (statement)
+
+
+State 63
+
+   25 expr: OPEN_PARENTHESIS expr CLOSE_PARENTHESIS .
+
+    $default  reduce using rule 25 (expr)
+
+
+State 64
+
+   16 statement_klein: statement statement_klein .
+
+    $default  reduce using rule 16 (statement_klein)
+
+
+State 65
+
+   13 statement: OPEN_BRACE statement_klein CLOSE_BRACE .
+
+    $default  reduce using rule 13 (statement)
+
+
+State 66
+
+   12 statement: KEYWORD_WHILE OPEN_PARENTHESIS expr . CLOSE_PARENTHESIS statement
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+    CLOSE_PARENTHESIS      shift, and go to state 98
+
+
+State 67
+
+   10 statement: KEYWORD_IF OPEN_PARENTHESIS expr . CLOSE_PARENTHESIS statement
+   11          | KEYWORD_IF OPEN_PARENTHESIS expr . CLOSE_PARENTHESIS statement KEYWORD_ELSE statement
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+    CLOSE_PARENTHESIS      shift, and go to state 99
+
+
+State 68
+
+    6 statement: KEYWORD_INT SQUARE_PAIR ID . SEMICOLON
+
+    SEMICOLON  shift, and go to state 100
+
+
+State 69
 
     2 statement: KEYWORD_INT ID SEMICOLON .
 
     $default  reduce using rule 2 (statement)
 
 
-State 44
+State 70
 
     7 statement: KEYWORD_BOOL SQUARE_PAIR ID . SEMICOLON
 
-    SEMICOLON  shift, and go to state 65
+    SEMICOLON  shift, and go to state 101
 
 
-State 45
+State 71
 
     3 statement: KEYWORD_BOOL ID SEMICOLON .
 
     $default  reduce using rule 3 (statement)
 
 
-State 46
+State 72
 
     8 statement: KEYWORD_VOID SQUARE_PAIR ID . SEMICOLON
 
-    SEMICOLON  shift, and go to state 66
+    SEMICOLON  shift, and go to state 102
 
 
-State 47
+State 73
 
     4 statement: KEYWORD_VOID ID SEMICOLON .
 
     $default  reduce using rule 4 (statement)
 
 
-State 48
+State 74
 
     9 statement: ID SQUARE_PAIR ID . SEMICOLON
 
-    SEMICOLON  shift, and go to state 67
+    SEMICOLON  shift, and go to state 103
 
 
-State 49
+State 75
 
     5 statement: ID ID SEMICOLON .
 
     $default  reduce using rule 5 (statement)
 
 
-State 50
+State 76
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   22     | expr LESS_THAN_OR_EQUAL expr .
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   30     | expr LESS_THAN_OR_EQUAL expr .
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
 
-    GREATER_THAN_OR_EQUAL  shift, and go to state 29
-    EQUIVALENT             shift, and go to state 30
-    IS_NOT_EQUAL           shift, and go to state 31
-    LESS_THAN              shift, and go to state 32
-    GREATER_THAN           shift, and go to state 33
-    OR                     shift, and go to state 34
-    AND                    shift, and go to state 35
-    MINUS                  shift, and go to state 36
-    PLUS                   shift, and go to state 37
-    DIVIDE                 shift, and go to state 38
-    TIMES                  shift, and go to state 39
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
 
     LESS_THAN_OR_EQUAL  error (nonassociative)
 
-    $default  reduce using rule 22 (expr)
+    $default  reduce using rule 30 (expr)
 
 
-State 51
+State 77
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   24     | expr GREATER_THAN_OR_EQUAL expr .
-   25     | expr . GREATER_THAN expr
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   32     | expr GREATER_THAN_OR_EQUAL expr .
+   33     | expr . GREATER_THAN expr
 
-    EQUIVALENT    shift, and go to state 30
-    IS_NOT_EQUAL  shift, and go to state 31
-    LESS_THAN     shift, and go to state 32
-    GREATER_THAN  shift, and go to state 33
-    OR            shift, and go to state 34
-    AND           shift, and go to state 35
-    MINUS         shift, and go to state 36
-    PLUS          shift, and go to state 37
-    DIVIDE        shift, and go to state 38
-    TIMES         shift, and go to state 39
+    EQUIVALENT    shift, and go to state 43
+    IS_NOT_EQUAL  shift, and go to state 44
+    LESS_THAN     shift, and go to state 45
+    GREATER_THAN  shift, and go to state 46
+    OR            shift, and go to state 47
+    AND           shift, and go to state 48
+    MINUS         shift, and go to state 49
+    PLUS          shift, and go to state 50
+    DIVIDE        shift, and go to state 51
+    TIMES         shift, and go to state 52
 
     GREATER_THAN_OR_EQUAL  error (nonassociative)
+
+    $default  reduce using rule 32 (expr)
+
+
+State 78
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   28     | expr EQUIVALENT expr .
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    IS_NOT_EQUAL  shift, and go to state 44
+    LESS_THAN     shift, and go to state 45
+    GREATER_THAN  shift, and go to state 46
+    OR            shift, and go to state 47
+    AND           shift, and go to state 48
+    MINUS         shift, and go to state 49
+    PLUS          shift, and go to state 50
+    DIVIDE        shift, and go to state 51
+    TIMES         shift, and go to state 52
+
+    EQUIVALENT  error (nonassociative)
+
+    $default  reduce using rule 28 (expr)
+
+
+State 79
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   29     | expr IS_NOT_EQUAL expr .
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    LESS_THAN     shift, and go to state 45
+    GREATER_THAN  shift, and go to state 46
+    OR            shift, and go to state 47
+    AND           shift, and go to state 48
+    MINUS         shift, and go to state 49
+    PLUS          shift, and go to state 50
+    DIVIDE        shift, and go to state 51
+    TIMES         shift, and go to state 52
+
+    IS_NOT_EQUAL  error (nonassociative)
+
+    $default  reduce using rule 29 (expr)
+
+
+State 80
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   31     | expr LESS_THAN expr .
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    GREATER_THAN  shift, and go to state 46
+    OR            shift, and go to state 47
+    AND           shift, and go to state 48
+    MINUS         shift, and go to state 49
+    PLUS          shift, and go to state 50
+    DIVIDE        shift, and go to state 51
+    TIMES         shift, and go to state 52
+
+    LESS_THAN  error (nonassociative)
+
+    $default  reduce using rule 31 (expr)
+
+
+State 81
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   33     | expr GREATER_THAN expr .
+
+    OR      shift, and go to state 47
+    AND     shift, and go to state 48
+    MINUS   shift, and go to state 49
+    PLUS    shift, and go to state 50
+    DIVIDE  shift, and go to state 51
+    TIMES   shift, and go to state 52
+
+    GREATER_THAN  error (nonassociative)
+
+    $default  reduce using rule 33 (expr)
+
+
+State 82
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   27     | expr OR expr .
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    AND     shift, and go to state 48
+    MINUS   shift, and go to state 49
+    PLUS    shift, and go to state 50
+    DIVIDE  shift, and go to state 51
+    TIMES   shift, and go to state 52
+
+    $default  reduce using rule 27 (expr)
+
+
+State 83
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   26     | expr AND expr .
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    MINUS   shift, and go to state 49
+    PLUS    shift, and go to state 50
+    DIVIDE  shift, and go to state 51
+    TIMES   shift, and go to state 52
+
+    $default  reduce using rule 26 (expr)
+
+
+State 84
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   24     | expr MINUS expr .
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    PLUS    shift, and go to state 50
+    DIVIDE  shift, and go to state 51
+    TIMES   shift, and go to state 52
 
     $default  reduce using rule 24 (expr)
 
 
-State 52
+State 85
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   20     | expr EQUIVALENT expr .
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   23     | expr PLUS expr .
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
 
-    IS_NOT_EQUAL  shift, and go to state 31
-    LESS_THAN     shift, and go to state 32
-    GREATER_THAN  shift, and go to state 33
-    OR            shift, and go to state 34
-    AND           shift, and go to state 35
-    MINUS         shift, and go to state 36
-    PLUS          shift, and go to state 37
-    DIVIDE        shift, and go to state 38
-    TIMES         shift, and go to state 39
-
-    EQUIVALENT  error (nonassociative)
-
-    $default  reduce using rule 20 (expr)
-
-
-State 53
-
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   21     | expr IS_NOT_EQUAL expr .
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-
-    LESS_THAN     shift, and go to state 32
-    GREATER_THAN  shift, and go to state 33
-    OR            shift, and go to state 34
-    AND           shift, and go to state 35
-    MINUS         shift, and go to state 36
-    PLUS          shift, and go to state 37
-    DIVIDE        shift, and go to state 38
-    TIMES         shift, and go to state 39
-
-    IS_NOT_EQUAL  error (nonassociative)
-
-    $default  reduce using rule 21 (expr)
-
-
-State 54
-
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   23     | expr LESS_THAN expr .
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-
-    GREATER_THAN  shift, and go to state 33
-    OR            shift, and go to state 34
-    AND           shift, and go to state 35
-    MINUS         shift, and go to state 36
-    PLUS          shift, and go to state 37
-    DIVIDE        shift, and go to state 38
-    TIMES         shift, and go to state 39
-
-    LESS_THAN  error (nonassociative)
+    DIVIDE  shift, and go to state 51
+    TIMES   shift, and go to state 52
 
     $default  reduce using rule 23 (expr)
 
 
-State 55
+State 86
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-   25     | expr GREATER_THAN expr .
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   22     | expr DIVIDE expr .
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
 
-    OR      shift, and go to state 34
-    AND     shift, and go to state 35
-    MINUS   shift, and go to state 36
-    PLUS    shift, and go to state 37
-    DIVIDE  shift, and go to state 38
-    TIMES   shift, and go to state 39
+    TIMES  shift, and go to state 52
 
-    GREATER_THAN  error (nonassociative)
-
-    $default  reduce using rule 25 (expr)
+    $default  reduce using rule 22 (expr)
 
 
-State 56
+State 87
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   19     | expr OR expr .
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
+   21 expr: expr . TIMES expr
+   21     | expr TIMES expr .
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
 
-    AND     shift, and go to state 35
-    MINUS   shift, and go to state 36
-    PLUS    shift, and go to state 37
-    DIVIDE  shift, and go to state 38
-    TIMES   shift, and go to state 39
-
-    $default  reduce using rule 19 (expr)
+    $default  reduce using rule 21 (expr)
 
 
-State 57
+State 88
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   18     | expr AND expr .
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   39     | KEYWORD_NEW KEYWORD_INT OPEN_SQUARE expr . CLOSE_SQUARE
 
-    MINUS   shift, and go to state 36
-    PLUS    shift, and go to state 37
-    DIVIDE  shift, and go to state 38
-    TIMES   shift, and go to state 39
-
-    $default  reduce using rule 18 (expr)
-
-
-State 58
-
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   16     | expr MINUS expr .
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-
-    PLUS    shift, and go to state 37
-    DIVIDE  shift, and go to state 38
-    TIMES   shift, and go to state 39
-
-    $default  reduce using rule 16 (expr)
+    CLOSE_SQUARE           shift, and go to state 104
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
 
 
-State 59
+State 89
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   15     | expr PLUS expr .
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
+   42 expr: KEYWORD_NEW KEYWORD_INT SQUARE_PAIR OPEN_SQUARE . expr CLOSE_SQUARE
 
-    DIVIDE  shift, and go to state 38
-    TIMES   shift, and go to state 39
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
 
-    $default  reduce using rule 15 (expr)
+    expr  go to state 105
 
 
-State 60
+State 90
 
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   14     | expr DIVIDE expr .
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   40     | KEYWORD_NEW KEYWORD_BOOL OPEN_SQUARE expr . CLOSE_SQUARE
 
-    TIMES  shift, and go to state 39
-
-    $default  reduce using rule 14 (expr)
-
-
-State 61
-
-   13 expr: expr . TIMES expr
-   13     | expr TIMES expr .
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-
-    $default  reduce using rule 13 (expr)
+    CLOSE_SQUARE           shift, and go to state 106
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
 
 
-State 62
+State 91
 
-   31 expr: KEYWORD_NEW ID OPEN_PARENTHESIS actuals . CLOSE_PARENTHESIS
+   43 expr: KEYWORD_NEW KEYWORD_BOOL SQUARE_PAIR OPEN_SQUARE . expr CLOSE_SQUARE
 
-    CLOSE_PARENTHESIS  shift, and go to state 68
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
 
-
-State 63
-
-   10 actuals: expr . actuals_optional
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-
-    COMMA                  shift, and go to state 69
-    LESS_THAN_OR_EQUAL     shift, and go to state 28
-    GREATER_THAN_OR_EQUAL  shift, and go to state 29
-    EQUIVALENT             shift, and go to state 30
-    IS_NOT_EQUAL           shift, and go to state 31
-    LESS_THAN              shift, and go to state 32
-    GREATER_THAN           shift, and go to state 33
-    OR                     shift, and go to state 34
-    AND                    shift, and go to state 35
-    MINUS                  shift, and go to state 36
-    PLUS                   shift, and go to state 37
-    DIVIDE                 shift, and go to state 38
-    TIMES                  shift, and go to state 39
-
-    $default  reduce using rule 12 (actuals_optional)
-
-    actuals_optional  go to state 70
+    expr  go to state 107
 
 
-State 64
+State 92
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   41     | KEYWORD_NEW KEYWORD_VOID OPEN_SQUARE expr . CLOSE_SQUARE
+
+    CLOSE_SQUARE           shift, and go to state 108
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+
+
+State 93
+
+   44 expr: KEYWORD_NEW KEYWORD_VOID SQUARE_PAIR OPEN_SQUARE . expr CLOSE_SQUARE
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 109
+
+
+State 94
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   46     | KEYWORD_NEW ID OPEN_SQUARE expr . CLOSE_SQUARE
+
+    CLOSE_SQUARE           shift, and go to state 110
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+
+
+State 95
+
+   45 expr: KEYWORD_NEW ID OPEN_PARENTHESIS actuals . CLOSE_PARENTHESIS
+
+    CLOSE_PARENTHESIS  shift, and go to state 111
+
+
+State 96
+
+   18 actuals: expr . actuals_optional
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    COMMA                  shift, and go to state 112
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+
+    $default  reduce using rule 20 (actuals_optional)
+
+    actuals_optional  go to state 113
+
+
+State 97
+
+   47 expr: KEYWORD_NEW ID SQUARE_PAIR OPEN_SQUARE . expr CLOSE_SQUARE
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 114
+
+
+State 98
+
+   12 statement: KEYWORD_WHILE OPEN_PARENTHESIS expr CLOSE_PARENTHESIS . statement
+
+    SEMICOLON         shift, and go to state 1
+    KEYWORD_NEW       shift, and go to state 2
+    KEYWORD_RETURN    shift, and go to state 3
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    OPEN_BRACE        shift, and go to state 7
+    KEYWORD_WHILE     shift, and go to state 8
+    KEYWORD_IF        shift, and go to state 9
+    KEYWORD_INT       shift, and go to state 10
+    KEYWORD_BOOL      shift, and go to state 11
+    KEYWORD_VOID      shift, and go to state 12
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+    ID                shift, and go to state 16
+
+    statement  go to state 115
+    expr       go to state 18
+
+
+State 99
+
+   10 statement: KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS . statement
+   11          | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS . statement KEYWORD_ELSE statement
+
+    SEMICOLON         shift, and go to state 1
+    KEYWORD_NEW       shift, and go to state 2
+    KEYWORD_RETURN    shift, and go to state 3
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    OPEN_BRACE        shift, and go to state 7
+    KEYWORD_WHILE     shift, and go to state 8
+    KEYWORD_IF        shift, and go to state 9
+    KEYWORD_INT       shift, and go to state 10
+    KEYWORD_BOOL      shift, and go to state 11
+    KEYWORD_VOID      shift, and go to state 12
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+    ID                shift, and go to state 16
+
+    statement  go to state 116
+    expr       go to state 18
+
+
+State 100
 
     6 statement: KEYWORD_INT SQUARE_PAIR ID SEMICOLON .
 
     $default  reduce using rule 6 (statement)
 
 
-State 65
+State 101
 
     7 statement: KEYWORD_BOOL SQUARE_PAIR ID SEMICOLON .
 
     $default  reduce using rule 7 (statement)
 
 
-State 66
+State 102
 
     8 statement: KEYWORD_VOID SQUARE_PAIR ID SEMICOLON .
 
     $default  reduce using rule 8 (statement)
 
 
-State 67
+State 103
 
     9 statement: ID SQUARE_PAIR ID SEMICOLON .
 
     $default  reduce using rule 9 (statement)
 
 
-State 68
+State 104
 
-   31 expr: KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS .
+   39 expr: KEYWORD_NEW KEYWORD_INT OPEN_SQUARE expr CLOSE_SQUARE .
 
-    $default  reduce using rule 31 (expr)
-
-
-State 69
-
-   11 actuals_optional: COMMA . expr actuals_optional
-
-    MINUS             shift, and go to state 1
-    NEGATE            shift, and go to state 2
-    OPEN_PARENTHESIS  shift, and go to state 3
-    KEYWORD_NEW       shift, and go to state 4
-    KEYWORD_TRUE      shift, and go to state 8
-    KEYWORD_FALSE     shift, and go to state 9
-    INTEGER           shift, and go to state 10
-
-    expr  go to state 71
+    $default  reduce using rule 39 (expr)
 
 
-State 70
+State 105
 
-   10 actuals: expr actuals_optional .
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   42     | KEYWORD_NEW KEYWORD_INT SQUARE_PAIR OPEN_SQUARE expr . CLOSE_SQUARE
 
-    $default  reduce using rule 10 (actuals)
-
-
-State 71
-
-   11 actuals_optional: COMMA expr . actuals_optional
-   13 expr: expr . TIMES expr
-   14     | expr . DIVIDE expr
-   15     | expr . PLUS expr
-   16     | expr . MINUS expr
-   18     | expr . AND expr
-   19     | expr . OR expr
-   20     | expr . EQUIVALENT expr
-   21     | expr . IS_NOT_EQUAL expr
-   22     | expr . LESS_THAN_OR_EQUAL expr
-   23     | expr . LESS_THAN expr
-   24     | expr . GREATER_THAN_OR_EQUAL expr
-   25     | expr . GREATER_THAN expr
-
-    COMMA                  shift, and go to state 69
-    LESS_THAN_OR_EQUAL     shift, and go to state 28
-    GREATER_THAN_OR_EQUAL  shift, and go to state 29
-    EQUIVALENT             shift, and go to state 30
-    IS_NOT_EQUAL           shift, and go to state 31
-    LESS_THAN              shift, and go to state 32
-    GREATER_THAN           shift, and go to state 33
-    OR                     shift, and go to state 34
-    AND                    shift, and go to state 35
-    MINUS                  shift, and go to state 36
-    PLUS                   shift, and go to state 37
-    DIVIDE                 shift, and go to state 38
-    TIMES                  shift, and go to state 39
-
-    $default  reduce using rule 12 (actuals_optional)
-
-    actuals_optional  go to state 72
+    CLOSE_SQUARE           shift, and go to state 117
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
 
 
-State 72
+State 106
 
-   11 actuals_optional: COMMA expr actuals_optional .
+   40 expr: KEYWORD_NEW KEYWORD_BOOL OPEN_SQUARE expr CLOSE_SQUARE .
 
-    $default  reduce using rule 11 (actuals_optional)
+    $default  reduce using rule 40 (expr)
+
+
+State 107
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   43     | KEYWORD_NEW KEYWORD_BOOL SQUARE_PAIR OPEN_SQUARE expr . CLOSE_SQUARE
+
+    CLOSE_SQUARE           shift, and go to state 118
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+
+
+State 108
+
+   41 expr: KEYWORD_NEW KEYWORD_VOID OPEN_SQUARE expr CLOSE_SQUARE .
+
+    $default  reduce using rule 41 (expr)
+
+
+State 109
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   44     | KEYWORD_NEW KEYWORD_VOID SQUARE_PAIR OPEN_SQUARE expr . CLOSE_SQUARE
+
+    CLOSE_SQUARE           shift, and go to state 119
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+
+
+State 110
+
+   46 expr: KEYWORD_NEW ID OPEN_SQUARE expr CLOSE_SQUARE .
+
+    $default  reduce using rule 46 (expr)
+
+
+State 111
+
+   45 expr: KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS .
+
+    $default  reduce using rule 45 (expr)
+
+
+State 112
+
+   19 actuals_optional: COMMA . expr actuals_optional
+
+    KEYWORD_NEW       shift, and go to state 2
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+
+    expr  go to state 120
+
+
+State 113
+
+   18 actuals: expr actuals_optional .
+
+    $default  reduce using rule 18 (actuals)
+
+
+State 114
+
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+   47     | KEYWORD_NEW ID SQUARE_PAIR OPEN_SQUARE expr . CLOSE_SQUARE
+
+    CLOSE_SQUARE           shift, and go to state 121
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+
+
+State 115
+
+   12 statement: KEYWORD_WHILE OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement .
+
+    $default  reduce using rule 12 (statement)
+
+
+State 116
+
+   10 statement: KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement .
+   11          | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement . KEYWORD_ELSE statement
+
+    KEYWORD_ELSE  shift, and go to state 122
+
+    KEYWORD_ELSE  [reduce using rule 10 (statement)]
+    $default      reduce using rule 10 (statement)
+
+
+State 117
+
+   42 expr: KEYWORD_NEW KEYWORD_INT SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE .
+
+    $default  reduce using rule 42 (expr)
+
+
+State 118
+
+   43 expr: KEYWORD_NEW KEYWORD_BOOL SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE .
+
+    $default  reduce using rule 43 (expr)
+
+
+State 119
+
+   44 expr: KEYWORD_NEW KEYWORD_VOID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE .
+
+    $default  reduce using rule 44 (expr)
+
+
+State 120
+
+   19 actuals_optional: COMMA expr . actuals_optional
+   21 expr: expr . TIMES expr
+   22     | expr . DIVIDE expr
+   23     | expr . PLUS expr
+   24     | expr . MINUS expr
+   26     | expr . AND expr
+   27     | expr . OR expr
+   28     | expr . EQUIVALENT expr
+   29     | expr . IS_NOT_EQUAL expr
+   30     | expr . LESS_THAN_OR_EQUAL expr
+   31     | expr . LESS_THAN expr
+   32     | expr . GREATER_THAN_OR_EQUAL expr
+   33     | expr . GREATER_THAN expr
+
+    COMMA                  shift, and go to state 112
+    LESS_THAN_OR_EQUAL     shift, and go to state 41
+    GREATER_THAN_OR_EQUAL  shift, and go to state 42
+    EQUIVALENT             shift, and go to state 43
+    IS_NOT_EQUAL           shift, and go to state 44
+    LESS_THAN              shift, and go to state 45
+    GREATER_THAN           shift, and go to state 46
+    OR                     shift, and go to state 47
+    AND                    shift, and go to state 48
+    MINUS                  shift, and go to state 49
+    PLUS                   shift, and go to state 50
+    DIVIDE                 shift, and go to state 51
+    TIMES                  shift, and go to state 52
+
+    $default  reduce using rule 20 (actuals_optional)
+
+    actuals_optional  go to state 123
+
+
+State 121
+
+   47 expr: KEYWORD_NEW ID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE .
+
+    $default  reduce using rule 47 (expr)
+
+
+State 122
+
+   11 statement: KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement KEYWORD_ELSE . statement
+
+    SEMICOLON         shift, and go to state 1
+    KEYWORD_NEW       shift, and go to state 2
+    KEYWORD_RETURN    shift, and go to state 3
+    MINUS             shift, and go to state 4
+    NEGATE            shift, and go to state 5
+    OPEN_PARENTHESIS  shift, and go to state 6
+    OPEN_BRACE        shift, and go to state 7
+    KEYWORD_WHILE     shift, and go to state 8
+    KEYWORD_IF        shift, and go to state 9
+    KEYWORD_INT       shift, and go to state 10
+    KEYWORD_BOOL      shift, and go to state 11
+    KEYWORD_VOID      shift, and go to state 12
+    KEYWORD_TRUE      shift, and go to state 13
+    KEYWORD_FALSE     shift, and go to state 14
+    INTEGER           shift, and go to state 15
+    ID                shift, and go to state 16
+
+    statement  go to state 124
+    expr       go to state 18
+
+
+State 123
+
+   19 actuals_optional: COMMA expr actuals_optional .
+
+    $default  reduce using rule 19 (actuals_optional)
+
+
+State 124
+
+   11 statement: KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement KEYWORD_ELSE statement .
+
+    $default  reduce using rule 11 (statement)

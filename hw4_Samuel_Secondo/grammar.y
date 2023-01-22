@@ -11,6 +11,7 @@
 
     ASTNode* node;
     ASTNode_Actuals* actual;
+    ASTNode_Statement_Body* body;
 }
 
 %code {
@@ -23,6 +24,12 @@
 
 %token SEMICOLON
 %token COMMA
+
+%token KEYWORD_NEW
+%token KEYWORD_RETURN
+
+%token OPEN_SQUARE
+%token CLOSE_SQUARE
 
 %token ASSIGN
 
@@ -47,9 +54,6 @@
 
 %token DOT
 
-%token OPEN_SQUARE
-%token CLOSE_SQUARE
-
 %token OPEN_PARENTHESIS
 %token CLOSE_PARENTHESIS
 
@@ -64,8 +68,6 @@
 %token KEYWORD_THIS
 %token KEYWORD_CLASS
 %token KEYWORD_EXTENDS
-%token KEYWORD_NEW
-%token KEYWORD_RETURN
 %token KEYWORD_INT 
 %token KEYWORD_BOOL
 %token KEYWORD_VOID
@@ -81,6 +83,7 @@
 
 %type <node> expr
 %type <node> statement
+%type <body> statement_klein
 %type <actual> actuals
 %type <actual> actuals_optional
 
@@ -101,17 +104,20 @@ statement:
 
 /*
     | lvalue ASSIGN expr SEMICOLON
-    | OPEN_BRACE statement_klein CLOSE_BRACE
-    | KEYWORD_WHILE OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement
-
-    
-    | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement
-    | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement KEYWORD_ELSE statement
-    
-
-    | KEYWORD_RETURN expr SEMICOLON
-    | SEMICOLON
 */
+    
+    | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_If>($3, $5)); }
+    | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement KEYWORD_ELSE statement { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_IfElse>($3, $5, $7)); }
+
+    | KEYWORD_WHILE OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_While>($3, $5)); }
+    | OPEN_BRACE statement_klein CLOSE_BRACE { $$ = $2; }
+
+    | KEYWORD_RETURN expr SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Return>($2)); }
+    | SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Empty>()); }
+
+statement_klein:
+	statement statement_klein { $$ = $2; $$->AddStatement($1); }
+    | %empty { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Body>()); }
 
 actuals:
     expr actuals_optional { $$ = $2; $$->AddExpression($1); }
@@ -143,18 +149,16 @@ expr:
     | KEYWORD_TRUE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Boolean>($1)); }
     | KEYWORD_FALSE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Boolean>($1)); }
 
-
-    | KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Obj>($4, $2)); }
-
-/*
     | KEYWORD_NEW KEYWORD_INT OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Int>($4)); }
     | KEYWORD_NEW KEYWORD_BOOL OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Bool>($4)); }
     | KEYWORD_NEW KEYWORD_VOID OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Void>($4)); }
-    | KEYWORD_NEW ID OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Custom>($4, $2)); }
 
     | KEYWORD_NEW KEYWORD_INT SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_IntArray>($5)); }
     | KEYWORD_NEW KEYWORD_BOOL SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_BoolArray>($5)); }
     | KEYWORD_NEW KEYWORD_VOID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_VoidArray>($5)); }
+
+    | KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Obj>($4, $2)); }
+    | KEYWORD_NEW ID OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Custom>($4, $2)); }
     | KEYWORD_NEW ID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_CustomArray>($5, $2)); }
-*/
+
 %%

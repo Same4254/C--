@@ -323,153 +323,6 @@ public:
     }
 };
 
-class ASTNode_Statement_ExprOnly : public ASTNode {
-private:
-    ASTNode *expr;
-
-public:
-    ASTNode_Statement_ExprOnly(ASTNode *expr) 
-        : expr(expr)
-    {
-
-    }
-
-    void print() override {
-		expr->print();
-        std::cout << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Int : public ASTNode {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Int(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "int " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Custom : public ASTNode {
-private:
-    std::string name;
-    std::string type;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Custom(const char* type_c, const char* name_c)
-        : type(type_c), name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << type << " " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Bool : public ASTNode {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Bool(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "bool " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Void : public ASTNode {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Void(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "void " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Int_Array : public ASTNode {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Int_Array(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "int[] " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Custom_Array : public ASTNode {
-private:
-    std::string name;
-    std::string type;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Custom_Array(const char* type_c, const char* name_c)
-        : type(type_c), name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << type << "[] " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Bool_Array : public ASTNode {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Bool_Array(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "bool[] " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Void_Array : public ASTNode {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Void_Array(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "void[] " << name << ";" << std::endl;
-    }
-};
-
 class ASTNode_Actuals : public ASTNode {
 private:
     std::vector<ASTNode*> expressions;
@@ -657,6 +510,266 @@ public:
         std::cout << "new " << type << "[] [ ";
         expr->print();
         std::cout << " ]";
+    }
+};
+
+class ASTNode_Statement_ExprOnly : public ASTNode {
+private:
+    ASTNode *expr;
+
+public:
+    ASTNode_Statement_ExprOnly(ASTNode *expr) 
+        : expr(expr)
+    {
+
+    }
+
+    void print() override {
+		expr->print();
+        std::cout << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_VariableDeclaration_Int : public ASTNode {
+private:
+    std::string name;
+
+public:
+    ASTNode_Statement_VariableDeclaration_Int(const char* name_c)
+        : name(name_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "int " << name << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_VariableDeclaration_Custom : public ASTNode {
+private:
+    std::string name;
+    std::string type;
+
+public:
+    ASTNode_Statement_VariableDeclaration_Custom(const char* type_c, const char* name_c)
+        : type(type_c), name(name_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << type << " " << name << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_VariableDeclaration_Bool : public ASTNode {
+private:
+    std::string name;
+
+public:
+    ASTNode_Statement_VariableDeclaration_Bool(const char* name_c)
+        : name(name_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "bool " << name << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_VariableDeclaration_Void : public ASTNode {
+private:
+    std::string name;
+
+public:
+    ASTNode_Statement_VariableDeclaration_Void(const char* name_c)
+        : name(name_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "void " << name << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_VariableDeclaration_Int_Array : public ASTNode {
+private:
+    std::string name;
+
+public:
+    ASTNode_Statement_VariableDeclaration_Int_Array(const char* name_c)
+        : name(name_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "int[] " << name << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_VariableDeclaration_Custom_Array : public ASTNode {
+private:
+    std::string name;
+    std::string type;
+
+public:
+    ASTNode_Statement_VariableDeclaration_Custom_Array(const char* type_c, const char* name_c)
+        : type(type_c), name(name_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << type << "[] " << name << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_VariableDeclaration_Bool_Array : public ASTNode {
+private:
+    std::string name;
+
+public:
+    ASTNode_Statement_VariableDeclaration_Bool_Array(const char* name_c)
+        : name(name_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "bool[] " << name << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_VariableDeclaration_Void_Array : public ASTNode {
+private:
+    std::string name;
+
+public:
+    ASTNode_Statement_VariableDeclaration_Void_Array(const char* name_c)
+        : name(name_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "void[] " << name << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_Empty : public ASTNode {
+public:
+    ASTNode_Statement_Empty() {
+
+    }
+
+    void print() override {
+        std::cout << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_Return : public ASTNode {
+private:
+    ASTNode *expr;
+
+public:
+    ASTNode_Statement_Return(ASTNode *expr) 
+        : expr(expr)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "return ";
+        expr->print();
+        std::cout << ";" << std::endl;
+    }
+};
+
+class ASTNode_Statement_Body : public ASTNode {
+private:
+    std::vector<ASTNode*> nodes;
+
+public:
+    ASTNode_Statement_Body() {
+
+    }
+
+    void AddStatement(ASTNode *node) {
+		nodes.insert(nodes.begin(), node);
+    }
+
+    void print() override {
+        std::cout << "{" << std::endl;
+        for (auto statement : nodes)
+            statement->print();
+        std::cout << "}" << std::endl;
+    }
+};
+
+class ASTNode_Statement_While : public ASTNode {
+private:
+    ASTNode *condition_expr;
+    ASTNode *statement;
+
+public:
+    ASTNode_Statement_While(ASTNode *condition_expr, ASTNode *statement)
+        : condition_expr(condition_expr), statement(statement)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "while ( ";
+		condition_expr->print();
+        std::cout << " )" << std::endl;
+        statement->print();
+    }
+};
+
+class ASTNode_Statement_If : public ASTNode {
+private:
+	ASTNode *condition_expr;
+    ASTNode *statement;
+
+public:
+    ASTNode_Statement_If(ASTNode *condition_expr, ASTNode *statement) 
+        : condition_expr(condition_expr), statement(statement)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "if ( ";
+        condition_expr->print();
+        std::cout << ")" << std::endl;
+        statement->print();
+    }
+};
+
+class ASTNode_Statement_IfElse : public ASTNode {
+private:
+	ASTNode *condition_expr;
+    ASTNode *statement_true;
+    ASTNode *statement_false;
+
+public:
+    ASTNode_Statement_IfElse(ASTNode *condition_expr, ASTNode *statement_true, ASTNode *statement_false) 
+        : condition_expr(condition_expr), statement_true(statement_true), statement_false(statement_false)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "if ( ";
+        condition_expr->print();
+        std::cout << ")" << std::endl;
+        statement_true->print();
+        std::cout << "else" << std::endl;
+        statement_false->print();
     }
 };
 

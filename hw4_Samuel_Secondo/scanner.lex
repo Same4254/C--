@@ -34,7 +34,7 @@ WHITESPACE [ \n\t\r]+
 "[]" { return SQUARE_PAIR; }
 
 "[" { return OPEN_SQUARE; }
-"]" { return OPEN_SQUARE; }
+"]" { return CLOSE_SQUARE; }
 
 "(" { return OPEN_PARENTHESIS; }
 ")" { return CLOSE_PARENTHESIS; }

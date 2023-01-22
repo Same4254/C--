@@ -51,36 +51,36 @@ extern int yydebug;
   {
     SEMICOLON = 258,
     COMMA = 259,
-    ASSIGN = 260,
-    LESS_THAN_OR_EQUAL = 261,
-    GREATER_THAN_OR_EQUAL = 262,
-    EQUIVALENT = 263,
-    IS_NOT_EQUAL = 264,
-    LESS_THAN = 265,
-    GREATER_THAN = 266,
-    OR = 267,
-    AND = 268,
-    MINUS = 269,
-    PLUS = 270,
-    DIVIDE = 271,
-    TIMES = 272,
-    NEGATE = 273,
-    DOT = 274,
-    OPEN_SQUARE = 275,
-    CLOSE_SQUARE = 276,
-    OPEN_PARENTHESIS = 277,
-    CLOSE_PARENTHESIS = 278,
-    OPEN_BRACE = 279,
-    CLOSE_BRACE = 280,
-    SQUARE_PAIR = 281,
-    KEYWORD_WHILE = 282,
-    KEYWORD_IF = 283,
-    KEYWORD_ELSE = 284,
-    KEYWORD_THIS = 285,
-    KEYWORD_CLASS = 286,
-    KEYWORD_EXTENDS = 287,
-    KEYWORD_NEW = 288,
-    KEYWORD_RETURN = 289,
+    KEYWORD_NEW = 260,
+    KEYWORD_RETURN = 261,
+    OPEN_SQUARE = 262,
+    CLOSE_SQUARE = 263,
+    ASSIGN = 264,
+    LESS_THAN_OR_EQUAL = 265,
+    GREATER_THAN_OR_EQUAL = 266,
+    EQUIVALENT = 267,
+    IS_NOT_EQUAL = 268,
+    LESS_THAN = 269,
+    GREATER_THAN = 270,
+    OR = 271,
+    AND = 272,
+    MINUS = 273,
+    PLUS = 274,
+    DIVIDE = 275,
+    TIMES = 276,
+    NEGATE = 277,
+    DOT = 278,
+    OPEN_PARENTHESIS = 279,
+    CLOSE_PARENTHESIS = 280,
+    OPEN_BRACE = 281,
+    CLOSE_BRACE = 282,
+    SQUARE_PAIR = 283,
+    KEYWORD_WHILE = 284,
+    KEYWORD_IF = 285,
+    KEYWORD_ELSE = 286,
+    KEYWORD_THIS = 287,
+    KEYWORD_CLASS = 288,
+    KEYWORD_EXTENDS = 289,
     KEYWORD_INT = 290,
     KEYWORD_BOOL = 291,
     KEYWORD_VOID = 292,
@@ -98,13 +98,14 @@ union YYSTYPE
 {
 #line 8 "grammar.y"
 
-	int val;
+    int val;
     char *id;
 
-	ASTNode* node;
+    ASTNode* node;
     ASTNode_Actuals* actual;
+    ASTNode_Statement_Body* body;
 
-#line 108 "grammar.h"
+#line 109 "grammar.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
