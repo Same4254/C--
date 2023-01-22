@@ -10,6 +10,9 @@
     char *id;
 
     ASTNode* node;
+	ASTNode_Expr* expr;
+    ASTNode_Statement* statement;
+
     ASTNode_Actuals* actual;
     ASTNode_Statement_Body* body;
 }
@@ -81,8 +84,8 @@
 
 %token UNKOWN;
 
-%type <node> expr
-%type <node> statement
+%type <expr> expr
+%type <statement> statement
 %type <body> statement_klein
 %type <actual> actuals
 %type <actual> actuals_optional
