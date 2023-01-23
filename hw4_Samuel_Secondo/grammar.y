@@ -10,11 +10,13 @@
     char *id;
 
     ASTNode* node;
-	ASTNode_Expr* expr;
+    ASTNode_Expr* expr;
     ASTNode_Statement* statement;
 
     ASTNode_Actuals* actual;
     ASTNode_Statement_Body* body;
+
+    ASTNode_LValue* lvalue;
 }
 
 %code {
@@ -85,10 +87,14 @@
 %token UNKOWN;
 
 %type <expr> expr
+
 %type <statement> statement
 %type <body> statement_klein
+
 %type <actual> actuals
 %type <actual> actuals_optional
+
+%type <lvalue> lvalue
 
 %%
 
@@ -105,9 +111,7 @@ statement:
     | KEYWORD_VOID SQUARE_PAIR ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Void_Array>($3)); }
     | ID SQUARE_PAIR ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Custom_Array>($1, $3)); }
 
-/*
-    | lvalue ASSIGN expr SEMICOLON
-*/
+    | lvalue ASSIGN expr SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Assignment>($1, $3)); }
     
     | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_If>($3, $5)); }
     | KEYWORD_IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS statement KEYWORD_ELSE statement { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_IfElse>($3, $5, $7)); }
@@ -119,11 +123,12 @@ statement:
     | SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Empty>()); }
 
 statement_klein:
-	statement statement_klein { $$ = $2; $$->AddStatement($1); }
+    statement statement_klein { $$ = $2; $$->AddStatement($1); }
     | %empty { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Body>()); }
 
 actuals:
     expr actuals_optional { $$ = $2; $$->AddExpression($1); }
+    | %empty { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Actuals>()); }
 
 actuals_optional:
     COMMA expr actuals_optional { $$ = $3; $$->AddExpression($2); }
@@ -163,5 +168,18 @@ expr:
     | KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Obj>($4, $2)); }
     | KEYWORD_NEW ID OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Custom>($4, $2)); }
     | KEYWORD_NEW ID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_CustomArray>($5, $2)); }
+
+    | lvalue
+
+lvalue:
+    ID { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_ID>($1)); }
+    | ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_MethodCall>($3, $1)); }
+
+    | lvalue OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_Array>($1, $3)); }
+
+    | lvalue DOT ID { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_Obj_Access>($1, $3)); }
+    | lvalue DOT ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_Obj_MethodCall> ($1, $3, $5)); }
+
+    | KEYWORD_THIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_This>()); }
 
 %%

@@ -1,5 +1,5 @@
 %{
-	#include <iostream>
+    #include <iostream>
     #include <iomanip>
     #include "parser.h"
     #include "grammar.h"
@@ -60,7 +60,7 @@ WHITESPACE [ \n\t\r]+
 "//".* { ; }
 
 {ID} {
-	yylval->id = strdup(yytext);
+    yylval->id = strdup(yytext);
    
     return ID;
 }
@@ -68,15 +68,15 @@ WHITESPACE [ \n\t\r]+
 {INTEGER} {
     yylval->val = atoi(yytext);
    
-	return INTEGER;
+    return INTEGER;
 }
 
 {WHITESPACE} { ; }
 
 . { 
-	printf("UNKOWN: %s. Hex: ", yytext);
-	char *string = yytext;
-	while (*string) printf("%02x ", *string++);
+    printf("UNKOWN: %s. Hex: ", yytext);
+    char *string = yytext;
+    while (*string) printf("%02x ", *string++);
     printf("\n");
 
     return UNKOWN; }
@@ -84,5 +84,5 @@ WHITESPACE [ \n\t\r]+
 %%
 
 int yywrap() {
-	return 1;
+    return 1;
 }

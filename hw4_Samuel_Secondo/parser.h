@@ -6,7 +6,7 @@
 
 class ASTNode {
 public:
-	virtual ~ASTNode() = default;
+    virtual ~ASTNode() = default;
 
     virtual void print() = 0;
 };
@@ -17,8 +17,8 @@ class ASTNode_Expr : public ASTNode {
 
 class ASTNode_Expr_Times : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_Times(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -36,8 +36,8 @@ public:
 
 class ASTNode_Expr_Divide : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_Divide(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -55,8 +55,8 @@ public:
 
 class ASTNode_Expr_Plus : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_Plus(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -74,8 +74,8 @@ public:
 
 class ASTNode_Expr_Minus : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_Minus(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -93,7 +93,7 @@ public:
 
 class ASTNode_Expr_Parenthesis : public ASTNode_Expr {
 private:
-	ASTNode_Expr *expr;
+    ASTNode_Expr *expr;
 
 public:
     ASTNode_Expr_Parenthesis(ASTNode_Expr *expr)
@@ -111,8 +111,8 @@ public:
 
 class ASTNode_Expr_And : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_And(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -130,8 +130,8 @@ public:
 
 class ASTNode_Expr_Or : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_Or(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -149,8 +149,8 @@ public:
 
 class ASTNode_Expr_Equivalent : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_Equivalent(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -168,8 +168,8 @@ public:
 
 class ASTNode_Expr_IsNotEqual : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_IsNotEqual(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -187,8 +187,8 @@ public:
 
 class ASTNode_Expr_LessThanOrEqual : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_LessThanOrEqual(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -206,8 +206,8 @@ public:
 
 class ASTNode_Expr_LessThan : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_LessThan(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -225,8 +225,8 @@ public:
 
 class ASTNode_Expr_GreaterThanOrEqual : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_GreaterThanOrEqual(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -244,8 +244,8 @@ public:
 
 class ASTNode_Expr_GreaterThan : public ASTNode_Expr {
 private:
-	ASTNode_Expr *left;
-	ASTNode_Expr *right;
+    ASTNode_Expr *left;
+    ASTNode_Expr *right;
 
 public:
     ASTNode_Expr_GreaterThan(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -263,7 +263,7 @@ public:
 
 class ASTNode_Expr_UnaryMinus : public ASTNode_Expr {
 private:
-	ASTNode_Expr *expr;
+    ASTNode_Expr *expr;
 
 public:
     ASTNode_Expr_UnaryMinus(ASTNode_Expr *expr)
@@ -280,7 +280,7 @@ public:
 
 class ASTNode_Expr_BooleanNegate : public ASTNode_Expr {
 private:
-	ASTNode_Expr *expr;
+    ASTNode_Expr *expr;
 
 public:
     ASTNode_Expr_BooleanNegate(ASTNode_Expr *expr)
@@ -337,19 +337,19 @@ public:
     }
 
     void AddExpression(ASTNode_Expr *expr) {
-		expressions.insert(expressions.begin(), expr);
+        expressions.insert(expressions.begin(), expr);
     }
 
     void print() override {
-		for (size_t i = 0; i < expressions.size(); i++) {
-			if (i == 0) {
+        for (size_t i = 0; i < expressions.size(); i++) {
+            if (i == 0) {
                 expressions[0]->print();
             } else {
-            	std::cout << ", ";
+                std::cout << ", ";
                 expressions[i]->print();
             }
         }
-	}
+    }
 };
 
 class ASTNode_Expr_New_Obj : public ASTNode_Expr {
@@ -373,7 +373,7 @@ public:
 
 class ASTNode_Expr_New_Array_Int : public ASTNode_Expr {
 private:
-	ASTNode_Expr *expr;
+    ASTNode_Expr *expr;
 
 public:
     ASTNode_Expr_New_Array_Int(ASTNode_Expr *expr)
@@ -446,7 +446,7 @@ public:
 
 class ASTNode_Expr_New_Array_IntArray : public ASTNode_Expr {
 private:
-	ASTNode_Expr *expr;
+    ASTNode_Expr *expr;
 
 public:
     ASTNode_Expr_New_Array_IntArray(ASTNode_Expr *expr)
@@ -533,7 +533,7 @@ public:
     }
 
     void print() override {
-		expr->print();
+        expr->print();
         std::cout << ";" << std::endl;
     }
 };
@@ -708,7 +708,7 @@ public:
 
     void AddStatement(ASTNode_Statement *statement) {
         // bottom up parsing...
-		nodes.insert(nodes.begin(), statement);
+        nodes.insert(nodes.begin(), statement);
     }
 
     void print() override {
@@ -733,7 +733,7 @@ public:
 
     void print() override {
         std::cout << "while ( ";
-		condition_expr->print();
+        condition_expr->print();
         std::cout << " )" << std::endl;
         statement->print();
     }
@@ -741,7 +741,7 @@ public:
 
 class ASTNode_Statement_If : public ASTNode_Statement {
 private:
-	ASTNode_Expr *condition_expr;
+    ASTNode_Expr *condition_expr;
     ASTNode_Statement *statement;
 
 public:
@@ -761,7 +761,7 @@ public:
 
 class ASTNode_Statement_IfElse : public ASTNode_Statement {
 private:
-	ASTNode_Expr *condition_expr;
+    ASTNode_Expr *condition_expr;
     ASTNode_Statement *statement_true;
     ASTNode_Statement *statement_false;
 
@@ -782,6 +782,285 @@ public:
     }
 };
 
+class ASTNode_LValue : public ASTNode_Expr {
+    
+};
+
+class ASTNode_LValue_ID : public ASTNode_LValue {
+private:
+    std::string id;
+
+public:
+    ASTNode_LValue_ID(const char *id_c)
+        : id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << id;
+    }
+};
+
+class ASTNode_LValue_MethodCall : public ASTNode_LValue {
+private:
+    ASTNode_Actuals *actuals;
+    std::string id;
+
+public:
+    ASTNode_LValue_MethodCall(ASTNode_Actuals *actuals, const char *id_c)
+        : actuals(actuals), id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << id << "(";
+        actuals->print();
+        std::cout << ")";
+    }
+};
+
+class ASTNode_LValue_Obj_Access : public ASTNode_LValue {
+private:
+    ASTNode_LValue *obj_lvalue;
+    std::string id;
+
+public:
+    ASTNode_LValue_Obj_Access(ASTNode_LValue *obj_lvalue, const char *id_c)
+        : obj_lvalue(obj_lvalue), id(id_c)
+    {
+
+    }
+
+    void print() override {
+        obj_lvalue->print();
+        std::cout << "." << id;
+    }
+};
+
+class ASTNode_LValue_Obj_MethodCall : public ASTNode_LValue {
+private:
+    ASTNode_LValue *obj_lvalue;
+    std::string id;
+    ASTNode_Actuals *actuals;
+
+public:
+    ASTNode_LValue_Obj_MethodCall(ASTNode_LValue *obj_lvalue, const char *id_c, ASTNode_Actuals *actuals)
+        : obj_lvalue(obj_lvalue), id(id_c), actuals(actuals)
+    {
+
+    }
+
+    void print() override {
+        obj_lvalue->print();
+        std::cout << "." << id;
+        std::cout << "(";
+        actuals->print();
+        std::cout << ")";
+    }
+};
+
+class ASTNode_LValue_Array : public ASTNode_LValue {
+private:
+    ASTNode_LValue *lvalue;
+    ASTNode_Expr *expr;
+
+public:
+    ASTNode_LValue_Array(ASTNode_LValue *lvalue, ASTNode_Expr *expr)
+        : lvalue(lvalue), expr(expr)
+    {
+
+    }
+
+    void print() override {
+        lvalue->print();
+        std::cout << "[";
+        expr->print();
+        std::cout << "]";
+    }
+};
+
+class ASTNode_LValue_This : public ASTNode_LValue { 
+public:
+    void print() override {
+        std::cout << "this";
+    }
+};
+
+class ASTNode_Statement_Assignment : public ASTNode_Statement {
+private:
+    ASTNode_LValue *lvalue;
+    ASTNode_Expr *expr;
+
+public:
+    ASTNode_Statement_Assignment(ASTNode_LValue *lvalue, ASTNode_Expr *expr)
+        : lvalue(lvalue), expr(expr)
+    {
+
+    }
+
+    void print() override {
+        lvalue->print();
+        std::cout << " = ";
+        expr->print();
+        std::cout << ";" << std::endl;
+    }
+};
+
+class ASTNode_Formal : public ASTNode {
+
+};
+
+class ASTNode_Formal_List : public ASTNode {
+private:
+    std::vector<ASTNode_Formal*> formals;
+
+public:
+    void AddFormal(ASTNode_Formal *formal) {
+        formals.insert(formals.begin(), formal);
+    }
+
+    void print() override {
+        for (auto formal : formals)
+            formal->print();
+    }
+};
+
+class ASTNode_Formal_Int : ASTNode_Formal {
+private:
+    std::string id;
+
+public:
+    ASTNode_Formal_Int(const char *id_c)
+        : id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "int " << id;
+    }
+};
+
+class ASTNode_Formal_Bool : ASTNode_Formal {
+private:
+    std::string id;
+
+public:
+    ASTNode_Formal_Bool(const char *id_c)
+        : id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "bool " << id;
+    }
+};
+
+class ASTNode_Formal_Void : ASTNode_Formal {
+private:
+    std::string id;
+
+public:
+    ASTNode_Formal_Void(const char *id_c)
+        : id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "void " << id;
+    }
+};
+
+class ASTNode_Formal_Custom : ASTNode_Formal {
+private:
+    std::string type;
+    std::string id;
+
+public:
+    ASTNode_Formal_Custom(const char* type, const char *id_c)
+        : type(type), id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << type << " " << id;
+    }
+};
+
+class ASTNode_Formal_Int_Array : ASTNode_Formal {
+private:
+    std::string id;
+
+public:
+    ASTNode_Formal_Int_Array(const char *id_c)
+        : id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "int[] " << id;
+    }
+};
+
+class ASTNode_Formal_Bool_Array : ASTNode_Formal {
+private:
+    std::string id;
+
+public:
+    ASTNode_Formal_Bool_Array(const char *id_c)
+        : id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "bool[] " << id;
+    }
+};
+
+class ASTNode_Formal_Void_Array : ASTNode_Formal {
+private:
+    std::string id;
+
+public:
+    ASTNode_Formal_Void_Array(const char *id_c)
+        : id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << "void[] " << id;
+    }
+};
+
+class ASTNode_Formal_Custom_Array : ASTNode_Formal {
+private:
+    std::string type;
+    std::string id;
+
+public:
+    ASTNode_Formal_Custom_Array(const char *type, const char *id_c)
+        : type(type), id(id_c)
+    {
+
+    }
+
+    void print() override {
+        std::cout << type << "[] " << id;
+    }
+};
+
+class ASTNode_Delcaration : public ASTNode {
+
+};
+
 class AST {
 public:
     // ownership lives here in this list so that the unique_ptrs do not need to be passed around inside the grammar
@@ -796,7 +1075,7 @@ public:
     }
 
     ASTNode* GetRootNode() {
-		if (nodes.size() == 0)
+        if (nodes.size() == 0)
             return nullptr;
         return nodes[nodes.size() - 1].get();
     }
@@ -804,7 +1083,7 @@ public:
 
 class Parser {
 public:
-	AST ast;
+    AST ast;
 
     Parser() {
     }
