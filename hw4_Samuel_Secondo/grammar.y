@@ -17,6 +17,16 @@
     ASTNode_Statement_Body* body;
 
     ASTNode_LValue* lvalue;
+    ASTNode_Type* type;
+
+    ASTNode_Formal_List* formals;
+    ASTNode_Formal* formal;
+
+    ASTNode_MemberDeclaration* member_declaration;
+    ASTNode_MemberDeclaration_List* member_declaration_list;
+
+    ASTNode_Class* clazz;
+    ASTNode_Class_List* class_list;
 }
 
 %code {
@@ -94,22 +104,61 @@
 %type <actual> actuals
 %type <actual> actuals_optional
 
+%type <formal> formal
+
+%type <formals> formals_list
+%type <formals> formals_optional
+
 %type <lvalue> lvalue
+%type <type> type
+
+%type <member_declaration_list> member_declaration_klein
+%type <member_declaration> member_declaration
+
+%type <clazz> class_declaration
+%type <class_list> class_list
+%type <class_list> class_klein
 
 %%
+
+class_list:
+    class_declaration class_klein { $$ = $2; $$->AddClass($1); }
+
+class_klein:
+    class_declaration class_klein { $$ = $2; $$->AddClass($1); }
+    | %empty { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Class_List>()); }
+
+class_declaration:
+    KEYWORD_CLASS ID OPEN_BRACE member_declaration_klein CLOSE_BRACE SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Class>($2, $4)); }
+    | KEYWORD_CLASS ID KEYWORD_EXTENDS ID OPEN_BRACE member_declaration_klein CLOSE_BRACE SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Class_Child>($2, $4, $6)); }
+
+member_declaration:
+    type ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_MemberDeclaration_Variable>($1, $2)); }
+    | type ID OPEN_PARENTHESIS formals_list CLOSE_PARENTHESIS OPEN_BRACE statement_klein CLOSE_BRACE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_MemberDeclaration_Function>($1, $4, $2, $7)); }
+    | ID OPEN_PARENTHESIS formals_list CLOSE_PARENTHESIS OPEN_BRACE statement_klein CLOSE_BRACE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_MemberDeclaration_Constructor>($3, $1, $6)); }
+
+member_declaration_klein:
+    member_declaration member_declaration_klein { $$ = $2; $$->AddDeclaration($1); }
+    | %empty { $$ = parser->ast.AddNode(std::make_unique<ASTNode_MemberDeclaration_List>()); }
 
 statement:
     expr SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_ExprOnly>($1)); }
 
+    | type ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration>($1, $2)); }
+
+    /*
     | KEYWORD_INT ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Int>($2)); }
     | KEYWORD_BOOL ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Bool>($2)); }
     | KEYWORD_VOID ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Void>($2)); }
     | ID ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Custom>($1, $2)); }
+    */
 
+    /*
     | KEYWORD_INT SQUARE_PAIR ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Int_Array>($3)); }
     | KEYWORD_BOOL SQUARE_PAIR ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Bool_Array>($3)); }
     | KEYWORD_VOID SQUARE_PAIR ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Void_Array>($3)); }
     | ID SQUARE_PAIR ID SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_VariableDeclaration_Custom_Array>($1, $3)); }
+    */
 
     | lvalue ASSIGN expr SEMICOLON { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Statement_Assignment>($1, $3)); }
     
@@ -157,6 +206,9 @@ expr:
     | KEYWORD_TRUE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Boolean>($1)); }
     | KEYWORD_FALSE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_Boolean>($1)); }
 
+    | KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Obj>($4, $2)); }
+
+    /*
     | KEYWORD_NEW KEYWORD_INT OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Int>($4)); }
     | KEYWORD_NEW KEYWORD_BOOL OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Bool>($4)); }
     | KEYWORD_NEW KEYWORD_VOID OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Void>($4)); }
@@ -165,11 +217,13 @@ expr:
     | KEYWORD_NEW KEYWORD_BOOL SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_BoolArray>($5)); }
     | KEYWORD_NEW KEYWORD_VOID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_VoidArray>($5)); }
 
-    | KEYWORD_NEW ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Obj>($4, $2)); }
     | KEYWORD_NEW ID OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_Custom>($4, $2)); }
     | KEYWORD_NEW ID SQUARE_PAIR OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array_CustomArray>($5, $2)); }
+    */
 
-    | lvalue
+    | KEYWORD_NEW type OPEN_SQUARE expr CLOSE_SQUARE { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Expr_New_Array>($2, $4)); }
+
+    | lvalue { $$ = $1; }
 
 lvalue:
     ID { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_ID>($1)); }
@@ -181,5 +235,28 @@ lvalue:
     | lvalue DOT ID OPEN_PARENTHESIS actuals CLOSE_PARENTHESIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_Obj_MethodCall> ($1, $3, $5)); }
 
     | KEYWORD_THIS { $$ = parser->ast.AddNode(std::make_unique<ASTNode_LValue_This>()); }
+
+type:
+    KEYWORD_INT { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Type_Int>()); }
+    | KEYWORD_BOOL { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Type_Bool>()); }
+    | KEYWORD_VOID { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Type_Void>()); }
+    | ID { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Type_ID>($1)); }
+    
+    | KEYWORD_INT SQUARE_PAIR { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Type_Int_Array>()); }
+    | KEYWORD_BOOL SQUARE_PAIR { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Type_Bool_Array>()); }
+    | KEYWORD_VOID SQUARE_PAIR { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Type_Void_Array>()); }
+    | ID SQUARE_PAIR { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Type_ID_Array>($1)); }
+
+
+formal:
+    type ID { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Formal>($1, $2)); }
+
+formals_list:
+    formal formals_optional { $$ = $2; $$->AddFormal($1); }
+    | %empty { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Formal_List>()); }
+
+formals_optional:
+    COMMA formal formals_optional { $$ = $3; $$->AddFormal($2); }
+    | %empty { $$ = parser->ast.AddNode(std::make_unique<ASTNode_Formal_List>()); }
 
 %%

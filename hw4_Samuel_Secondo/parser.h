@@ -11,6 +11,83 @@ public:
     virtual void print() = 0;
 };
 
+class ASTNode_Type : public ASTNode {
+    
+};
+
+class ASTNode_Type_Int : public ASTNode_Type {
+public:
+    void print() override {
+        std::cout << "int";
+    }
+};
+
+class ASTNode_Type_Bool : public ASTNode_Type {
+public:
+    void print() override {
+        std::cout << "bool";
+    }
+};
+
+class ASTNode_Type_Void : public ASTNode_Type {
+public:
+    void print() override {
+        std::cout << "void";
+    }
+};
+
+class ASTNode_Type_ID : public ASTNode_Type {
+private:
+    std::string id;
+
+public:
+    ASTNode_Type_ID(const char *id_c)
+        : id(id_c)
+    {
+        
+    }
+
+    void print() override {
+        std::cout << id;
+    }
+};
+
+class ASTNode_Type_Int_Array : public ASTNode_Type {
+public:
+    void print() override {
+        std::cout << "int[]";
+    }
+};
+
+class ASTNode_Type_Bool_Array : public ASTNode_Type {
+public:
+    void print() override {
+        std::cout << "bool[]";
+    }
+};
+
+class ASTNode_Type_Void_Array : public ASTNode_Type {
+public:
+    void print() override {
+        std::cout << "void[]";
+    }
+};
+
+class ASTNode_Type_ID_Array : public ASTNode_Type {
+private:
+    std::string id;
+
+public:
+    ASTNode_Type_ID_Array(const char *id_c)
+        : id(id_c)
+    {
+        
+    }
+
+    void print() override {
+        std::cout << id << "[]";
+    }
+};
 class ASTNode_Expr : public ASTNode {
 
 };
@@ -371,147 +448,20 @@ public:
     }
 };
 
-class ASTNode_Expr_New_Array_Int : public ASTNode_Expr {
+class ASTNode_Expr_New_Array : public ASTNode_Expr {
 private:
+    ASTNode_Type *type;
     ASTNode_Expr *expr;
 
 public:
-    ASTNode_Expr_New_Array_Int(ASTNode_Expr *expr)
-        : expr(expr)
+    ASTNode_Expr_New_Array(ASTNode_Type *type, ASTNode_Expr *expr)
+        : type(type), expr(expr)
     {
 
     }
 
     void print() override {
         std::cout << "new int [ ";
-        expr->print();
-        std::cout << " ]";
-    }
-};
-
-class ASTNode_Expr_New_Array_Bool : public ASTNode_Expr {
-private:
-    ASTNode_Expr *expr;
-
-public:
-    ASTNode_Expr_New_Array_Bool(ASTNode_Expr *expr)
-        : expr(expr)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "new bool [ ";
-        expr->print();
-        std::cout << " ]";
-    }
-};
-
-class ASTNode_Expr_New_Array_Void : public ASTNode_Expr {
-private:
-    ASTNode_Expr *expr;
-
-public:
-    ASTNode_Expr_New_Array_Void(ASTNode_Expr *expr)
-        : expr(expr)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "new void [ ";
-        expr->print();
-        std::cout << " ]";
-    }
-};
-
-class ASTNode_Expr_New_Array_Custom : public ASTNode_Expr {
-private:
-    ASTNode_Expr *expr;
-    std::string type;
-
-public:
-    ASTNode_Expr_New_Array_Custom(ASTNode_Expr *expr, const char *type_c)
-        : expr(expr), type(type_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "new " << type << " [ ";
-        expr->print();
-        std::cout << " ]";
-    }
-};
-
-class ASTNode_Expr_New_Array_IntArray : public ASTNode_Expr {
-private:
-    ASTNode_Expr *expr;
-
-public:
-    ASTNode_Expr_New_Array_IntArray(ASTNode_Expr *expr)
-        : expr(expr)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "new int [] [ ";
-        expr->print();
-        std::cout << " ]";
-    }
-};
-
-class ASTNode_Expr_New_Array_BoolArray : public ASTNode_Expr {
-private:
-    ASTNode_Expr *expr;
-
-public:
-    ASTNode_Expr_New_Array_BoolArray(ASTNode_Expr *expr)
-        : expr(expr)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "new bool [] [ ";
-        expr->print();
-        std::cout << " ]";
-    }
-};
-
-class ASTNode_Expr_New_Array_VoidArray : public ASTNode_Expr {
-private:
-    ASTNode_Expr *expr;
-
-public:
-    ASTNode_Expr_New_Array_VoidArray(ASTNode_Expr *expr)
-        : expr(expr)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "new void [] [ ";
-        expr->print();
-        std::cout << " ]";
-    }
-};
-
-class ASTNode_Expr_New_Array_CustomArray : public ASTNode_Expr {
-private:
-    ASTNode_Expr *expr;
-    std::string type;
-
-public:
-    ASTNode_Expr_New_Array_CustomArray(ASTNode_Expr *expr, const char *type_c)
-        : expr(expr), type(type_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "new " << type << "[] [ ";
         expr->print();
         std::cout << " ]";
     }
@@ -538,133 +488,21 @@ public:
     }
 };
 
-class ASTNode_Statement_VariableDeclaration_Int : public ASTNode_Statement {
+class ASTNode_Statement_VariableDeclaration : public ASTNode_Statement {
 private:
+    ASTNode_Type *type;
     std::string name;
 
 public:
-    ASTNode_Statement_VariableDeclaration_Int(const char* name_c)
-        : name(name_c)
+    ASTNode_Statement_VariableDeclaration(ASTNode_Type *type, const char* name_c)
+        : type(type), name(name_c)
     {
 
     }
 
     void print() override {
-        std::cout << "int " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Custom : public ASTNode_Statement {
-private:
-    std::string name;
-    std::string type;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Custom(const char* type_c, const char* name_c)
-        : type(type_c), name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << type << " " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Bool : public ASTNode_Statement {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Bool(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "bool " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Void : public ASTNode_Statement {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Void(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "void " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Int_Array : public ASTNode_Statement {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Int_Array(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "int[] " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Custom_Array : public ASTNode_Statement {
-private:
-    std::string name;
-    std::string type;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Custom_Array(const char* type_c, const char* name_c)
-        : type(type_c), name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << type << "[] " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Bool_Array : public ASTNode_Statement {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Bool_Array(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "bool[] " << name << ";" << std::endl;
-    }
-};
-
-class ASTNode_Statement_VariableDeclaration_Void_Array : public ASTNode_Statement {
-private:
-    std::string name;
-
-public:
-    ASTNode_Statement_VariableDeclaration_Void_Array(const char* name_c)
-        : name(name_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "void[] " << name << ";" << std::endl;
+        type->print();
+        std::cout << " " << name << ";" << std::endl;
     }
 };
 
@@ -909,7 +747,21 @@ public:
 };
 
 class ASTNode_Formal : public ASTNode {
+private:
+    ASTNode_Type *type;
+    std::string id;
 
+public:
+    ASTNode_Formal(ASTNode_Type *type, const char *id_c) 
+        : type(type), id(id_c)
+    {
+
+    }
+
+    void print() override {
+        type->print();
+        std::cout << " " << id;
+    }
 };
 
 class ASTNode_Formal_List : public ASTNode {
@@ -922,143 +774,163 @@ public:
     }
 
     void print() override {
-        for (auto formal : formals)
-            formal->print();
+        for (int i = 0; i < formals.size(); i++) {
+            if (i != 0)
+                std::cout << ", ";
+            formals[i]->print();
+        }
     }
 };
 
-class ASTNode_Formal_Int : ASTNode_Formal {
-private:
-    std::string id;
+class ASTNode_MemberDeclaration : public ASTNode {
 
-public:
-    ASTNode_Formal_Int(const char *id_c)
-        : id(id_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "int " << id;
-    }
 };
 
-class ASTNode_Formal_Bool : ASTNode_Formal {
+class ASTNode_MemberDeclaration_Variable : public ASTNode_MemberDeclaration {
 private:
+    ASTNode_Type *type;
     std::string id;
 
 public:
-    ASTNode_Formal_Bool(const char *id_c)
-        : id(id_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "bool " << id;
-    }
-};
-
-class ASTNode_Formal_Void : ASTNode_Formal {
-private:
-    std::string id;
-
-public:
-    ASTNode_Formal_Void(const char *id_c)
-        : id(id_c)
-    {
-
-    }
-
-    void print() override {
-        std::cout << "void " << id;
-    }
-};
-
-class ASTNode_Formal_Custom : ASTNode_Formal {
-private:
-    std::string type;
-    std::string id;
-
-public:
-    ASTNode_Formal_Custom(const char* type, const char *id_c)
+    ASTNode_MemberDeclaration_Variable(ASTNode_Type *type, const char *id_c)
         : type(type), id(id_c)
     {
 
     }
 
     void print() override {
-        std::cout << type << " " << id;
+        type->print();
+        std::cout << id << ";" << std::endl;
     }
 };
 
-class ASTNode_Formal_Int_Array : ASTNode_Formal {
+class ASTNode_MemberDeclaration_Function : public ASTNode_MemberDeclaration {
 private:
+    ASTNode_Type *type;
+    ASTNode_Formal_List *formals;
     std::string id;
+    ASTNode_Statement_Body *body;
 
 public:
-    ASTNode_Formal_Int_Array(const char *id_c)
-        : id(id_c)
+    ASTNode_MemberDeclaration_Function(ASTNode_Type *type, ASTNode_Formal_List *formals, const char *id_c, ASTNode_Statement_Body *body)
+        : type(type), formals(formals), id(id_c), body(body)
     {
 
     }
 
     void print() override {
-        std::cout << "int[] " << id;
+        type->print();
+        std::cout << " " << id << "( ";
+        formals->print();
+        std::cout << " )" << std::endl;
+
+        body->print();
     }
 };
 
-class ASTNode_Formal_Bool_Array : ASTNode_Formal {
+class ASTNode_MemberDeclaration_Constructor : public ASTNode_MemberDeclaration {
 private:
+    ASTNode_Formal_List *formals;
     std::string id;
+    ASTNode_Statement_Body *body;
 
 public:
-    ASTNode_Formal_Bool_Array(const char *id_c)
-        : id(id_c)
+    ASTNode_MemberDeclaration_Constructor(ASTNode_Formal_List *formals, const char *id_c, ASTNode_Statement_Body *body)
+        : formals(formals), id(id_c), body(body)
     {
 
     }
 
     void print() override {
-        std::cout << "bool[] " << id;
+        std::cout << id << "( ";
+        formals->print();
+        std::cout << " )" << std::endl;
+
+        std::cout << "{" << std::endl;
+        body->print();
+        std::cout << "}" << std::endl;
     }
 };
 
-class ASTNode_Formal_Void_Array : ASTNode_Formal {
+class ASTNode_MemberDeclaration_List : public ASTNode {
 private:
-    std::string id;
+    std::vector<ASTNode_MemberDeclaration*> declarations;
 
 public:
-    ASTNode_Formal_Void_Array(const char *id_c)
-        : id(id_c)
+    ASTNode_MemberDeclaration_List() {
+
+    }
+
+    void AddDeclaration(ASTNode_MemberDeclaration *decl) {
+        declarations.insert(declarations.begin(), decl);
+    }
+
+    void print() override {
+        for (auto decl : declarations)
+            decl->print();
+    }
+};
+
+class ASTNode_Class : public ASTNode {
+protected:
+    std::string name;
+    ASTNode_MemberDeclaration_List *declarations;
+
+public:
+    ASTNode_Class(const char *name_c, ASTNode_MemberDeclaration_List *declarations)
+        : name(name_c), declarations(declarations)
     {
 
     }
 
     void print() override {
-        std::cout << "void[] " << id;
+        std::cout << "class " << name << std::endl;
+        std::cout << "{" << std::endl;
+
+        declarations->print();
+
+        std::cout << "};" << std::endl;
     }
 };
 
-class ASTNode_Formal_Custom_Array : ASTNode_Formal {
-private:
-    std::string type;
-    std::string id;
+class ASTNode_Class_Child : public ASTNode_Class {
+protected:
+    std::string parent_name;
 
 public:
-    ASTNode_Formal_Custom_Array(const char *type, const char *id_c)
-        : type(type), id(id_c)
+    ASTNode_Class_Child(const char *name_c, const char *parent_name_c, ASTNode_MemberDeclaration_List *declarations)
+        : ASTNode_Class(name_c, declarations), parent_name(parent_name_c)
     {
 
     }
 
     void print() override {
-        std::cout << type << "[] " << id;
+        std::cout << "class " << name << " extends " << parent_name << std::endl;
+        std::cout << "{" << std::endl;
+
+        declarations->print();
+
+        std::cout << "};" << std::endl;
     }
 };
 
-class ASTNode_Delcaration : public ASTNode {
+class ASTNode_Class_List : public ASTNode {
+private:
+    std::vector<ASTNode_Class*> classes;
 
+public:
+    ASTNode_Class_List() {
+
+    }
+
+    void AddClass(ASTNode_Class *clazz) {
+        classes.insert(classes.begin(), clazz);
+    }
+
+    void print() override {
+        for (auto c : classes)
+            c->print();
+    }
 };
 
 class AST {
