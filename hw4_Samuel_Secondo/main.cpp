@@ -7,5 +7,6 @@ int main() {
     yyparse(&parser);
 
     ASTNode *node = parser.ast.GetRootNode();
-    node->print();
+    //node->print();
+    node->printTree(0);
 }
