@@ -4,11 +4,17 @@
 #include <vector>
 #include <memory>
 
+void printIndent(int level) {
+	for (int i = 0; i < 2 * level; i++)
+        std::cout << " ";
+}
+
 class ASTNode {
 public:
     virtual ~ASTNode() = default;
 
     virtual void print() = 0;
+    virtual void printTree(int level) = 0;
 };
 
 class ASTNode_Type : public ASTNode {
@@ -20,6 +26,11 @@ public:
     void print() override {
         std::cout << "int";
     }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Type: int" << std::endl;
+    }
 };
 
 class ASTNode_Type_Bool : public ASTNode_Type {
@@ -27,12 +38,22 @@ public:
     void print() override {
         std::cout << "bool";
     }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Type: bool" << std::endl;
+    }
 };
 
 class ASTNode_Type_Void : public ASTNode_Type {
 public:
     void print() override {
         std::cout << "void";
+    }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Type: void" << std::endl;
     }
 };
 
@@ -50,12 +71,22 @@ public:
     void print() override {
         std::cout << id;
     }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Type: " << id << std::endl;
+    }
 };
 
 class ASTNode_Type_Int_Array : public ASTNode_Type {
 public:
     void print() override {
         std::cout << "int[]";
+    }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Type: int[]" << std::endl;
     }
 };
 
@@ -64,12 +95,22 @@ public:
     void print() override {
         std::cout << "bool[]";
     }
+    
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Type: bool[]" << std::endl;
+    }
 };
 
 class ASTNode_Type_Void_Array : public ASTNode_Type {
 public:
     void print() override {
         std::cout << "void[]";
+    }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Type: void[]" << std::endl;
     }
 };
 
@@ -86,6 +127,11 @@ public:
 
     void print() override {
         std::cout << id << "[]";
+    }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Type: " << id << "[]" << std::endl;
     }
 };
 class ASTNode_Expr : public ASTNode {
@@ -109,6 +155,13 @@ public:
         std::cout << " * ";
         right->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_Times" << std::endl;
+        left->printTree(level + 1);
+        right->printTree(level + 1);
+    }
 };
 
 class ASTNode_Expr_Divide : public ASTNode_Expr {
@@ -127,6 +180,11 @@ public:
         left->print();
         std::cout << " / ";
         right->print();
+    }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_Divide" << std::endl;
     }
 };
 
@@ -147,6 +205,11 @@ public:
         std::cout << " + ";
         right->print();
     }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Expr_Plus";
+    }
 };
 
 class ASTNode_Expr_Minus : public ASTNode_Expr {
@@ -166,6 +229,11 @@ public:
         std::cout << " - ";
         right->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_Minus" << std::endl;
+    }
 };
 
 class ASTNode_Expr_Parenthesis : public ASTNode_Expr {
@@ -183,6 +251,12 @@ public:
         std::cout << "( ";
         expr->print();
         std::cout << " )";
+    }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_Parenthesis" << std::endl;
+        expr->printTree(level + 1);
     }
 };
 
@@ -203,6 +277,14 @@ public:
         std::cout << " && ";
         right->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_And" << std::endl;
+
+        left->printTree(level + 1);
+        right->printTree(level + 1);
+    }
 };
 
 class ASTNode_Expr_Or : public ASTNode_Expr {
@@ -221,6 +303,14 @@ public:
         left->print();
         std::cout << " || ";
         right->print();
+    }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_Or" << std::endl;
+
+        left->printTree(level + 1);
+        right->printTree(level + 1);
     }
 };
 
@@ -241,6 +331,14 @@ public:
         std::cout << " == ";
         right->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_Equivalent" << std::endl;
+
+        left->printTree(level + 1);
+        right->printTree(level + 1);
+    }
 };
 
 class ASTNode_Expr_IsNotEqual : public ASTNode_Expr {
@@ -259,6 +357,14 @@ public:
         left->print();
         std::cout << " != ";
         right->print();
+    }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_IsNotEqual" << std::endl;
+
+        left->printTree(level + 1);
+        right->printTree(level + 1);
     }
 };
 
@@ -279,6 +385,13 @@ public:
         std::cout << " <= ";
         right->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_LessThanOrEqual" << std::endl;
+
+        left->printTree(level + 1);
+        right->printTree(level + 1);
 };
 
 class ASTNode_Expr_LessThan : public ASTNode_Expr {
@@ -298,6 +411,13 @@ public:
         std::cout << " < ";
         right->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_LessThan" << std::endl;
+
+        left->printTree(level + 1);
+        right->printTree(level + 1);
 };
 
 class ASTNode_Expr_GreaterThanOrEqual : public ASTNode_Expr {
@@ -317,6 +437,13 @@ public:
         std::cout << " >= ";
         right->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_GreaterThanOrEqual" << std::endl;
+
+        left->printTree(level + 1);
+        right->printTree(level + 1);
 };
 
 class ASTNode_Expr_GreaterThan : public ASTNode_Expr {
@@ -336,6 +463,13 @@ public:
         std::cout << " > ";
         right->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_GreaterThan" << std::endl;
+
+        left->printTree(level + 1);
+        right->printTree(level + 1);
 };
 
 class ASTNode_Expr_UnaryMinus : public ASTNode_Expr {
@@ -352,6 +486,13 @@ public:
     void print() override {
         std::cout << "-";
         expr->print();
+    }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_UnaryMinus" << std::endl;
+
+        expr->printTree(level + 1);
     }
 };
 
@@ -370,6 +511,13 @@ public:
         std::cout << "!";
         expr->print();
     }
+
+    void printTree(int level) {
+		printIndent(level);
+        std::cout << "ASTNode_Expr_BooleanNegate" << std::endl;
+
+        expr->printTree(level + 1);
+    }
 };
 
 class ASTNode_Expr_Integer : public ASTNode_Expr {
@@ -386,6 +534,11 @@ public:
     void print() override {
         std::cout << integer;
     }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Expr_Integer: " << integer << std::endl;
+    }
 };
 
 class ASTNode_Expr_Boolean : public ASTNode_Expr {
@@ -401,6 +554,11 @@ public:
 
     void print() override {
         std::cout << (boolean ? "true" : "false");
+    }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Expr_Boolean: " << boolean << std::endl;
     }
 };
 
@@ -427,6 +585,14 @@ public:
             }
         }
     }
+
+    void printTree(int level) {
+        printIndent(level);
+		std::cout << "ASTNode_Actuals" << std::endl;
+
+        for (auto expr : expressions)
+            expr->printTree(level + 1);
+	}
 };
 
 class ASTNode_Expr_New_Obj : public ASTNode_Expr {
@@ -446,6 +612,12 @@ public:
         actuals->print();
         std::cout << " )";
     }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Expr_New_Obj: " << type;
+		actuals->printTree(level + 1);
+    }
 };
 
 class ASTNode_Expr_New_Array : public ASTNode_Expr {
@@ -464,6 +636,12 @@ public:
         std::cout << "new int [ ";
         expr->print();
         std::cout << " ]";
+    }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Expr_New_Array: " << type;
+		expr->printTree(level + 1);
     }
 };
 
@@ -486,6 +664,12 @@ public:
         expr->print();
         std::cout << ";" << std::endl;
     }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Statement_ExprOnly";
+        expr->printTree(level + 1);
+    }
 };
 
 class ASTNode_Statement_VariableDeclaration : public ASTNode_Statement {
@@ -503,6 +687,12 @@ public:
     void print() override {
         type->print();
         std::cout << " " << name << ";" << std::endl;
+    }
+
+    void printTree(int level) {
+        printIndent(level);
+        std::cout << "ASTNode_Statement_VariableDeclaration. name: " << name;
+        type->printTree(level + 1);
     }
 };
 
