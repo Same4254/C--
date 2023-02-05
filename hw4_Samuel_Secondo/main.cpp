@@ -2,11 +2,10 @@
 
 int main() {
     Parser parser;
-    extern int yyparse(Parser *parser);
+    extern int yyparse(Parser &parser);
 
-    yyparse(&parser);
+    yyparse(parser);
 
-    ASTNode *node = parser.ast.GetRootNode();
     //node->print();
-    node->printTree(0);
+    parser.ast.root.printTree(0);
 }

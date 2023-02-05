@@ -144,8 +144,8 @@ class ASTNode_Expr : public ASTNode {
 
 class ASTNode_Expr_Times : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_Times(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -170,8 +170,8 @@ public:
 
 class ASTNode_Expr_Divide : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_Divide(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -194,8 +194,8 @@ public:
 
 class ASTNode_Expr_Plus : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_Plus(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -218,8 +218,8 @@ public:
 
 class ASTNode_Expr_Minus : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_Minus(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -242,7 +242,7 @@ public:
 
 class ASTNode_Expr_Parenthesis : public ASTNode_Expr {
 private:
-    ASTNode_Expr *expr;
+    std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_Expr_Parenthesis(ASTNode_Expr *expr)
@@ -266,8 +266,8 @@ public:
 
 class ASTNode_Expr_And : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_And(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -293,8 +293,8 @@ public:
 
 class ASTNode_Expr_Or : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_Or(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -320,8 +320,8 @@ public:
 
 class ASTNode_Expr_Equivalent : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_Equivalent(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -347,8 +347,8 @@ public:
 
 class ASTNode_Expr_IsNotEqual : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_IsNotEqual(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -374,8 +374,8 @@ public:
 
 class ASTNode_Expr_LessThanOrEqual : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_LessThanOrEqual(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -401,8 +401,8 @@ public:
 
 class ASTNode_Expr_LessThan : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_LessThan(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -428,8 +428,8 @@ public:
 
 class ASTNode_Expr_GreaterThanOrEqual : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_GreaterThanOrEqual(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -455,8 +455,8 @@ public:
 
 class ASTNode_Expr_GreaterThan : public ASTNode_Expr {
 private:
-    ASTNode_Expr *left;
-    ASTNode_Expr *right;
+    std::unique_ptr<ASTNode_Expr> left;
+    std::unique_ptr<ASTNode_Expr> right;
 
 public:
     ASTNode_Expr_GreaterThan(ASTNode_Expr *left, ASTNode_Expr *right)
@@ -482,7 +482,7 @@ public:
 
 class ASTNode_Expr_UnaryMinus : public ASTNode_Expr {
 private:
-    ASTNode_Expr *expr;
+    std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_Expr_UnaryMinus(ASTNode_Expr *expr)
@@ -506,7 +506,7 @@ public:
 
 class ASTNode_Expr_BooleanNegate : public ASTNode_Expr {
 private:
-    ASTNode_Expr *expr;
+    std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_Expr_BooleanNegate(ASTNode_Expr *expr)
@@ -572,7 +572,7 @@ public:
 
 class ASTNode_Actuals : public ASTNode {
 private:
-    std::vector<ASTNode_Expr*> expressions;
+    std::vector<std::unique_ptr<ASTNode_Expr>> expressions;
 
 public:
     ASTNode_Actuals() {
@@ -580,7 +580,7 @@ public:
     }
 
     void AddExpression(ASTNode_Expr *expr) {
-        expressions.insert(expressions.begin(), expr);
+        expressions.insert(expressions.begin(), std::unique_ptr<ASTNode_Expr>(expr));
     }
 
     void print() override {
@@ -598,18 +598,18 @@ public:
         printIndent(level);
         std::cout << "ASTNode_Actuals" << std::endl;
 
-        for (auto expr : expressions)
+        for (auto& expr : expressions)
             expr->printTree(level + 1);
     }
 };
 
 class ASTNode_Expr_New_Obj : public ASTNode_Expr {
 private:
-    ASTNode_Actuals* actuals;
+    std::unique_ptr<ASTNode_Actuals> actuals;
     std::string type;
 
 public:
-    ASTNode_Expr_New_Obj(ASTNode_Actuals* actuals, const char *type_c)
+    ASTNode_Expr_New_Obj(ASTNode_Actuals *actuals, const char *type_c)
         : actuals(actuals), type(type_c)
     {
 
@@ -630,8 +630,8 @@ public:
 
 class ASTNode_Expr_New_Array : public ASTNode_Expr {
 private:
-    ASTNode_Type *type;
-    ASTNode_Expr *expr;
+    std::unique_ptr<ASTNode_Type> type;
+    std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_Expr_New_Array(ASTNode_Type *type, ASTNode_Expr *expr)
@@ -660,7 +660,7 @@ class ASTNode_Statement : public ASTNode {
 
 class ASTNode_Statement_ExprOnly : public ASTNode_Statement {
 private:
-    ASTNode_Expr *expr;
+    std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_Statement_ExprOnly(ASTNode_Expr *expr) 
@@ -683,7 +683,7 @@ public:
 
 class ASTNode_Statement_VariableDeclaration : public ASTNode_Statement {
 private:
-    ASTNode_Type *type;
+    std::unique_ptr<ASTNode_Type> type;
     std::string name;
 
 public:
@@ -723,7 +723,7 @@ public:
 
 class ASTNode_Statement_Return : public ASTNode_Statement {
 private:
-    ASTNode_Expr *expr;
+    std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_Statement_Return(ASTNode_Expr *expr) 
@@ -747,7 +747,7 @@ public:
 
 class ASTNode_Statement_Body : public ASTNode_Statement {
 private:
-    std::vector<ASTNode_Statement*> nodes;
+    std::vector<std::unique_ptr<ASTNode_Statement>> nodes;
 
 public:
     ASTNode_Statement_Body() {
@@ -756,12 +756,12 @@ public:
 
     void AddStatement(ASTNode_Statement *statement) {
         // bottom up parsing...
-        nodes.insert(nodes.begin(), statement);
+        nodes.insert(nodes.begin(), std::unique_ptr<ASTNode_Statement>(statement));
     }
 
     void print() override {
         std::cout << "{" << std::endl;
-        for (auto statement : nodes)
+        for (auto &statement : nodes)
             statement->print();
         std::cout << "}" << std::endl;
     }
@@ -769,15 +769,15 @@ public:
     void printTree(int level) override {
         printIndent(level);
         std::cout << "ASTNode_Statement_Body" << std::endl;
-        for (auto node : nodes)
+        for (auto& node : nodes)
             node->printTree(level + 1);
     }
 };
 
 class ASTNode_Statement_While : public ASTNode_Statement {
 private:
-    ASTNode_Expr *condition_expr;
-    ASTNode_Statement *statement;
+    std::unique_ptr<ASTNode_Expr> condition_expr;
+    std::unique_ptr<ASTNode_Statement> statement;
 
 public:
     ASTNode_Statement_While(ASTNode_Expr *condition_expr, ASTNode_Statement *statement)
@@ -803,8 +803,8 @@ public:
 
 class ASTNode_Statement_If : public ASTNode_Statement {
 private:
-    ASTNode_Expr *condition_expr;
-    ASTNode_Statement *statement;
+    std::unique_ptr<ASTNode_Expr> condition_expr;
+    std::unique_ptr<ASTNode_Statement> statement;
 
 public:
     ASTNode_Statement_If(ASTNode_Expr *condition_expr, ASTNode_Statement *statement) 
@@ -830,9 +830,9 @@ public:
 
 class ASTNode_Statement_IfElse : public ASTNode_Statement {
 private:
-    ASTNode_Expr *condition_expr;
-    ASTNode_Statement *statement_true;
-    ASTNode_Statement *statement_false;
+    std::unique_ptr<ASTNode_Expr> condition_expr;
+    std::unique_ptr<ASTNode_Statement> statement_true;
+    std::unique_ptr<ASTNode_Statement> statement_false;
 
 public:
     ASTNode_Statement_IfElse(ASTNode_Expr *condition_expr, ASTNode_Statement *statement_true, ASTNode_Statement *statement_false) 
@@ -886,7 +886,7 @@ public:
 
 class ASTNode_LValue_MethodCall : public ASTNode_LValue {
 private:
-    ASTNode_Actuals *actuals;
+    std::unique_ptr<ASTNode_Actuals> actuals;
     std::string id;
 
 public:
@@ -911,7 +911,7 @@ public:
 
 class ASTNode_LValue_Obj_Access : public ASTNode_LValue {
 private:
-    ASTNode_LValue *obj_lvalue;
+    std::unique_ptr<ASTNode_LValue> obj_lvalue;
     std::string id;
 
 public:
@@ -935,9 +935,9 @@ public:
 
 class ASTNode_LValue_Obj_MethodCall : public ASTNode_LValue {
 private:
-    ASTNode_LValue *obj_lvalue;
+    std::unique_ptr<ASTNode_LValue> obj_lvalue;
     std::string id;
-    ASTNode_Actuals *actuals;
+    std::unique_ptr<ASTNode_Actuals> actuals;
 
 public:
     ASTNode_LValue_Obj_MethodCall(ASTNode_LValue *obj_lvalue, const char *id_c, ASTNode_Actuals *actuals)
@@ -964,8 +964,8 @@ public:
 
 class ASTNode_LValue_Array : public ASTNode_LValue {
 private:
-    ASTNode_LValue *lvalue;
-    ASTNode_Expr *expr;
+    std::unique_ptr<ASTNode_LValue> lvalue;
+    std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_LValue_Array(ASTNode_LValue *lvalue, ASTNode_Expr *expr)
@@ -1003,8 +1003,8 @@ public:
 
 class ASTNode_Statement_Assignment : public ASTNode_Statement {
 private:
-    ASTNode_LValue *lvalue;
-    ASTNode_Expr *expr;
+    std::unique_ptr<ASTNode_LValue> lvalue;
+    std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_Statement_Assignment(ASTNode_LValue *lvalue, ASTNode_Expr *expr)
@@ -1030,7 +1030,7 @@ public:
 
 class ASTNode_Formal : public ASTNode {
 private:
-    ASTNode_Type *type;
+    std::unique_ptr<ASTNode_Type> type;
     std::string id;
 
 public:
@@ -1054,11 +1054,11 @@ public:
 
 class ASTNode_Formal_List : public ASTNode {
 private:
-    std::vector<ASTNode_Formal*> formals;
+    std::vector<std::unique_ptr<ASTNode_Formal>> formals;
 
 public:
     void AddFormal(ASTNode_Formal *formal) {
-        formals.insert(formals.begin(), formal);
+        formals.insert(formals.begin(), std::unique_ptr<ASTNode_Formal>(formal));
     }
 
     void print() override {
@@ -1072,7 +1072,7 @@ public:
     void printTree(int level) override {
         printIndent(level);
         std::cout << "ASTNode_Formal_List" << std::endl;
-        for (auto f : formals)
+        for (auto &f : formals)
             f->printTree(level + 1);
     }
 };
@@ -1083,7 +1083,7 @@ class ASTNode_MemberDeclaration : public ASTNode {
 
 class ASTNode_MemberDeclaration_Variable : public ASTNode_MemberDeclaration {
 private:
-    ASTNode_Type *type;
+    std::unique_ptr<ASTNode_Type> type;
     std::string id;
 
 public:
@@ -1107,10 +1107,10 @@ public:
 
 class ASTNode_MemberDeclaration_Function : public ASTNode_MemberDeclaration {
 private:
-    ASTNode_Type *type;
-    ASTNode_Formal_List *formals;
+    std::unique_ptr<ASTNode_Type> type;
+    std::unique_ptr<ASTNode_Formal_List> formals;
     std::string id;
-    ASTNode_Statement_Body *body;
+    std::unique_ptr<ASTNode_Statement_Body> body;
 
 public:
     ASTNode_MemberDeclaration_Function(ASTNode_Type *type, ASTNode_Formal_List *formals, const char *id_c, ASTNode_Statement_Body *body)
@@ -1139,9 +1139,9 @@ public:
 
 class ASTNode_MemberDeclaration_Constructor : public ASTNode_MemberDeclaration {
 private:
-    ASTNode_Formal_List *formals;
+    std::unique_ptr<ASTNode_Formal_List> formals;
     std::string id;
-    ASTNode_Statement_Body *body;
+    std::unique_ptr<ASTNode_Statement_Body> body;
 
 public:
     ASTNode_MemberDeclaration_Constructor(ASTNode_Formal_List *formals, const char *id_c, ASTNode_Statement_Body *body)
@@ -1170,7 +1170,7 @@ public:
 
 class ASTNode_MemberDeclaration_List : public ASTNode {
 private:
-    std::vector<ASTNode_MemberDeclaration*> declarations;
+    std::vector<std::unique_ptr<ASTNode_MemberDeclaration>> declarations;
 
 public:
     ASTNode_MemberDeclaration_List() {
@@ -1178,18 +1178,18 @@ public:
     }
 
     void AddDeclaration(ASTNode_MemberDeclaration *decl) {
-        declarations.insert(declarations.begin(), decl);
+        declarations.insert(declarations.begin(), std::unique_ptr<ASTNode_MemberDeclaration>(decl));
     }
 
     void print() override {
-        for (auto decl : declarations)
+        for (auto& decl : declarations)
             decl->print();
     }
 
     void printTree(int level) override {
         printIndent(level);
         std::cout << "ASTNode_MemberDeclaration_List" << std::endl;
-        for (auto decl : declarations)
+        for (auto& decl : declarations)
             decl->printTree(level);
     }
 };
@@ -1197,7 +1197,7 @@ public:
 class ASTNode_Class : public ASTNode {
 protected:
     std::string name;
-    ASTNode_MemberDeclaration_List *declarations;
+    std::unique_ptr<ASTNode_MemberDeclaration_List> declarations;
 
 public:
     ASTNode_Class(const char *name_c, ASTNode_MemberDeclaration_List *declarations)
@@ -1251,7 +1251,7 @@ public:
 
 class ASTNode_Class_List : public ASTNode {
 private:
-    std::vector<ASTNode_Class*> classes;
+    std::vector<std::unique_ptr<ASTNode_Class>> classes;
 
 public:
     ASTNode_Class_List() {
@@ -1259,40 +1259,25 @@ public:
     }
 
     void AddClass(ASTNode_Class *clazz) {
-        classes.insert(classes.begin(), clazz);
+        classes.insert(classes.begin(), std::unique_ptr<ASTNode_Class>(clazz));
     }
 
     void print() override {
-        for (auto c : classes)
+        for (auto& c : classes)
             c->print();
     }
 
     void printTree(int level) override {
         printIndent(level);
         std::cout << "ASTNode_Class_List" << std::endl;
-        for (auto cl : classes)
+        for (auto& cl : classes)
             cl ->printTree(level + 1);
     }
 };
 
 class AST {
 public:
-    // ownership lives here in this list so that the unique_ptrs do not need to be passed around inside the grammar
-    // makes the cleanup process very easy
-    std::vector<std::unique_ptr<ASTNode>> nodes;
-
-public:
-    template <typename T>
-    T* AddNode(std::unique_ptr<T>&& ptr) {
-        nodes.push_back(std::move(ptr));
-        return (T*)nodes[nodes.size() - 1].get();
-    }
-
-    ASTNode* GetRootNode() {
-        if (nodes.size() == 0)
-            return nullptr;
-        return nodes[nodes.size() - 1].get();
-    }
+    ASTNode_Class_List root;
 };
 
 class Parser {
