@@ -795,7 +795,7 @@ public:
 
     void printTree(int level) override {
         printIndent(level);
-        std::cout << "ASTNode_Statement_While";
+        std::cout << "ASTNode_Statement_While" << std::endl;
         condition_expr->printTree(level + 1);
         statement->printTree(level + 1);
     }
@@ -904,7 +904,7 @@ public:
 
     void printTree(int level) override {
         printIndent(level);
-        std::cout << "ASTNode_LValue_MethodCall: " << id;
+        std::cout << "ASTNode_LValue_MethodCall: " << id << std::endl;
         actuals->printTree(level + 1);
     }
 };
