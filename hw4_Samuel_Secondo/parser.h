@@ -623,7 +623,7 @@ public:
 
     void printTree(int level) override {
         printIndent(level);
-        std::cout << "ASTNode_Expr_New_Obj: " << type;
+        std::cout << "ASTNode_Expr_New_Obj: " << type << std::endl;
         actuals->printTree(level + 1);
     }
 };
@@ -676,7 +676,7 @@ public:
 
     void printTree(int level) override {
         printIndent(level);
-        std::cout << "ASTNode_Statement_ExprOnly";
+        std::cout << "ASTNode_Statement_ExprOnly" << std::endl;
         expr->printTree(level + 1);
     }
 };
