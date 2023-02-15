@@ -1,10 +1,16 @@
 #include "Scoping.hpp"
+#include "Type.hpp"
+#include <memory>
 
 Scope::MaybeDescriptor Scope::getDescriptor(const std::string &id) {
     auto search = this->descriptors.find(id);
     if (search != this->descriptors.end())
         return search->second;
     return {};
+}
+
+void Scope::setDescriptor(const std::string &id, std::shared_ptr<Descriptor> desc) {
+    this->descriptors.insert(std::make_pair(id, desc));
 }
 
 Scope::MaybeDescriptor Environment::getDescriptor(const std::string &id) {

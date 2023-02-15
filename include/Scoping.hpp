@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <optional>
+#include <iostream>
 #include <vector>
 #include <unordered_map>
 
@@ -16,6 +17,15 @@ public:
 
     MaybeDescriptor getDescriptor(const std::string &id);
     void setDescriptor(const std::string &id, std::shared_ptr<Descriptor> desc);
+
+    friend std::ostream& operator<<(std::ostream &stream, const Scope &scope) {
+        stream << "{" << std::endl;
+        for (auto pair : scope.descriptors)
+            stream << pair.first << " : {" << *pair.second << "}" << std::endl;
+        stream << "}";
+
+        return stream;
+    }
 };
 
 /**

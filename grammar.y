@@ -125,8 +125,8 @@ class_list:
     class_declaration class_klein { driver.ast.root.AddClass($1); }
 
 class_klein:
-    class_declaration class_klein { $$ = $2; $$->AddClass($1); }
-    | %empty { $$ = new ASTNode_Class_List(); }
+    class_declaration class_klein { driver.ast.root.AddClass($1); }
+    | %empty 
 
 class_declaration:
     KEYWORD_CLASS ID OPEN_BRACE member_declaration_klein CLOSE_BRACE SEMICOLON { $$ = new ASTNode_Class($2, $4); }

@@ -18,7 +18,7 @@ ADD_FLEX_BISON_DEPENDENCY(MyScanner MyGrammar)
 
 include_directories(include)
 
-add_executable(c-- main.cpp src/Driver.cpp src/Scoping.cpp src/scanner.cpp src/grammar.cpp src/grammar.h)
+add_executable(c-- main.cpp src/Driver.cpp src/Scoping.cpp src/Type.cpp src/scanner.cpp src/grammar.cpp src/grammar.h)
     # ${BISON_MyGrammar_OUTPUTS}
     # ${FLEX_MyScanner_OUTPUTS})
 

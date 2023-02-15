@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <iostream>
 #include <memory>
 
 // maybe someone should update their parser to have more than two passes so we don't gotta do this :)
@@ -30,13 +30,20 @@ public:
 
     virtual ~Type() = default;
 
+    friend std::ostream& operator<<(std::ostream& stream, const Type &type) {
+        stream << "ID: " << type.id << ", Name: " << type.name;
+        if (type.parent_type != nullptr)
+            stream << " Parent $$ " <<  *type.parent_type;
+        return stream;
+    }
+
     virtual void pushScope(Environment &environment) const;
 
     const std::shared_ptr<Type> getParentClassType() { return parent_type; }
     void setParentClassType(std::shared_ptr<Type> parent_type) { this->parent_type = parent_type; }
 
-    virtual bool typeEqual(const Type &other) const = 0;
-    virtual bool isSubtype(const Type &other) const = 0;
+    virtual bool typeEqual(const std::shared_ptr<Type> other) const = 0;
+    virtual bool isSubtype(const std::shared_ptr<Type> other) const = 0;
 
     const std::string& getName() const { return name; }
     const TYPE_ID getID() const { return id; }
@@ -53,12 +60,12 @@ public:
 
     }
 
-    bool typeEqual(const Type &other) {
-        return this->id == other.getID();
+    bool typeEqual(const std::shared_ptr<Type> other) {
+        return this->id == other->getID();
     }
 
-    bool isSubtype(const Type &other) {
-        return this->id == other.getID();
+    bool isSubtype(const std::shared_ptr<Type> other) {
+        return this->id == other->getID();
     }
 };
 
@@ -70,12 +77,12 @@ public:
 
     }
 
-    bool typeEqual(const Type &other) {
-        return this->id == other.getID();
+    bool typeEqual(const std::shared_ptr<Type> other) {
+        return this->id == other->getID();
     }
 
-    bool isSubtype(const Type &other) {
-        return this->id == other.getID();
+    bool isSubtype(const std::shared_ptr<Type> other) {
+        return this->id == other->getID();
     }
 };
 
@@ -87,12 +94,12 @@ public:
 
     }
 
-    bool typeEqual(const Type &other) {
-        return this->id == other.getID();
+    bool typeEqual(const std::shared_ptr<Type> other) {
+        return this->id == other->getID();
     }
 
-    bool isSubtype(const Type &other) {
-        return this->id == other.getID();
+    bool isSubtype(const std::shared_ptr<Type> other) {
+        return this->id == other->getID();
     }
 };
 
@@ -106,12 +113,12 @@ public:
 
     void pushScope(Environment &environment) const override;
 
-    bool typeEqual(const Type &other) const override {
-        return this->id == other.getID() && this->name == other.getName();
+    bool typeEqual(const std::shared_ptr<Type> other) const override {
+        return this->id == other->getID() && this == other.get();
     }
 
-    bool isSubtype(const Type &other) const override {
-        if (other.getID() != this->id)
+    bool isSubtype(const std::shared_ptr<Type> other) const override {
+        if (other->getID() != this->id)
             return false;
 
         if (this->typeEqual(other))
@@ -136,11 +143,16 @@ public:
     }
 
     const std::shared_ptr<Type> getType() const { return type; }
+
+    friend std::ostream& operator<<(std::ostream &stream, const Descriptor &descriptor) {
+        stream << *descriptor.type;
+        return stream;
+    }
 };
 
 class Descriptor_Class : public Descriptor {
 private:
-    std::shared_ptr<Descriptor_Class> parent_class;
+    //std::shared_ptr<Descriptor_Class> parent_class;
 
 public:
     Descriptor_Class(std::string name)
@@ -149,8 +161,8 @@ public:
 
     }
 
-    void setParentClass(std::shared_ptr<Descriptor_Class> parent_class) {
-        this->parent_class = parent_class;
-        this->type->setParentClassType(parent_class->getType());
-    }
+    //void setParentClass(std::shared_ptr<Descriptor_Class> parent_class) {
+    //    this->parent_class = parent_class;
+    //    this->type->setParentClassType(parent_class->getType());
+    //}
 };

@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_HOME_SAM_CODINGPROJECTS_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED
 # define YY_YY_HOME_SAM_CODINGPROJECTS_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED
@@ -44,52 +45,57 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    SEMICOLON = 258,
-    COMMA = 259,
-    KEYWORD_NEW = 260,
-    KEYWORD_RETURN = 261,
-    OPEN_SQUARE = 262,
-    CLOSE_SQUARE = 263,
-    ASSIGN = 264,
-    LESS_THAN_OR_EQUAL = 265,
-    GREATER_THAN_OR_EQUAL = 266,
-    EQUIVALENT = 267,
-    IS_NOT_EQUAL = 268,
-    LESS_THAN = 269,
-    GREATER_THAN = 270,
-    OR = 271,
-    AND = 272,
-    MINUS = 273,
-    PLUS = 274,
-    DIVIDE = 275,
-    TIMES = 276,
-    NEGATE = 277,
-    DOT = 278,
-    OPEN_PARENTHESIS = 279,
-    CLOSE_PARENTHESIS = 280,
-    OPEN_BRACE = 281,
-    CLOSE_BRACE = 282,
-    SQUARE_PAIR = 283,
-    KEYWORD_WHILE = 284,
-    KEYWORD_IF = 285,
-    KEYWORD_ELSE = 286,
-    KEYWORD_THIS = 287,
-    KEYWORD_CLASS = 288,
-    KEYWORD_EXTENDS = 289,
-    KEYWORD_INT = 290,
-    KEYWORD_BOOL = 291,
-    KEYWORD_VOID = 292,
-    KEYWORD_TRUE = 293,
-    KEYWORD_FALSE = 294,
-    INTEGER = 295,
-    ID = 296,
-    UNKOWN = 297
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    SEMICOLON = 258,               /* SEMICOLON  */
+    COMMA = 259,                   /* COMMA  */
+    KEYWORD_NEW = 260,             /* KEYWORD_NEW  */
+    KEYWORD_RETURN = 261,          /* KEYWORD_RETURN  */
+    OPEN_SQUARE = 262,             /* OPEN_SQUARE  */
+    CLOSE_SQUARE = 263,            /* CLOSE_SQUARE  */
+    ASSIGN = 264,                  /* ASSIGN  */
+    LESS_THAN_OR_EQUAL = 265,      /* LESS_THAN_OR_EQUAL  */
+    GREATER_THAN_OR_EQUAL = 266,   /* GREATER_THAN_OR_EQUAL  */
+    EQUIVALENT = 267,              /* EQUIVALENT  */
+    IS_NOT_EQUAL = 268,            /* IS_NOT_EQUAL  */
+    LESS_THAN = 269,               /* LESS_THAN  */
+    GREATER_THAN = 270,            /* GREATER_THAN  */
+    OR = 271,                      /* OR  */
+    AND = 272,                     /* AND  */
+    MINUS = 273,                   /* MINUS  */
+    PLUS = 274,                    /* PLUS  */
+    DIVIDE = 275,                  /* DIVIDE  */
+    TIMES = 276,                   /* TIMES  */
+    NEGATE = 277,                  /* NEGATE  */
+    DOT = 278,                     /* DOT  */
+    OPEN_PARENTHESIS = 279,        /* OPEN_PARENTHESIS  */
+    CLOSE_PARENTHESIS = 280,       /* CLOSE_PARENTHESIS  */
+    OPEN_BRACE = 281,              /* OPEN_BRACE  */
+    CLOSE_BRACE = 282,             /* CLOSE_BRACE  */
+    SQUARE_PAIR = 283,             /* SQUARE_PAIR  */
+    KEYWORD_WHILE = 284,           /* KEYWORD_WHILE  */
+    KEYWORD_IF = 285,              /* KEYWORD_IF  */
+    KEYWORD_ELSE = 286,            /* KEYWORD_ELSE  */
+    KEYWORD_THIS = 287,            /* KEYWORD_THIS  */
+    KEYWORD_CLASS = 288,           /* KEYWORD_CLASS  */
+    KEYWORD_EXTENDS = 289,         /* KEYWORD_EXTENDS  */
+    KEYWORD_INT = 290,             /* KEYWORD_INT  */
+    KEYWORD_BOOL = 291,            /* KEYWORD_BOOL  */
+    KEYWORD_VOID = 292,            /* KEYWORD_VOID  */
+    KEYWORD_TRUE = 293,            /* KEYWORD_TRUE  */
+    KEYWORD_FALSE = 294,           /* KEYWORD_FALSE  */
+    INTEGER = 295,                 /* INTEGER  */
+    ID = 296,                      /* ID  */
+    UNKOWN = 297                   /* UNKOWN  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
@@ -120,7 +126,7 @@ union YYSTYPE
     ASTNode_Class *clazz;
     ASTNode_Class_List *class_list;
 
-#line 124 "/home/sam/CodingProjects/Compiler-Assignments/src/grammar.h"
+#line 130 "/home/sam/CodingProjects/Compiler-Assignments/src/grammar.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -130,6 +136,8 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
+
 int yyparse (Driver &driver);
+
 
 #endif /* !YY_YY_HOME_SAM_CODINGPROJECTS_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED  */

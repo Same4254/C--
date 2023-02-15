@@ -8,4 +8,8 @@ int main() {
 
     //node->print();
     driver.ast.root.printTree(0);
+
+    Environment env;
+    driver.ast.root.pass_0(env);
+    driver.ast.root.pass_1(env);
 }

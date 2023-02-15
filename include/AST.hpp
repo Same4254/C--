@@ -1207,7 +1207,10 @@ public:
     }
 
     virtual void pass_0(Environment &env) {
-        env.getTopScope()->setDescriptor(name, std::make_shared<Descriptor_Class>(name));
+        auto desc = std::make_shared<Descriptor_Class>(name);
+        env.getTopScope()->setDescriptor(name, desc);
+
+        desc->getType()->setScope(scope);
     }
 
     virtual void pass_1(Environment &env) {
@@ -1243,6 +1246,9 @@ public:
 
     void pass_1(Environment &env) override {
         Scope::MaybeDescriptor desc = env.getTopScope()->getDescriptor(name);
+        Scope::MaybeDescriptor parent_desc = env.getTopScope()->getDescriptor(parent_name);
+
+        desc.value()->getType()->setParentClassType(parent_desc.value()->getType());
     }
 
     void print() override {
@@ -1267,7 +1273,7 @@ private:
     std::shared_ptr<Scope> scope;
 
 public:
-    ASTNode_Class_List() {
+    ASTNode_Class_List() : scope(std::make_shared<Scope>()) {
 
     }
 
@@ -1280,6 +1286,9 @@ public:
             for (auto& clazz : classes)
                 clazz->pass_0(env);
         env.popScope();
+
+        std::cout << "Pass 0:" << std::endl;
+        std::cout << *scope << std::endl;
     }
 
     void pass_1(Environment &env) {
@@ -1287,6 +1296,9 @@ public:
             for (auto& clazz : classes)
                 clazz->pass_1(env);
         env.popScope();
+
+        std::cout << std::endl << "Pass 1:" << std::endl;
+        std::cout << *scope << std::endl;
     }
 
     void print() override {
