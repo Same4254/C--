@@ -1,4 +1,6 @@
 class X {
+    Z obj;
+
     X(int x, int[] z) {
         int y;
         int z;
@@ -23,10 +25,10 @@ class X {
     }
 };
 
-class Y {
+class Y extends X {
 
 };
 
-class Z extends X {
+class Z extends Y {
 
 };

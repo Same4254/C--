@@ -1290,6 +1290,8 @@ public:
         env.getTopScope()->setDescriptor(name, desc);
 
         desc->getType()->setScope(scope);
+
+        std::cout << *desc << std::endl << std::endl;
     }
 
     virtual void pass_1(Environment &env) {
@@ -1301,7 +1303,8 @@ public:
         desc->getType()->pushScope(env);
 
         declarations->pass_2(env);
-        std::cout << *scope << std::endl;
+        //std::cout << *scope << std::endl;
+        std::cout << *desc << std::endl << std::endl;
 
         desc->getType()->popScope(env);
     }
@@ -1338,6 +1341,7 @@ public:
         Scope::MaybeDescriptor parent_desc = env.getTopScope()->getDescriptor(parent_name);
 
         desc.value()->getType()->setParentClassType(parent_desc.value()->getType());
+        std::cout << *desc.value() << std::endl << std::endl;
     }
 
     void print() override {
@@ -1371,33 +1375,31 @@ public:
     }
 
     void pass_0(Environment &env) {
+        std::cout << "Pass 0:" << std::endl;
         env.addScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_0(env);
         env.popScope();
-
-        std::cout << "Pass 0:" << std::endl;
-        std::cout << *scope << std::endl;
     }
 
     void pass_1(Environment &env) {
+        std::cout << std::endl << "Pass 1:" << std::endl;
         env.addScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_1(env);
         env.popScope();
 
-        std::cout << std::endl << "Pass 1:" << std::endl;
-        std::cout << *scope << std::endl;
+        //std::cout << *scope << std::endl;
     }
 
     void pass_2(Environment & env) {
+        std::cout << std::endl << "Pass 2:" << std::endl;
         env.addScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_2(env);
         env.popScope();
 
-        std::cout << std::endl << "Pass 2:" << std::endl;
-        std::cout << *scope << std::endl;
+        //std::cout << *scope << std::endl;
     }
 
     void print() override {

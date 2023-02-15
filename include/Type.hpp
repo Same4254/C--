@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <memory>
+#include <ostream>
+#include <unordered_map>
 #include <vector>
 
 // maybe someone should update their parser to have more than two passes so we don't gotta do this :)
@@ -33,9 +35,10 @@ public:
     virtual ~Type() = default;
 
     friend std::ostream& operator<<(std::ostream& stream, const Type &type) {
-        stream << "ID: " << type.id << ", Name: " << type.name;
+        stream << "{" << type.name;
         if (type.parent_type != nullptr)
-            stream << " Parent $$ " <<  *type.parent_type;
+            stream << " Parent: " <<  *type.parent_type;
+        stream << "}";
         return stream;
     }
 
@@ -58,7 +61,7 @@ public:
 class Type_Int : public Type {
 public:
     Type_Int() 
-        : Type(TYPE_ID::INT, "int")
+        : Type(TYPE_ID::INT, "TYPE_INT")
     {
 
     }
@@ -75,7 +78,7 @@ public:
 class Type_Bool : public Type {
 public:
     Type_Bool() 
-        : Type(TYPE_ID::BOOL, "bool")
+        : Type(TYPE_ID::BOOL, "TYPE_BOOL")
     {
 
     }
@@ -92,7 +95,7 @@ public:
 class Type_Void : public Type {
 public:
     Type_Void() 
-        : Type(TYPE_ID::VOID, "void")
+        : Type(TYPE_ID::VOID, "TYPE_VOID")
     {
 
     }
@@ -109,7 +112,7 @@ public:
 class Type_Class : public Type {
 public:
     Type_Class(std::string &name)
-        : Type(TYPE_ID::CLASS, name)
+        : Type(TYPE_ID::CLASS, "TYPE_" + name)
     {
 
     }
@@ -141,7 +144,7 @@ private:
 
 public:
     Type_Array(std::shared_ptr<Type> element_type) 
-        : Type(TYPE_ID::ARRAY, "array"), element_type(element_type)
+        : Type(TYPE_ID::ARRAY, "TYPE_ARRAY"), element_type(element_type)
     {
 
     }
@@ -173,7 +176,7 @@ public:
     const std::shared_ptr<Type> getType() const { return type; }
 
     virtual void print(std::ostream &stream) const {
-        stream << *this->type;
+        stream << *this->type << " ";
     }
 
     friend std::ostream& operator<<(std::ostream &stream, const Descriptor &descriptor) {
@@ -192,6 +195,8 @@ public:
     {
 
     }
+
+    void print(std::ostream &stream) const override;
 
     //void setParentClass(std::shared_ptr<Descriptor_Class> parent_class) {
     //    this->parent_class = parent_class;
@@ -215,8 +220,10 @@ public:
     }
 
     void print(std::ostream &stream) const override { 
+        stream << *type << ", ( ";
         for (auto t : argument_types)
-            stream << *t;
+            stream << *t << " ";
+        stream << ")";
     }
 };
 

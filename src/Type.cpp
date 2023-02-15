@@ -1,5 +1,6 @@
 #include "Scoping.hpp"
 #include "Type.hpp"
+#include <ostream>
 
 void Type::pushScope(Environment &environment) const {
     if (this->scope != nullptr)
@@ -23,4 +24,10 @@ void Type_Class::popScope(Environment &environment) const {
         parent_type->popScope(environment);
 
     environment.popScope();
+}
+
+void Descriptor_Class::print(std::ostream &stream) const {
+    stream << "Class " << *type << " {" << std::endl;
+    stream << *type->getScope();
+    stream << "}";
 }
