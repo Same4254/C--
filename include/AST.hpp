@@ -1375,7 +1375,6 @@ public:
     }
 
     void pass_0(Environment &env) {
-        std::cout << "Pass 0:" << std::endl;
         env.addScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_0(env);
@@ -1383,7 +1382,6 @@ public:
     }
 
     void pass_1(Environment &env) {
-        std::cout << std::endl << "Pass 1:" << std::endl;
         env.addScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_1(env);
@@ -1393,7 +1391,6 @@ public:
     }
 
     void pass_2(Environment & env) {
-        std::cout << std::endl << "Pass 2:" << std::endl;
         env.addScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_2(env);
