@@ -13,7 +13,6 @@ enum TYPE_ID {
     BOOL,
     VOID,
     CLASS,
-    ARRAY
 };
 
 class Type {
@@ -40,7 +39,6 @@ public:
     }
 
     virtual void pushScope(Environment &environment) const;
-    virtual void popScope(Environment &environment) const;
 
     const std::shared_ptr<Type> getParentClassType() { return parent_type; }
     void setParentClassType(std::shared_ptr<Type> parent_type) { this->parent_type = parent_type; }
@@ -63,11 +61,11 @@ public:
 
     }
 
-    bool typeEqual(const std::shared_ptr<Type> other) const override {
+    bool typeEqual(const std::shared_ptr<Type> other) {
         return this->id == other->getID();
     }
 
-    bool isSubtype(const std::shared_ptr<Type> other) const override {
+    bool isSubtype(const std::shared_ptr<Type> other) {
         return this->id == other->getID();
     }
 };
@@ -80,11 +78,11 @@ public:
 
     }
 
-    bool typeEqual(const std::shared_ptr<Type> other) const override {
+    bool typeEqual(const std::shared_ptr<Type> other) {
         return this->id == other->getID();
     }
 
-    bool isSubtype(const std::shared_ptr<Type> other) const override {
+    bool isSubtype(const std::shared_ptr<Type> other) {
         return this->id == other->getID();
     }
 };
@@ -97,11 +95,11 @@ public:
 
     }
 
-    bool typeEqual(const std::shared_ptr<Type> other) const override {
+    bool typeEqual(const std::shared_ptr<Type> other) {
         return this->id == other->getID();
     }
 
-    bool isSubtype(const std::shared_ptr<Type> other) const override {
+    bool isSubtype(const std::shared_ptr<Type> other) {
         return this->id == other->getID();
     }
 };
@@ -115,7 +113,6 @@ public:
     }
 
     void pushScope(Environment &environment) const override;
-    void popScope(Environment &environment) const override;
 
     bool typeEqual(const std::shared_ptr<Type> other) const override {
         return this->id == other->getID() && this == other.get();
@@ -135,30 +132,6 @@ public:
     }
 };
 
-class Type_Array : public Type {
-private:
-    std::shared_ptr<Type> element_type;
-
-public:
-    Type_Array(std::shared_ptr<Type> element_type) 
-        : Type(TYPE_ID::ARRAY, "array"), element_type(element_type)
-    {
-
-    }
-
-    bool typeEqual(const std::shared_ptr<Type> other) const override {
-        if (this->id == other->getID())
-            return element_type->typeEqual(std::static_pointer_cast<Type_Array>(other)->element_type);
-        return false;
-    }
-
-    bool isSubtype(const std::shared_ptr<Type> other) const override {
-        if (this->id == other->getID())
-            return element_type->isSubtype(std::static_pointer_cast<Type_Array>(other)->element_type);
-        return false;
-    }
-};
-
 class Descriptor {
 protected:
     std::shared_ptr<Type> type;
@@ -172,12 +145,11 @@ public:
 
     const std::shared_ptr<Type> getType() const { return type; }
 
-    virtual void print(std::ostream &stream) const {
-        stream << *this->type;
+    virtual void print(std::ostream &stream) {
+        stream << *type;
     }
 
     friend std::ostream& operator<<(std::ostream &stream, const Descriptor &descriptor) {
-        descriptor.print(stream);
         return stream;
     }
 };
@@ -201,22 +173,13 @@ public:
 
 class Descriptor_Method : public Descriptor {
 private:
-    std::vector<std::shared_ptr<Type>> argument_types;
+    std::vector<std::shared_ptr<Type>> argumentTypes;
 
 public:
     Descriptor_Method(std::string name, std::shared_ptr<Type> return_type) 
         : Descriptor(return_type) 
     {
 
-    }
-
-    void addArgumentType(std::shared_ptr<Type> type) {
-        argument_types.push_back(type);
-    }
-
-    void print(std::ostream &stream) const override { 
-        for (auto t : argument_types)
-            stream << *t;
     }
 };
 

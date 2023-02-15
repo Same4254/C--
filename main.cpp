@@ -12,4 +12,5 @@ int main() {
     Environment env;
     driver.ast.root.pass_0(env);
     driver.ast.root.pass_1(env);
+    driver.ast.root.pass_2(env);
 }

@@ -21,11 +21,16 @@ public:
 };
 
 class ASTNode_Type : public ASTNode {
-
+public:
+    virtual std::shared_ptr<Type> getType(Environment &env) = 0;
 };
 
 class ASTNode_Type_Int : public ASTNode_Type {
 public:
+    std::shared_ptr<Type> getType(Environment &env) override {
+        return std::make_shared<Type_Int>();
+    }
+
     void print() override {
         std::cout << "int";
     }
@@ -38,6 +43,10 @@ public:
 
 class ASTNode_Type_Bool : public ASTNode_Type {
 public:
+    std::shared_ptr<Type> getType(Environment &env) override {
+        return std::make_shared<Type_Bool>();
+    }
+
     void print() override {
         std::cout << "bool";
     }
@@ -50,6 +59,10 @@ public:
 
 class ASTNode_Type_Void : public ASTNode_Type {
 public:
+    std::shared_ptr<Type> getType(Environment &env) override {
+        return std::make_shared<Type_Void>();
+    }
+
     void print() override {
         std::cout << "void";
     }
@@ -71,6 +84,12 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        // should exist because we go through all of the classes in the first pass
+        auto desc = env.getDescriptor(id);
+        return desc.value()->getType();
+    }
+
     void print() override {
         std::cout << id;
     }
@@ -83,6 +102,10 @@ public:
 
 class ASTNode_Type_Int_Array : public ASTNode_Type {
 public:
+    std::shared_ptr<Type> getType(Environment &env) override {
+        return std::make_shared<Type_Array>(std::make_shared<Type_Int>());
+    }
+
     void print() override {
         std::cout << "int[]";
     }
@@ -95,6 +118,10 @@ public:
 
 class ASTNode_Type_Bool_Array : public ASTNode_Type {
 public:
+    std::shared_ptr<Type> getType(Environment &env) override {
+        return std::make_shared<Type_Array>(std::make_shared<Type_Bool>());
+    }
+
     void print() override {
         std::cout << "bool[]";
     }
@@ -107,6 +134,10 @@ public:
 
 class ASTNode_Type_Void_Array : public ASTNode_Type {
 public:
+    std::shared_ptr<Type> getType(Environment &env) override {
+        return std::make_shared<Type_Array>(std::make_shared<Type_Void>());
+    }
+
     void print() override {
         std::cout << "void[]";
     }
@@ -126,6 +157,11 @@ public:
         : id(id_c)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        auto desc = env.getDescriptor(id);
+        return std::make_shared<Type_Array>(desc.value()->getType());
     }
 
     void print() override {
@@ -1039,6 +1075,10 @@ public:
 
     }
 
+    void pass_2(Environment& env, std::shared_ptr<Descriptor_Method> method_descriptor) {
+        method_descriptor->addArgumentType(type->getType(env));
+    }
+
     void print() override {
         type->print();
         std::cout << " " << id;
@@ -1060,6 +1100,11 @@ public:
         formals.insert(formals.begin(), std::unique_ptr<ASTNode_Formal>(formal));
     }
 
+    void pass_2(Environment& env, std::shared_ptr<Descriptor_Method> method_descriptor) {
+        for (auto& formal : formals)
+            formal->pass_2(env, method_descriptor);
+    }
+
     void print() override {
         for (int i = 0; i < formals.size(); i++) {
             if (i != 0)
@@ -1077,7 +1122,8 @@ public:
 };
 
 class ASTNode_MemberDeclaration : public ASTNode {
-
+public:
+    virtual void pass_2(Environment &env) = 0;
 };
 
 class ASTNode_MemberDeclaration_Variable : public ASTNode_MemberDeclaration {
@@ -1090,6 +1136,10 @@ public:
         : type(type), id(id_c)
     {
 
+    }
+
+    void pass_2(Environment &env) override {
+        env.getTopScope()->setDescriptor(id, std::make_shared<Descriptor_Field>(type->getType(env)));
     }
 
     void print() override {
@@ -1111,11 +1161,23 @@ private:
     std::string id;
     std::unique_ptr<ASTNode_Statement_Body> body;
 
+    std::shared_ptr<Scope> argument_scope;
+    std::shared_ptr<Scope> body_scope;
+
 public:
     ASTNode_MemberDeclaration_Function(ASTNode_Type *type, ASTNode_Formal_List *formals, const char *id_c, ASTNode_Statement_Body *body)
-        : type(type), formals(formals), id(id_c), body(body)
+        : type(type), formals(formals), id(id_c), body(body), argument_scope(std::make_shared<Scope>()), body_scope()
     {
 
+    }
+
+    void pass_2(Environment &env) override {
+        auto desc = std::make_shared<Descriptor_Method>(id, type->getType(env));
+        env.getTopScope()->setDescriptor(id, desc);
+
+        env.addScope(argument_scope);
+            formals->pass_2(env, desc);
+        env.popScope();
     }
 
     void print() override {
@@ -1142,11 +1204,23 @@ private:
     std::string id;
     std::unique_ptr<ASTNode_Statement_Body> body;
 
+    std::shared_ptr<Scope> argument_scope;
+    std::shared_ptr<Scope> body_scope;
+
 public:
     ASTNode_MemberDeclaration_Constructor(ASTNode_Formal_List *formals, const char *id_c, ASTNode_Statement_Body *body)
-        : formals(formals), id(id_c), body(body)
+        : formals(formals), id(id_c), body(body), argument_scope(std::make_shared<Scope>()), body_scope(std::make_shared<Scope>())
     {
 
+    }
+
+    void pass_2(Environment &env) override {
+        auto desc = std::make_shared<Descriptor_Method>(id, std::make_shared<Type_Void>());
+        env.getTopScope()->setDescriptor(id, desc);
+
+        env.addScope(argument_scope);
+            formals->pass_2(env, desc);
+        env.popScope();
     }
 
     void print() override {
@@ -1180,6 +1254,11 @@ public:
         declarations.insert(declarations.begin(), std::unique_ptr<ASTNode_MemberDeclaration>(decl));
     }
 
+    void pass_2(Environment &env) {
+        for (auto& decl : declarations)
+            decl->pass_2(env);
+    }
+
     void print() override {
         for (auto& decl : declarations)
             decl->print();
@@ -1201,7 +1280,7 @@ protected:
 
 public:
     ASTNode_Class(const char *name_c, ASTNode_MemberDeclaration_List *declarations)
-        : name(name_c), declarations(declarations)
+        : name(name_c), declarations(declarations), scope(std::make_shared<Scope>())
     {
 
     }
@@ -1215,6 +1294,16 @@ public:
 
     virtual void pass_1(Environment &env) {
 
+    }
+
+    virtual void pass_2(Environment & env) {
+        auto desc = env.getTopScope()->getDescriptor(name).value();
+        desc->getType()->pushScope(env);
+
+        declarations->pass_2(env);
+        std::cout << *scope << std::endl;
+
+        desc->getType()->popScope(env);
     }
 
     void print() override {
@@ -1301,6 +1390,16 @@ public:
         std::cout << *scope << std::endl;
     }
 
+    void pass_2(Environment & env) {
+        env.addScope(scope);
+            for (auto& clazz : classes)
+                clazz->pass_2(env);
+        env.popScope();
+
+        std::cout << std::endl << "Pass 2:" << std::endl;
+        std::cout << *scope << std::endl;
+    }
+
     void print() override {
         for (auto& c : classes)
             c->print();
@@ -1324,5 +1423,9 @@ public:
 
     void pass_1(Environment &env) {
         root.pass_1(env);
+    }
+
+    void pass_2(Environment & env) {
+        root.pass_2(env);
     }
 };
