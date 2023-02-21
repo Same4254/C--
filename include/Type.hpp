@@ -185,35 +185,19 @@ public:
     }
 };
 
-class Descriptor_Class : public Descriptor {
-private:
-    //std::shared_ptr<Descriptor_Class> parent_class;
-
-public:
-    Descriptor_Class(std::string name)
-        : Descriptor(std::make_shared<Type_Class>(name))
-    {
-
-    }
-
-    void print(std::ostream &stream) const override;
-
-    //void setParentClass(std::shared_ptr<Descriptor_Class> parent_class) {
-    //    this->parent_class = parent_class;
-    //    this->type->setParentClassType(parent_class->getType());
-    //}
-};
-
 class Descriptor_Method : public Descriptor {
 private:
     std::vector<std::shared_ptr<Type>> argument_types;
+    std::string name;
 
 public:
     Descriptor_Method(std::string name, std::shared_ptr<Type> return_type) 
-        : Descriptor(return_type) 
+        : Descriptor(return_type), name(name)
     {
 
     }
+
+    std::string getName() { return name; }
 
     void addArgumentType(std::shared_ptr<Type> type) {
         argument_types.push_back(type);
@@ -235,3 +219,77 @@ public:
 
     }
 };
+
+class Descriptor_Constructor : public Descriptor_Method {
+private:
+    std::vector<std::shared_ptr<Type>> argument_types;
+
+public:
+    Descriptor_Constructor(std::string name) 
+        : Descriptor_Method(name, std::make_shared<Type_Void>()) 
+    {
+
+    }
+
+    void addArgumentType(std::shared_ptr<Type> type) {
+        argument_types.push_back(type);
+    }
+
+    void print(std::ostream &stream) const override { 
+        stream << *type << ", ( ";
+        for (auto t : argument_types)
+            stream << *t << " ";
+        stream << ")";
+    }
+};
+
+class Descriptor_Class : public Descriptor {
+private:
+    // std::shared_ptr<Descriptor_Class> parent_class;
+    std::shared_ptr<Descriptor_Constructor> desc_constructor;
+
+    std::vector<std::shared_ptr<Descriptor_Field>> desc_fields;
+    std::vector<std::shared_ptr<Descriptor_Method>> desc_methods;
+
+    std::string name;
+
+public:
+    Descriptor_Class(std::string name)
+        : Descriptor(std::make_shared<Type_Class>(name)), desc_constructor(nullptr), name(name)
+    {
+
+    }
+
+    void print(std::ostream &stream) const override;
+
+    //void setParentClass(std::shared_ptr<Descriptor_Class> parent_class) {
+    //    this->parent_class = parent_class;
+    //    this->type->setParentClassType(parent_class->getType());
+    //}
+
+    void setConstructor(std::shared_ptr<Descriptor_Constructor> desc_constructor) {
+        if (hasConstructor()) {
+            std::cout << "Cannot have multiple definitions of the constructor for class " << type->getName() << std::endl;
+            exit(1);
+        }
+
+        if (desc_constructor->getName() == this->type->getName()) {
+            this->desc_constructor = desc_constructor;
+        } else {
+            std::cout << "[Error]: Class name " << this->type->getName() << " and constructor name " << desc_constructor->getName() << " do not match!" << std::endl;
+            exit(1);
+        }
+    }
+
+    bool hasConstructor() { return desc_constructor != nullptr; }
+
+    void addField(std::shared_ptr<Descriptor_Field> desc_field) {
+        desc_fields.push_back(desc_field);
+    }
+
+    void addMethod(std::shared_ptr<Descriptor_Method> desc_method) {
+        desc_methods.push_back(desc_method);
+    }
+};
+
+

@@ -35,3 +35,7 @@ void Environment::popScope() {
 std::shared_ptr<Scope> Environment::getTopScope() {
     return scope_stack[scope_stack.size() - 1];
 }
+
+std::shared_ptr<Scope> Environment::getBottomScope() {
+    return scope_stack[0];
+}

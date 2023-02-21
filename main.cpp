@@ -22,4 +22,7 @@ int main() {
 
     std::cout << "----- Pass 2 -----" << std::endl;
     driver.ast.root.pass_2(env);
+
+    std::cout << "----- Pass 3 -----" << std::endl;
+    driver.ast.root.pass_3(env);
 }

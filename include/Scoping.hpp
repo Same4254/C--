@@ -38,5 +38,7 @@ public:
 
     void addScope(std::shared_ptr<Scope> scope);
     void popScope();
+
     std::shared_ptr<Scope> getTopScope();
+    std::shared_ptr<Scope> getBottomScope();
 };

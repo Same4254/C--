@@ -85,8 +85,8 @@ public:
     }
 
     std::shared_ptr<Type> getType(Environment &env) override {
-        // should exist because we go through all of the classes in the first pass
-        auto desc = env.getDescriptor(id);
+        // get it from the first scope because that is where the classes are declared
+        auto desc = env.getBottomScope()->getDescriptor(id);
         return desc.value()->getType();
     }
 
@@ -1123,7 +1123,7 @@ public:
 
 class ASTNode_MemberDeclaration : public ASTNode {
 public:
-    virtual void pass_2(Environment &env) = 0;
+    virtual void pass_2(Environment &env, Descriptor_Class &class_desc) = 0;
 };
 
 class ASTNode_MemberDeclaration_Variable : public ASTNode_MemberDeclaration {
@@ -1138,8 +1138,10 @@ public:
 
     }
 
-    void pass_2(Environment &env) override {
-        env.getTopScope()->setDescriptor(id, std::make_shared<Descriptor_Field>(type->getType(env)));
+    void pass_2(Environment &env, Descriptor_Class &class_desc) override {
+        auto desc = std::make_shared<Descriptor_Field>(type->getType(env));
+        env.getTopScope()->setDescriptor(id, desc);
+        class_desc.addField(desc);
     }
 
     void print() override {
@@ -1171,9 +1173,10 @@ public:
 
     }
 
-    void pass_2(Environment &env) override {
+    void pass_2(Environment &env, Descriptor_Class &class_desc) override {
         auto desc = std::make_shared<Descriptor_Method>(id, type->getType(env));
         env.getTopScope()->setDescriptor(id, desc);
+        class_desc.addMethod(desc);
 
         env.addScope(argument_scope);
             formals->pass_2(env, desc);
@@ -1214,9 +1217,10 @@ public:
 
     }
 
-    void pass_2(Environment &env) override {
-        auto desc = std::make_shared<Descriptor_Method>(id, std::make_shared<Type_Void>());
+    void pass_2(Environment &env, Descriptor_Class &class_desc) override {
+        auto desc = std::make_shared<Descriptor_Constructor>(id);
         env.getTopScope()->setDescriptor(id, desc);
+        class_desc.setConstructor(desc);
 
         env.addScope(argument_scope);
             formals->pass_2(env, desc);
@@ -1254,9 +1258,9 @@ public:
         declarations.insert(declarations.begin(), std::unique_ptr<ASTNode_MemberDeclaration>(decl));
     }
 
-    void pass_2(Environment &env) {
+    void pass_2(Environment &env, Descriptor_Class &class_desc) {
         for (auto& decl : declarations)
-            decl->pass_2(env);
+            decl->pass_2(env, class_desc);
     }
 
     void print() override {
@@ -1278,18 +1282,18 @@ protected:
     std::unique_ptr<ASTNode_MemberDeclaration_List> declarations;
     std::shared_ptr<Scope> scope;
 
+    std::shared_ptr<Descriptor_Class> desc;
+
 public:
     ASTNode_Class(const char *name_c, ASTNode_MemberDeclaration_List *declarations)
-        : name(name_c), declarations(declarations), scope(std::make_shared<Scope>())
+        : name(name_c), declarations(declarations), scope(std::make_shared<Scope>()), desc(std::make_shared<Descriptor_Class>(name))
     {
 
     }
 
     virtual void pass_0(Environment &env) {
-        auto desc = std::make_shared<Descriptor_Class>(name);
         env.getTopScope()->setDescriptor(name, desc);
-
-        desc->getType()->setScope(scope);
+        this->desc->getType()->setScope(scope);
 
         std::cout << *desc << std::endl << std::endl;
     }
@@ -1299,14 +1303,18 @@ public:
     }
 
     virtual void pass_2(Environment & env) {
-        auto desc = env.getTopScope()->getDescriptor(name).value();
-        desc->getType()->pushScope(env);
+        this->desc->getType()->pushScope(env);
+            declarations->pass_2(env, *desc);
+            //std::cout << *scope << std::endl;
+            std::cout << *desc << std::endl << std::endl;
+        this->desc->getType()->popScope(env);
+    }
 
-        declarations->pass_2(env);
-        //std::cout << *scope << std::endl;
-        std::cout << *desc << std::endl << std::endl;
-
-        desc->getType()->popScope(env);
+    virtual void pass_3(Environment &env) {
+        if (!desc->hasConstructor()) {
+            std::cout << "Class " << name << " does not have a constructor!" << std::endl;
+            exit(1);
+        }
     }
 
     void print() override {
@@ -1337,11 +1345,10 @@ public:
     }
 
     void pass_1(Environment &env) override {
-        Scope::MaybeDescriptor desc = env.getTopScope()->getDescriptor(name);
         Scope::MaybeDescriptor parent_desc = env.getTopScope()->getDescriptor(parent_name);
 
-        desc.value()->getType()->setParentClassType(parent_desc.value()->getType());
-        std::cout << *desc.value() << std::endl << std::endl;
+        desc->getType()->setParentClassType(parent_desc.value()->getType());
+        std::cout << *desc << std::endl << std::endl;
     }
 
     void print() override {
@@ -1399,6 +1406,21 @@ public:
         //std::cout << *scope << std::endl;
     }
 
+    void pass_3(Environment & env) {
+        env.addScope(scope);
+            auto maybeDesc = env.getDescriptor("Main");
+            if (maybeDesc.has_value()) {
+                for (auto& clazz : classes)
+                    clazz->pass_3(env);
+            } else {
+                // Does not have main class
+                std::cout << "[Error]: Code does not contain a Main class!" << std::endl;
+                exit(1);
+            }
+
+        env.popScope();
+    }
+
     void print() override {
         for (auto& c : classes)
             c->print();
@@ -1424,7 +1446,11 @@ public:
         root.pass_1(env);
     }
 
-    void pass_2(Environment & env) {
+    void pass_2(Environment &env) {
         root.pass_2(env);
+    }
+
+    void pass_3(Environment &env) { 
+        root.pass_3(env);
     }
 };

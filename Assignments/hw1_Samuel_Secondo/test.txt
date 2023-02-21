@@ -1,3 +1,0 @@
-125 45678 class x foo int = { } ( ) [ ] + - * / < > <=>=!===;,.if else
-extends bar while return this [] = // comment to be discarded
-&&||!bool int void new true false // true false
