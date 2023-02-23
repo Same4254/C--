@@ -24,10 +24,17 @@ protected:
     const std::string name;
     std::shared_ptr<Scope> scope;
     std::shared_ptr<Type> parent_type;
+    std::shared_ptr<Type> composite_type;
 
 public:
     Type(TYPE_ID id, const std::string &name) 
-        : id(id), name(name), scope(nullptr), parent_type(nullptr)
+        : id(id), name(name), scope(nullptr), parent_type(nullptr), composite_type(nullptr)
+    {
+
+    }
+
+    Type(TYPE_ID id, const std::string &name, std::shared_ptr<Type> composite_type) 
+        : id(id), name(name), scope(nullptr), parent_type(nullptr), composite_type(composite_type)
     {
 
     }
@@ -56,6 +63,34 @@ public:
     
     const std::shared_ptr<Scope> getScope() const { return scope; }
     void setScope(std::shared_ptr<Scope> scope) { this->scope = scope; }
+
+    void setCompositeType(std::shared_ptr<Type> type) {
+        if (id != TYPE_ID::ARRAY) {
+            std::cout << "[Error]: Cannot set composite type of type " << name << std::endl;
+            exit(1);
+        }
+
+        if (composite_type != nullptr) {
+            std::cout << "[Error]: Array already has composite type" << std::endl;
+            exit(1);
+        }
+
+        composite_type = type;
+    }
+
+    std::shared_ptr<Type> getCompositeType() {
+        if (id != TYPE_ID::ARRAY) {
+            std::cout << "[Error]: Cannot access the composite type of type " << name << std::endl;
+            exit(1);
+        }
+
+        if (composite_type == nullptr) {
+            std::cout << "[Error]: Array does not have a composite type..." << std::endl;
+            exit(1);
+        }
+
+        return composite_type;
+    }
 };
 
 class Type_Int : public Type {
@@ -139,45 +174,33 @@ public:
 };
 
 class Type_Array : public Type {
-private:
-    std::shared_ptr<Type> element_type;
-
 public:
     Type_Array(std::shared_ptr<Type> element_type) 
-        : Type(TYPE_ID::ARRAY, "TYPE_ARRAY"), element_type(element_type)
+        : Type(TYPE_ID::ARRAY, "TYPE_ARRAY", element_type)
     {
 
     }
 
     bool typeEqual(const std::shared_ptr<Type> other) const override {
         if (this->id == other->getID())
-            return element_type->typeEqual(std::static_pointer_cast<Type_Array>(other)->element_type);
+            return composite_type->typeEqual(other->getCompositeType());
         return false;
     }
 
     bool isSubtype(const std::shared_ptr<Type> other) const override {
         if (this->id == other->getID())
-            return element_type->isSubtype(std::static_pointer_cast<Type_Array>(other)->element_type);
+            return composite_type->isSubtype(other->getCompositeType());
         return false;
     }
 };
 
 class Descriptor {
-protected:
-    std::shared_ptr<Type> type;
-
 public:
-    Descriptor(std::shared_ptr<Type> type)
-        : type(type)
-    {
 
-    }
-
-    const std::shared_ptr<Type> getType() const { return type; }
-
-    virtual void print(std::ostream &stream) const {
-        stream << *this->type << " ";
-    }
+    virtual void print(std::ostream &stream) const = 0;
+    //virtual void print(std::ostream &stream) const {
+    //    stream << *this->type << " ";
+    //}
 
     friend std::ostream& operator<<(std::ostream &stream, const Descriptor &descriptor) {
         descriptor.print(stream);
@@ -187,36 +210,48 @@ public:
 
 class Descriptor_Method : public Descriptor {
 private:
+    std::shared_ptr<Type> return_type;
     std::vector<std::shared_ptr<Type>> argument_types;
     std::string name;
 
 public:
     Descriptor_Method(std::string name, std::shared_ptr<Type> return_type) 
-        : Descriptor(return_type), name(name)
+        : return_type(return_type), name(name)
     {
 
     }
 
     std::string getName() { return name; }
 
+    std::shared_ptr<Type> getReturnType() { return return_type; }
+
     void addArgumentType(std::shared_ptr<Type> type) {
         argument_types.push_back(type);
     }
 
     void print(std::ostream &stream) const override { 
-        stream << *type << ", ( ";
+        stream << *return_type << ", ( ";
         for (auto t : argument_types)
             stream << *t << " ";
         stream << ")";
     }
 };
 
-class Descriptor_Field : public Descriptor {
+class Descriptor_Variable : public Descriptor {
+protected: 
+    std::shared_ptr<Type> type;
+
 public:
-    Descriptor_Field(std::shared_ptr<Type> type) 
-        : Descriptor(type) 
+    Descriptor_Variable(std::shared_ptr<Type> type)
+        : type(type)
     {
 
+    }
+
+    std::shared_ptr<Type> getType() const { return type; }
+
+    virtual void print(std::ostream &stream) const override {
+        stream << *this->type << " ";
     }
 };
 
@@ -236,7 +271,7 @@ public:
     }
 
     void print(std::ostream &stream) const override { 
-        stream << *type << ", ( ";
+        stream << "( ";
         for (auto t : argument_types)
             stream << *t << " ";
         stream << ")";
@@ -245,27 +280,35 @@ public:
 
 class Descriptor_Class : public Descriptor {
 private:
-    // std::shared_ptr<Descriptor_Class> parent_class;
+    std::shared_ptr<Descriptor_Class> parent_class;
+    std::shared_ptr<Type> type;
     std::shared_ptr<Descriptor_Constructor> desc_constructor;
 
-    std::vector<std::shared_ptr<Descriptor_Field>> desc_fields;
+    std::vector<std::shared_ptr<Descriptor_Variable>> desc_fields;
     std::vector<std::shared_ptr<Descriptor_Method>> desc_methods;
 
     std::string name;
 
 public:
     Descriptor_Class(std::string name)
-        : Descriptor(std::make_shared<Type_Class>(name)), desc_constructor(nullptr), name(name)
+        : type(std::make_shared<Type_Class>(name)), desc_constructor(nullptr), name(name)
     {
 
     }
 
     void print(std::ostream &stream) const override;
+    
+    std::shared_ptr<Type> getType() { return type; }
 
-    //void setParentClass(std::shared_ptr<Descriptor_Class> parent_class) {
-    //    this->parent_class = parent_class;
-    //    this->type->setParentClassType(parent_class->getType());
-    //}
+    void setParentClass(std::shared_ptr<Descriptor_Class> parent_class) {
+        if (this->parent_class != nullptr) {
+            std::cout << "[Error]: Class " << name << " already has parent Class " << this->parent_class->name << ". Cannot set the parent to " << parent_class->name << std::endl;
+            exit(1);
+        }
+
+        this->parent_class = parent_class;
+        this->type->setParentClassType(parent_class->type);
+    }
 
     void setConstructor(std::shared_ptr<Descriptor_Constructor> desc_constructor) {
         if (hasConstructor()) {
@@ -273,17 +316,17 @@ public:
             exit(1);
         }
 
-        if (desc_constructor->getName() == this->type->getName()) {
+        if (desc_constructor->getName() == this->name) {
             this->desc_constructor = desc_constructor;
         } else {
-            std::cout << "[Error]: Class name " << this->type->getName() << " and constructor name " << desc_constructor->getName() << " do not match!" << std::endl;
+            std::cout << "[Error]: Class name " << this->name << " and constructor name " << desc_constructor->getName() << " do not match!" << std::endl;
             exit(1);
         }
     }
 
     bool hasConstructor() { return desc_constructor != nullptr; }
 
-    void addField(std::shared_ptr<Descriptor_Field> desc_field) {
+    void addField(std::shared_ptr<Descriptor_Variable> desc_field) {
         desc_fields.push_back(desc_field);
     }
 

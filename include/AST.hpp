@@ -2,6 +2,7 @@
 
 #include "Scoping.hpp"
 #include "Type.hpp"
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -86,8 +87,7 @@ public:
 
     std::shared_ptr<Type> getType(Environment &env) override {
         // get it from the first scope because that is where the classes are declared
-        auto desc = env.getBottomScope()->getDescriptor(id);
-        return desc.value()->getType();
+        return env.getClassDescriptor(id)->getType();
     }
 
     void print() override {
@@ -160,8 +160,7 @@ public:
     }
 
     std::shared_ptr<Type> getType(Environment &env) override {
-        auto desc = env.getDescriptor(id);
-        return std::make_shared<Type_Array>(desc.value()->getType());
+        return env.getClassDescriptor(id)->getType();
     }
 
     void print() override {
@@ -174,7 +173,8 @@ public:
     }
 };
 class ASTNode_Expr : public ASTNode {
-
+public:
+    virtual std::shared_ptr<Type> getType(Environment &env) = 0;
 };
 
 class ASTNode_Expr_Times : public ASTNode_Expr {
@@ -187,6 +187,18 @@ public:
         : left(left), right(right)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::INT) {
+            std::cout << "[Error]: Cannot multiply " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
     }
 
     void print() override {
@@ -215,6 +227,18 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::INT) {
+            std::cout << "[Error]: Cannot divide " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
+    }
+
     void print() override {
         left->print();
         std::cout << " / ";
@@ -237,6 +261,18 @@ public:
         : left(left), right(right)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::INT) {
+            std::cout << "[Error]: Cannot add " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
     }
 
     void print() override {
@@ -263,6 +299,18 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::INT) {
+            std::cout << "[Error]: Cannot subtract " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
+    }
+
     void print() override {
         left->print();
         std::cout << " - ";
@@ -284,6 +332,10 @@ public:
         : expr(expr)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override { 
+        return expr->getType(env);
     }
 
     void print() override {
@@ -309,6 +361,18 @@ public:
         : left(left), right(right)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::BOOL) {
+            std::cout << "[Error]: Cannot boolean AND " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
     }
 
     void print() override {
@@ -338,6 +402,18 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::BOOL) {
+            std::cout << "[Error]: Cannot boolean OR " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
+    }
+
     void print() override {
         left->print();
         std::cout << " || ";
@@ -363,6 +439,18 @@ public:
         : left(left), right(right)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+            std::cout << "[Error]: Cannot check equality of " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
     }
 
     void print() override {
@@ -392,6 +480,18 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+            std::cout << "[Error]: Cannot check negated equality of " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
+    }
+
     void print() override {
         left->print();
         std::cout << " != ";
@@ -417,6 +517,18 @@ public:
         : left(left), right(right)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+            std::cout << "[Error]: Cannot less or equal of " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
     }
 
     void print() override {
@@ -446,6 +558,18 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+            std::cout << "[Error]: Cannot less than of " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
+    }
+
     void print() override {
         left->print();
         std::cout << " < ";
@@ -471,6 +595,18 @@ public:
         : left(left), right(right)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+            std::cout << "[Error]: Cannot greater than or equal of " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
     }
 
     void print() override {
@@ -500,6 +636,18 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> left_type = left->getType(env);
+        std::shared_ptr<Type> right_type = right->getType(env);
+
+        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+            std::cout << "[Error]: Cannot greater than of " << left_type->getName() << " and " << right_type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return left_type;
+    }
+
     void print() override {
         left->print();
         std::cout << " > ";
@@ -526,6 +674,17 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> type = expr->getType(env);
+
+        if (type->getID() != TYPE_ID::INT) {
+            std::cout << "[Error]: Cannot negate " << type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return type;
+    }
+
     void print() override {
         std::cout << "-";
         expr->print();
@@ -548,6 +707,17 @@ public:
         : expr(expr)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> type = expr->getType(env);
+
+        if (type->getID() != TYPE_ID::INT) {
+            std::cout << "[Error]: Cannot logically negate " << type->getName() << std::endl;
+            exit(1);
+        }
+        
+        return type;
     }
 
     void print() override {
@@ -574,6 +744,8 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override { return std::make_shared<Type_Int>(); }
+
     void print() override {
         std::cout << integer;
     }
@@ -594,6 +766,8 @@ public:
     {
 
     }
+
+    std::shared_ptr<Type> getType(Environment &env) override { return std::make_shared<Type_Bool>(); }
 
     void print() override {
         std::cout << (boolean ? "true" : "false");
@@ -650,6 +824,10 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        return env.getClassDescriptor(type)->getType();
+    }
+
     void print() override {
         std::cout << "new " << type << "( ";
         actuals->print();
@@ -675,6 +853,11 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        auto arr_type = std::make_shared<Type_Array>(type->getType(env));
+        return arr_type;
+    }
+
     void print() override {
         std::cout << "new int [ ";
         expr->print();
@@ -690,7 +873,8 @@ public:
 };
 
 class ASTNode_Statement : public ASTNode {
-
+public:
+    virtual void pass_3(Environment &env) = 0;
 };
 
 class ASTNode_Statement_ExprOnly : public ASTNode_Statement {
@@ -702,6 +886,10 @@ public:
         : expr(expr)
     {
 
+    }
+
+    void pass_3(Environment &env) override {
+        expr->getType(env);
     }
 
     void print() override {
@@ -728,6 +916,10 @@ public:
 
     }
 
+    void pass_3(Environment &env) override {
+        env.getTopScope()->setVariableDescriptor(name, std::make_shared<Descriptor_Variable>(type->getType(env)));
+    }
+
     void print() override {
         type->print();
         std::cout << " " << name << ";" << std::endl;
@@ -743,6 +935,10 @@ public:
 class ASTNode_Statement_Empty : public ASTNode_Statement {
 public:
     ASTNode_Statement_Empty() {
+
+    }
+
+    void pass_3(Environment &env) override {
 
     }
 
@@ -767,6 +963,10 @@ public:
 
     }
 
+    void pass_3(Environment &env) override {
+
+    }
+
     void print() override {
         std::cout << "return ";
         expr->print();
@@ -787,6 +987,11 @@ private:
 public:
     ASTNode_Statement_Body() {
 
+    }
+
+    void pass_3(Environment &env) override {
+        for (auto& statement : nodes)
+            statement->pass_3(env);
     }
 
     void AddStatement(ASTNode_Statement *statement) {
@@ -821,6 +1026,16 @@ public:
 
     }
 
+    void pass_3(Environment &env) override {
+        auto condition_type = condition_expr->getType(env);
+        if (condition_type->getID() != TYPE_ID::BOOL) {
+            std::cout << "[Error]: Condition expression of while expects a boolean. Got " << condition_type->getName() << std::endl; 
+            exit(1);
+        }
+
+        statement->pass_3(env);
+    }
+
     void print() override {
         std::cout << "while ( ";
         condition_expr->print();
@@ -846,6 +1061,16 @@ public:
         : condition_expr(condition_expr), statement(statement)
     {
 
+    }
+
+    void pass_3(Environment &env) override {
+        auto cond_type = condition_expr->getType(env);
+        if (cond_type->getID() != TYPE_ID::BOOL) {
+            std::cout << "[Error]: if statement conditional expression must be of type boolean. Attempted type: " << cond_type->getName() << std::endl;
+            exit(1);
+        }
+
+        statement->pass_3(env);
     }
 
     void print() override {
@@ -874,6 +1099,17 @@ public:
         : condition_expr(condition_expr), statement_true(statement_true), statement_false(statement_false)
     {
 
+    }
+
+    void pass_3(Environment &env) override {
+        auto condition_type = condition_expr->getType(env);
+        if (condition_type->getID() != TYPE_ID::BOOL) {
+            std::cout << "[Error]: IfElse expects a boolean conditional type. Got " << condition_type->getName() << std::endl;
+            exit(1);
+        }
+
+        statement_true->pass_3(env);
+        statement_false->pass_3(env);
     }
 
     void print() override {
@@ -909,6 +1145,11 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::cout << "ID: " << id << std::endl;
+        return env.getVariableDescriptor(id)->getType();
+    }
+
     void print() override {
         std::cout << id;
     }
@@ -929,6 +1170,11 @@ public:
         : actuals(actuals), id(id_c)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        // this method name should be in scope
+        return env.getMethodDescriptor(id)->getReturnType();
     }
 
     void print() override {
@@ -956,6 +1202,17 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> callee_type = obj_lvalue->getType(env);
+        Scope::MaybeVariableDescriptor desc = callee_type->getScope()->getVariableDescriptor(id);
+        if (!desc.has_value()) {
+            std::cout << "[Error]: Obj of type " << callee_type->getName() << " does not have a member named " << id << std::endl;
+            exit(1);
+        }
+
+        return desc.value()->getType();
+    }
+
     void print() override {
         obj_lvalue->print();
         std::cout << "." << id;
@@ -979,6 +1236,17 @@ public:
         : obj_lvalue(obj_lvalue), id(id_c), actuals(actuals)
     {
 
+    }
+
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> callee_type = obj_lvalue->getType(env);
+        Scope::MaybeMethodDescriptor desc = callee_type->getScope()->getMethodDescriptor(id);
+        if (!desc.has_value()) {
+            std::cout << "[Error]: Obj of type " << callee_type->getName() << " does not have method named " << id << std::endl;
+            exit(1);
+        }
+
+        return desc.value()->getReturnType();
     }
 
     void print() override {
@@ -1009,6 +1277,18 @@ public:
 
     }
 
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::shared_ptr<Type> callee_type = lvalue->getType(env);
+        std::shared_ptr<Type> expr_type = expr->getType(env);
+
+        if (callee_type->getID() != TYPE_ID::ARRAY) {
+            std::cout << "[Error]: Type " << callee_type->getName() << " being accessed like an array, but it is not an array" << std::endl; 
+            exit(1);
+        }
+
+        return callee_type->getCompositeType();
+    }
+
     void print() override {
         lvalue->print();
         std::cout << "[";
@@ -1026,6 +1306,11 @@ public:
 
 class ASTNode_LValue_This : public ASTNode_LValue { 
 public:
+    std::shared_ptr<Type> getType(Environment &env) override {
+        std::cout << "[Error]: idk how to handle *this* right now..." << std::endl;
+        exit(1);
+    }
+
     void print() override {
         std::cout << "this";
     }
@@ -1046,6 +1331,16 @@ public:
         : lvalue(lvalue), expr(expr)
     {
 
+    }
+
+    void pass_3(Environment &env) override {
+        auto lvalue_type = lvalue->getType(env);
+        auto expr_type = expr->getType(env);
+
+        if (!lvalue_type->typeEqual(expr_type)) {
+            std::cout << "[Error]: Cannot assign to a type " << lvalue_type->getName() << " with type " << expr_type->getName() << std::endl;
+            exit(1);
+        }
     }
 
     void print() override {
@@ -1124,6 +1419,7 @@ public:
 class ASTNode_MemberDeclaration : public ASTNode {
 public:
     virtual void pass_2(Environment &env, Descriptor_Class &class_desc) = 0;
+    virtual void pass_3(Environment &env) = 0;
 };
 
 class ASTNode_MemberDeclaration_Variable : public ASTNode_MemberDeclaration {
@@ -1139,9 +1435,13 @@ public:
     }
 
     void pass_2(Environment &env, Descriptor_Class &class_desc) override {
-        auto desc = std::make_shared<Descriptor_Field>(type->getType(env));
-        env.getTopScope()->setDescriptor(id, desc);
+        auto desc = std::make_shared<Descriptor_Variable>(type->getType(env));
+        env.getTopScope()->setVariableDescriptor(id, desc);
         class_desc.addField(desc);
+    }
+
+    void pass_3(Environment &env) override {
+
     }
 
     void print() override {
@@ -1166,20 +1466,30 @@ private:
     std::shared_ptr<Scope> argument_scope;
     std::shared_ptr<Scope> body_scope;
 
+    std::shared_ptr<Descriptor_Method> desc;
+
 public:
     ASTNode_MemberDeclaration_Function(ASTNode_Type *type, ASTNode_Formal_List *formals, const char *id_c, ASTNode_Statement_Body *body)
-        : type(type), formals(formals), id(id_c), body(body), argument_scope(std::make_shared<Scope>()), body_scope()
+        : type(type), formals(formals), id(id_c), body(body), argument_scope(std::make_shared<Scope>()), body_scope(std::make_shared<Scope>()), desc(nullptr)
     {
 
     }
 
     void pass_2(Environment &env, Descriptor_Class &class_desc) override {
-        auto desc = std::make_shared<Descriptor_Method>(id, type->getType(env));
-        env.getTopScope()->setDescriptor(id, desc);
+        desc = std::make_shared<Descriptor_Method>(id, type->getType(env));
+        env.getTopScope()->setMethodDescriptor(id, desc);
         class_desc.addMethod(desc);
 
-        env.addScope(argument_scope);
+        env.pushScope(argument_scope);
             formals->pass_2(env, desc);
+        env.popScope();
+    }
+
+    void pass_3(Environment &env) override {
+        env.pushScope(argument_scope);
+        env.pushScope(body_scope);
+            body->pass_3(env);
+        env.popScope();
         env.popScope();
     }
 
@@ -1219,11 +1529,19 @@ public:
 
     void pass_2(Environment &env, Descriptor_Class &class_desc) override {
         auto desc = std::make_shared<Descriptor_Constructor>(id);
-        env.getTopScope()->setDescriptor(id, desc);
+        env.getTopScope()->setMethodDescriptor(id, desc);
         class_desc.setConstructor(desc);
 
-        env.addScope(argument_scope);
+        env.pushScope(argument_scope);
             formals->pass_2(env, desc);
+        env.popScope();
+    }
+
+    void pass_3(Environment &env) override {
+        env.pushScope(argument_scope);
+        env.pushScope(body_scope);
+            body->pass_3(env);
+        env.popScope();
         env.popScope();
     }
 
@@ -1263,6 +1581,11 @@ public:
             decl->pass_2(env, class_desc);
     }
 
+    void pass_3(Environment &env) {
+        for (auto& decl : declarations)
+            decl->pass_3(env);
+    }
+
     void print() override {
         for (auto& decl : declarations)
             decl->print();
@@ -1292,7 +1615,7 @@ public:
     }
 
     virtual void pass_0(Environment &env) {
-        env.getTopScope()->setDescriptor(name, desc);
+        env.setClassDescriptor(name, desc);
         this->desc->getType()->setScope(scope);
 
         std::cout << *desc << std::endl << std::endl;
@@ -1315,6 +1638,10 @@ public:
             std::cout << "Class " << name << " does not have a constructor!" << std::endl;
             exit(1);
         }
+
+        this->desc->getType()->pushScope(env);
+            declarations->pass_3(env);
+        this->desc->getType()->popScope(env);
     }
 
     void print() override {
@@ -1345,9 +1672,9 @@ public:
     }
 
     void pass_1(Environment &env) override {
-        Scope::MaybeDescriptor parent_desc = env.getTopScope()->getDescriptor(parent_name);
+        auto parent_desc = env.getClassDescriptor(parent_name);
 
-        desc->getType()->setParentClassType(parent_desc.value()->getType());
+        desc->getType()->setParentClassType(parent_desc->getType());
         std::cout << *desc << std::endl << std::endl;
     }
 
@@ -1382,14 +1709,14 @@ public:
     }
 
     void pass_0(Environment &env) {
-        env.addScope(scope);
+        env.pushScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_0(env);
         env.popScope();
     }
 
     void pass_1(Environment &env) {
-        env.addScope(scope);
+        env.pushScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_1(env);
         env.popScope();
@@ -1398,7 +1725,7 @@ public:
     }
 
     void pass_2(Environment & env) {
-        env.addScope(scope);
+        env.pushScope(scope);
             for (auto& clazz : classes)
                 clazz->pass_2(env);
         env.popScope();
@@ -1407,9 +1734,8 @@ public:
     }
 
     void pass_3(Environment & env) {
-        env.addScope(scope);
-            auto maybeDesc = env.getDescriptor("Main");
-            if (maybeDesc.has_value()) {
+        env.pushScope(scope);
+            if (env.hasClassDescriptor("Main")) {
                 for (auto& clazz : classes)
                     clazz->pass_3(env);
             } else {

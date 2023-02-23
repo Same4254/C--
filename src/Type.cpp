@@ -4,7 +4,7 @@
 
 void Type::pushScope(Environment &environment) const {
     if (this->scope != nullptr)
-        environment.addScope(this->scope);
+        environment.pushScope(this->scope);
 }
 
 void Type::popScope(Environment &environment) const {
@@ -16,7 +16,7 @@ void Type_Class::pushScope(Environment &environment) const {
     if (this->parent_type != nullptr)
         parent_type->pushScope(environment);
 
-    environment.addScope(this->scope);
+    environment.pushScope(this->scope);
 }
 
 void Type_Class::popScope(Environment &environment) const {
