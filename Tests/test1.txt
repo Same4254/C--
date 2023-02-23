@@ -8,6 +8,7 @@ class Main {
         y.c = false;
 
         int c;
+        void v;
 
         c = y.inheritFunc();
     }

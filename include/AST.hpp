@@ -906,29 +906,35 @@ public:
 
 class ASTNode_Statement_VariableDeclaration : public ASTNode_Statement {
 private:
-    std::unique_ptr<ASTNode_Type> type;
+    std::unique_ptr<ASTNode_Type> type_ast;
     std::string name;
 
 public:
-    ASTNode_Statement_VariableDeclaration(ASTNode_Type *type, const char* name_c)
-        : type(type), name(name_c)
+    ASTNode_Statement_VariableDeclaration(ASTNode_Type *type_ast, const char* name_c)
+        : type_ast(type_ast), name(name_c)
     {
 
     }
 
     void pass_3(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        env.getTopScope()->setVariableDescriptor(name, std::make_shared<Descriptor_Variable>(type->getType(env)));
+        auto type = type_ast->getType(env);
+        if (type->getID() == TYPE_ID::VOID) {
+            std::cout << "[Error]: Cannot declare local variable to be of type void" << std::endl;
+            exit(1);
+        }
+
+        env.getTopScope()->setVariableDescriptor(name, std::make_shared<Descriptor_Variable>(type));
     }
 
     void print() override {
-        type->print();
+        type_ast->print();
         std::cout << " " << name << ";" << std::endl;
     }
 
     void printTree(int level) override {
         printIndent(level);
         std::cout << "ASTNode_Statement_VariableDeclaration: " << name << std::endl;
-        type->printTree(level + 1);
+        type_ast->printTree(level + 1);
     }
 };
 
