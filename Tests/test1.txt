@@ -1,19 +1,27 @@
 class Main {
     Main() {
         Y y;
+
+        // need to check that LHS matches RHS
         y = new Y();
 
-        y.b = false;
+        y.c = false;
 
+        int c;
+
+        c = y.inheritFunc();
     }
 };
 
 class X {
+    bool c;
+
     X() {
 
     }
 
-    void inheritFunc() {
+    int inheritFunc() {
+        return 1;
     }
 };
 
@@ -26,6 +34,9 @@ class Y extends X {
     }
 
     int sum(int a, int b) {
-        return a + b;
+        int c;
+
+        c = inheritFunc();
+        return a + 1;
     }
 };

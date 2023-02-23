@@ -1152,7 +1152,6 @@ public:
     }
 
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        std::cout << "ID: " << id << std::endl;
         return env.getVariableDescriptor(id)->getType();
     }
 
@@ -1210,13 +1209,12 @@ public:
 
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
-        Scope::MaybeVariableDescriptor desc = callee_type->getScope()->getVariableDescriptor(id);
-        if (!desc.has_value()) {
-            std::cout << "[Error]: Obj of type " << callee_type->getName() << " does not have a member named " << id << std::endl;
-            exit(1);
-        }
 
-        return desc.value()->getType();
+        callee_type->pushScope(env);
+            std::shared_ptr<Descriptor_Variable> desc = env.getVariableDescriptor(id);
+        callee_type->popScope(env);
+
+        return desc->getType();
     }
 
     void print() override {
@@ -1246,13 +1244,12 @@ public:
 
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
-        Scope::MaybeMethodDescriptor desc = callee_type->getScope()->getMethodDescriptor(id);
-        if (!desc.has_value()) {
-            std::cout << "[Error]: Obj of type " << callee_type->getName() << " does not have method named " << id << std::endl;
-            exit(1);
-        }
 
-        return desc.value()->getReturnType();
+        callee_type->pushScope(env);
+            std::shared_ptr<Descriptor_Method> desc = env.getMethodDescriptor(id);
+        callee_type->popScope(env);
+
+        return desc->getReturnType();
     }
 
     void print() override {
@@ -1430,18 +1427,24 @@ public:
 
 class ASTNode_MemberDeclaration_Variable : public ASTNode_MemberDeclaration {
 private:
-    std::unique_ptr<ASTNode_Type> type;
+    std::unique_ptr<ASTNode_Type> type_ast;
     std::string id;
 
 public:
-    ASTNode_MemberDeclaration_Variable(ASTNode_Type *type, const char *id_c)
-        : type(type), id(id_c)
+    ASTNode_MemberDeclaration_Variable(ASTNode_Type *type_ast, const char *id_c)
+        : type_ast(type_ast), id(id_c)
     {
 
     }
 
     void pass_2(Environment &env, Descriptor_Class &class_desc) override {
-        auto desc = std::make_shared<Descriptor_Variable>(type->getType(env));
+        auto type = type_ast->getType(env);
+        if (type->getID() == TYPE_ID::VOID) {
+            std::cout << "[Error]: Variable cannot be declared to have type void" << std::endl;
+            exit(1);
+        }
+
+        auto desc = std::make_shared<Descriptor_Variable>(type);
         env.getTopScope()->setVariableDescriptor(id, desc);
         class_desc.addField(desc);
     }
@@ -1451,14 +1454,14 @@ public:
     }
 
     void print() override {
-        type->print();
+        type_ast->print();
         std::cout << id << ";" << std::endl;
     }
 
     void printTree(int level) override {
         printIndent(level);
         std::cout << "ASTNode_MemberDeclaration_Variable: " << id << std::endl;
-        type->printTree(level + 1);
+        type_ast->printTree(level + 1);
     }
 };
 
