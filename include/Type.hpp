@@ -214,9 +214,11 @@ private:
     std::vector<std::shared_ptr<Type>> argument_types;
     std::string name;
 
+    bool hasReturn;
+
 public:
     Descriptor_Method(std::string name, std::shared_ptr<Type> return_type) 
-        : return_type(return_type), name(name)
+        : return_type(return_type), name(name), hasReturn(false)
     {
 
     }
@@ -224,6 +226,9 @@ public:
     std::string getName() { return name; }
 
     std::shared_ptr<Type> getReturnType() { return return_type; }
+
+    void setHasReturnStmt(bool hasReturn) { this->hasReturn = hasReturn; }
+    bool hasReturnStmt() { return hasReturn; }
 
     void addArgumentType(std::shared_ptr<Type> type) {
         argument_types.push_back(type);
