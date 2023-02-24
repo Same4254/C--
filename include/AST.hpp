@@ -788,6 +788,22 @@ public:
 
     }
 
+    void checkTypes(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) {
+        auto argument_types = method_desc.getArgumentTypes();
+        if (argument_types.size() != expressions.size()) {
+            std::cout << "[Error]: Method call to " << method_desc.getName() << " expected " << argument_types.size() << " arguments, but got " << expressions.size() << std::endl;
+            exit(1);
+        }
+
+        for (size_t i = 0; i < argument_types.size(); i++) {
+            auto expr_type = expressions[i]->getType(env, class_desc, method_desc);
+            if (!expr_type->typeEqual(argument_types[i])) {
+                std::cout << "[Error]: Method call to " << method_desc.getName() << " expected the argument at position " << i << " to be of type " << argument_types[i]->getName() << " but got argument of type " << expr_type->getName() << std::endl;
+                exit(1);
+            }
+        }
+    }
+
     void AddExpression(ASTNode_Expr *expr) {
         expressions.insert(expressions.begin(), std::unique_ptr<ASTNode_Expr>(expr));
     }
@@ -825,7 +841,14 @@ public:
     }
 
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        return env.getClassDescriptor(type)->getType();
+        auto calling_class_desc = env.getClassDescriptor(type);
+        calling_class_desc->getType()->pushScope(env);
+            auto constructor_desc = env.getMethodDescriptor(type);
+        calling_class_desc->getType()->popScope(env);
+
+        actuals->checkTypes(env, class_desc, *constructor_desc);
+
+        return calling_class_desc->getType();
     }
 
     void print() override {
@@ -1184,8 +1207,12 @@ public:
     }
 
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        auto calling_method_desc = env.getMethodDescriptor(id);
+
+        actuals->checkTypes(env, class_desc, *calling_method_desc);
+
         // this method name should be in scope
-        return env.getMethodDescriptor(id)->getReturnType();
+        return calling_method_desc->getReturnType();
     }
 
     void print() override {
@@ -1254,6 +1281,8 @@ public:
         callee_type->pushScope(env);
             std::shared_ptr<Descriptor_Method> desc = env.getMethodDescriptor(id);
         callee_type->popScope(env);
+
+        actuals->checkTypes(env, class_desc, *desc);
 
         return desc->getReturnType();
     }

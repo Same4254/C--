@@ -230,6 +230,8 @@ public:
     void setHasReturnStmt(bool hasReturn) { this->hasReturn = hasReturn; }
     bool hasReturnStmt() { return hasReturn; }
 
+    const std::vector<std::shared_ptr<Type>>& getArgumentTypes() { return argument_types; }
+
     void addArgumentType(std::shared_ptr<Type> type) {
         argument_types.push_back(type);
     }

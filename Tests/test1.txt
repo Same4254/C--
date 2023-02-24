@@ -3,12 +3,11 @@ class Main {
         Y y;
 
         // need to check that LHS matches RHS
-        y = new Y();
+        y = new Y(1);
 
         y.c = false;
 
         int c;
-        void v;
 
         c = y.inheritFunc();
     }
@@ -30,8 +29,10 @@ class Y extends X {
     int num;
     bool b;
 
-    Y() {
-
+    Y(int a) {
+        int a;
+        int c;
+        sum(a, c);
     }
 
     int sum(int a, int b) {
