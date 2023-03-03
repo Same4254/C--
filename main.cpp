@@ -25,4 +25,5 @@ int main() {
 
     std::cout << "----- Pass 3 -----" << std::endl;
     driver.ast.root.pass_3(env);
+    std::cout << "Passed Semantic Analysis!!" << std::endl;
 }
