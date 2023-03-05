@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "GeneratedCode.hpp"
+
 // maybe someone should update their parser to have more than two passes so we don't gotta do this :)
 class Scope;
 class Environment;
@@ -26,15 +28,17 @@ protected:
     std::shared_ptr<Type> parent_type;
     std::shared_ptr<Type> composite_type;
 
+    llvm::Type* llvm_type;
+
 public:
     Type(TYPE_ID id, const std::string &name) 
-        : id(id), name(name), scope(nullptr), parent_type(nullptr), composite_type(nullptr)
+        : id(id), name(name), scope(nullptr), parent_type(nullptr), composite_type(nullptr), llvm_type(nullptr)
     {
 
     }
 
     Type(TYPE_ID id, const std::string &name, std::shared_ptr<Type> composite_type) 
-        : id(id), name(name), scope(nullptr), parent_type(nullptr), composite_type(composite_type)
+        : id(id), name(name), scope(nullptr), parent_type(nullptr), composite_type(composite_type), llvm_type(nullptr)
     {
 
     }
@@ -54,6 +58,8 @@ public:
 
     const std::shared_ptr<Type> getParentClassType() { return parent_type; }
     void setParentClassType(std::shared_ptr<Type> parent_type) { this->parent_type = parent_type; }
+
+    virtual llvm::Type* getLLVMType(GeneratedCode &code) = 0;
 
     virtual bool typeEqual(const std::shared_ptr<Type> other) const = 0;
     virtual bool isSubtype(const std::shared_ptr<Type> other) const = 0;
@@ -101,6 +107,8 @@ public:
 
     }
 
+    llvm::Type* getLLVMType(GeneratedCode &code) override { return llvm::Type::getInt32Ty(code.getContext()); }
+
     bool typeEqual(const std::shared_ptr<Type> other) const override {
         return this->id == other->getID();
     }
@@ -118,6 +126,8 @@ public:
 
     }
 
+    llvm::Type* getLLVMType(GeneratedCode &code) override { return llvm::Type::getInt32Ty(code.getContext()); }
+
     bool typeEqual(const std::shared_ptr<Type> other) const override {
         return this->id == other->getID();
     }
@@ -134,6 +144,8 @@ public:
     {
 
     }
+
+    llvm::Type* getLLVMType(GeneratedCode &code) override { return llvm::Type::getVoidTy(code.getContext()); }
 
     bool typeEqual(const std::shared_ptr<Type> other) const override {
         return this->id == other->getID();
@@ -154,6 +166,12 @@ public:
 
     void pushScope(Environment &environment) const override;
     void popScope(Environment &environment) const override;
+
+    llvm::Type* getLLVMType(GeneratedCode &code) override {
+        if (this->llvm_type == nullptr)
+            this->llvm_type = llvm::StructType::create(code.getContext(), name);
+        return llvm_type;
+    }
 
     bool typeEqual(const std::shared_ptr<Type> other) const override {
         return this->id == other->getID() && this == other.get();
@@ -179,6 +197,11 @@ public:
         : Type(TYPE_ID::ARRAY, "TYPE_ARRAY", element_type)
     {
 
+    }
+
+    llvm::Type* getLLVMType(GeneratedCode &code) override {
+        std::cout << "Array llvm type not implemented!" << std::endl;
+        exit(1);
     }
 
     bool typeEqual(const std::shared_ptr<Type> other) const override {
@@ -208,11 +231,38 @@ public:
     }
 };
 
+class Descriptor_Variable : public Descriptor {
+protected: 
+    std::string name;
+    std::shared_ptr<Type> type;
+    llvm::Value *location;
+
+public:
+    Descriptor_Variable(std::string name, std::shared_ptr<Type> type)
+        : name(name), type(type)
+    {
+
+    }
+
+    std::shared_ptr<Type> getType() const { return type; }
+
+    void setLLVMValue(llvm::Value* location) { this->location = location; }
+    llvm::Value* getLLVMValue() { return this->location; }
+
+    std::string getName() { return name; }
+
+    virtual void print(std::ostream &stream) const override {
+        stream << *this->type << " ";
+    }
+};
+
 class Descriptor_Method : public Descriptor {
 private:
     std::shared_ptr<Type> return_type;
-    std::vector<std::shared_ptr<Type>> argument_types;
     std::string name;
+
+    std::vector<std::shared_ptr<Descriptor_Variable>> local_variable_descriptors;
+    std::vector<std::shared_ptr<Descriptor_Variable>> argument_descriptors;
 
     bool hasReturn;
 
@@ -230,37 +280,25 @@ public:
     void setHasReturnStmt(bool hasReturn) { this->hasReturn = hasReturn; }
     bool hasReturnStmt() { return hasReturn; }
 
-    const std::vector<std::shared_ptr<Type>>& getArgumentTypes() { return argument_types; }
+    const std::vector<std::shared_ptr<Descriptor_Variable>>& getArgumentDescriptors() { return argument_descriptors; }
+    void addArgumentDescriptor(std::shared_ptr<Descriptor_Variable> argument_desc) {
+        argument_descriptors.push_back(argument_desc);
+    }
 
-    void addArgumentType(std::shared_ptr<Type> type) {
-        argument_types.push_back(type);
+    const std::vector<std::shared_ptr<Descriptor_Variable>>& getLocalVariableDescriptors() { return local_variable_descriptors; }
+    void addLocalVariable(std::shared_ptr<Descriptor_Variable> local_variable) {
+        local_variable_descriptors.push_back(local_variable);
     }
 
     void print(std::ostream &stream) const override { 
         stream << *return_type << ", ( ";
-        for (auto t : argument_types)
+        for (auto t : argument_descriptors)
             stream << *t << " ";
         stream << ")";
     }
 };
 
-class Descriptor_Variable : public Descriptor {
-protected: 
-    std::shared_ptr<Type> type;
 
-public:
-    Descriptor_Variable(std::shared_ptr<Type> type)
-        : type(type)
-    {
-
-    }
-
-    std::shared_ptr<Type> getType() const { return type; }
-
-    virtual void print(std::ostream &stream) const override {
-        stream << *this->type << " ";
-    }
-};
 
 class Descriptor_Constructor : public Descriptor_Method {
 private:
@@ -289,9 +327,12 @@ class Descriptor_Class : public Descriptor {
 private:
     std::shared_ptr<Descriptor_Class> parent_class;
     std::shared_ptr<Type> type;
+
     std::shared_ptr<Descriptor_Constructor> desc_constructor;
 
     std::vector<std::shared_ptr<Descriptor_Variable>> desc_fields;
+    std::vector<llvm::Type*> field_types;
+
     std::vector<std::shared_ptr<Descriptor_Method>> desc_methods;
 
     std::string name;
@@ -301,6 +342,13 @@ public:
         : type(std::make_shared<Type_Class>(name)), desc_constructor(nullptr), name(name)
     {
 
+    }
+
+    void genCode(GeneratedCode &code) {
+        for (auto desc_field : desc_fields)
+            field_types.push_back(desc_field->getType()->getLLVMType(code));
+
+        ((llvm::StructType*) type->getLLVMType(code))->setBody(field_types);
     }
 
     void print(std::ostream &stream) const override;

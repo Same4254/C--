@@ -1,4 +1,5 @@
 #include "Driver.hpp"
+#include "GeneratedCode.hpp"
 
 int main() {
     Driver driver;
@@ -26,4 +27,10 @@ int main() {
     std::cout << "----- Pass 3 -----" << std::endl;
     driver.ast.root.pass_3(env);
     std::cout << "Passed Semantic Analysis!!" << std::endl;
+
+    std::cout << "---------- Code Generation ----------" << std::endl;
+    GeneratedCode code;
+    driver.ast.root.genCode(env, code);
+
+    code.getModule().print(llvm::errs(), nullptr);
 }
