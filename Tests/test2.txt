@@ -4,10 +4,7 @@ class X {
     }
 
     int thing(int a) {
-        int b;
-        b = a + 1;
-        
-        return b + 1;
+        return -a;
     }
 };
 

@@ -178,7 +178,7 @@ public:
 class ASTNode_Expr : public ASTNode {
 public:
     virtual std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) = 0;
-    virtual llvm::Value* genCode(Environment &env, GeneratedCode &code) = 0;
+    virtual llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) = 0;
 };
 
 class ASTNode_Expr_Times : public ASTNode_Expr {
@@ -205,9 +205,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         return code.getBuilder().CreateMul(left_code, right_code);
     }
@@ -250,9 +250,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         return code.getBuilder().CreateSDiv(left_code, right_code);
     }
@@ -293,9 +293,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -345,9 +345,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -386,8 +386,8 @@ public:
         return expr->getType(env, class_desc, method_desc);
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        return expr->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        return expr->genCode(env, code, class_desc, method_desc);
     }
 
     void print() override {
@@ -427,9 +427,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -480,9 +480,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -533,9 +533,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -586,9 +586,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -639,9 +639,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -692,9 +692,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -745,9 +745,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -798,9 +798,9 @@ public:
         return left_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* left_code = left->genCode(env, code);
-        llvm::Value* right_code = right->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* left_code = left->genCode(env, code, class_desc, method_desc);
+        llvm::Value* right_code = right->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (left_code->getType()->isPointerTy())
@@ -849,8 +849,8 @@ public:
         return type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* expr_code = expr->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* expr_code = expr->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (expr_code->getType()->isPointerTy())
@@ -886,7 +886,7 @@ public:
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         std::shared_ptr<Type> type = expr->getType(env, class_desc, method_desc);
 
-        if (type->getID() != TYPE_ID::INT) {
+        if (type->getID() != TYPE_ID::BOOL) {
             std::cout << "[Error]: Cannot logically negate " << type->getName() << std::endl;
             exit(1);
         }
@@ -894,8 +894,8 @@ public:
         return type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        llvm::Value* expr_code = expr->genCode(env, code);
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value* expr_code = expr->genCode(env, code, class_desc, method_desc);
 
         // temps are on the stack, so if LHS or RHS is an id, we need to get the value
         if (expr_code->getType()->isPointerTy())
@@ -930,7 +930,7 @@ public:
 
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override { return std::make_shared<Type_Int>(); }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         return code.getNewLiteral(integer);
     }
 
@@ -957,7 +957,7 @@ public:
 
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override { return std::make_shared<Type_Bool>(); }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         return code.getNewLiteral(boolean);
     }
 
@@ -981,16 +981,18 @@ public:
     }
 
     void checkTypes(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) {
+        // size - 1 to account for "this"
         auto args = method_desc.getArgumentDescriptors();
-        if (args.size() != expressions.size()) {
-            std::cout << "[Error]: Method call to " << method_desc.getName() << " expected " << args.size() << " arguments, but got " << expressions.size() << std::endl;
+        if (args.size() - 1 != expressions.size()) {
+            std::cout << "[Error]: Method call to " << method_desc.getName() << " expected " << args.size() - 1 << " arguments, but got " << expressions.size() << std::endl;
             exit(1);
         }
 
-        for (size_t i = 0; i < args.size(); i++) {
+        for (size_t i = 0; i < expressions.size(); i++) {
+            // args[i + 1] to account for "this" being the first argument
             auto expr_type = expressions[i]->getType(env, class_desc, method_desc);
-            if (!expr_type->typeEqual(args[i]->getType())) {
-                std::cout << "[Error]: Method call to " << method_desc.getName() << " expected the argument at position " << i << " to be of type " << args[i]->getName() << " but got argument of type " << expr_type->getName() << std::endl;
+            if (!expr_type->typeEqual(args[i + 1]->getType())) {
+                std::cout << "[Error]: Method call to " << method_desc.getName() << " expected the argument at position " << i << " to be of type " << args[i + 1]->getName() << " but got argument of type " << expr_type->getName() << std::endl;
                 exit(1);
             }
         }
@@ -1043,7 +1045,7 @@ public:
         return calling_class_desc->getType();
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         auto calling_class_desc = env.getClassDescriptor(type);
         calling_class_desc->getType()->pushScope(env);
             llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
@@ -1088,7 +1090,7 @@ public:
         return arr_type;
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         // TODO
         return nullptr;
     }
@@ -1129,7 +1131,7 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        expr->genCode(env, code);
+        expr->genCode(env, code, class_desc, method_desc);
     }
 
     void print() override {
@@ -1230,7 +1232,7 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        llvm::Value *toRet = expr->genCode(env, code);
+        llvm::Value *toRet = expr->genCode(env, code, class_desc, method_desc);
         if (toRet->getType()->isPointerTy()) {
             toRet = code.getBuilder().CreateLoad(toRet->getType()->getPointerElementType(), toRet);
         }
@@ -1437,7 +1439,7 @@ public:
         return env.getVariableDescriptor(id)->getType();
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         return env.getVariableDescriptor(id)->getLLVMValue();
     }
 
@@ -1472,7 +1474,7 @@ public:
         return calling_method_desc->getReturnType();
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         return nullptr;
     }
 
@@ -1511,7 +1513,7 @@ public:
         return desc->getType();
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         return nullptr;
     }
 
@@ -1552,7 +1554,7 @@ public:
         return desc->getReturnType();
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         return nullptr;
     }
 
@@ -1596,7 +1598,7 @@ public:
         return callee_type->getCompositeType();
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         return nullptr;
     }
 
@@ -1621,8 +1623,8 @@ public:
         return class_desc.getType();
     }
 
-    llvm::Value* genCode(Environment &env, GeneratedCode &code) override {
-        return nullptr;
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        return env.getVariableDescriptor("this")->getLLVMValue();
     }
 
     void print() override {
@@ -1658,13 +1660,13 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        llvm::Value *expr_code = expr->genCode(env, code);
+        llvm::Value *expr_code = expr->genCode(env, code, class_desc, method_desc);
 
         // locals are pointers to somewhere on stack, must dereference
         if (expr_code->getType()->isPointerTy() && !expr_code->getType()->getPointerElementType()->isStructTy())
             expr_code = code.getBuilder().CreateLoad(expr_code->getType()->getPointerElementType(), expr_code);
 
-        code.getBuilder().CreateStore(expr_code, lvalue->genCode(env, code));
+        code.getBuilder().CreateStore(expr_code, lvalue->genCode(env, code, class_desc, method_desc));
     }
 
     void print() override {
@@ -1819,6 +1821,12 @@ public:
         class_desc.addMethod(desc);
 
         env.pushScope(argument_scope);
+            // this
+            auto this_desc = std::make_shared<Descriptor_Variable>("this", class_desc.getType());
+            env.getTopScope()->setVariableDescriptor("this", this_desc);
+            desc->addArgumentDescriptor(this_desc);
+
+            // actual formals
             formals->pass_2(env, desc);
         env.popScope();
     }
@@ -1838,8 +1846,12 @@ public:
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc) override {
         std::vector<llvm::Type*> argument_types;
-        for (auto arg : desc->getArgumentDescriptors())
-            argument_types.push_back(arg->getType()->getLLVMType(code));
+        for (auto arg : desc->getArgumentDescriptors()) {
+            llvm::Type *type = arg->getType()->getLLVMType(code);
+            if (type->isStructTy())
+                type = llvm::PointerType::getUnqual(type);
+            argument_types.push_back(type);
+        }
 
         llvm::FunctionType *FT = llvm::FunctionType::get(desc->getReturnType()->getLLVMType(code), argument_types, false);
         llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, id, code.getModule());
@@ -1853,13 +1865,17 @@ public:
             auto local_arg = desc->getArgumentDescriptors()[i];
             auto llvm_arg = F->getArg(i);
             
-            local_arg->setLLVMValue(code.getBuilder().CreateAlloca(local_arg->getType()->getLLVMType(code), nullptr, local_arg->getName()));
+            local_arg->setLLVMValue(code.getBuilder().CreateAlloca(llvm_arg->getType(), nullptr, local_arg->getName()));
             code.getBuilder().CreateStore(llvm_arg, local_arg->getLLVMValue());
         }
 
         auto locals = desc->getLocalVariableDescriptors();
         for (auto local : locals) {
-            local->setLLVMValue(code.getBuilder().CreateAlloca(local->getType()->getLLVMType(code), nullptr, local->getName()));
+            llvm::Type *type = local->getType()->getLLVMType(code);
+            if (type->isStructTy())
+                type = llvm::PointerType::getUnqual(type);
+
+            local->setLLVMValue(code.getBuilder().CreateAlloca(type, nullptr, local->getName()));
         }
 
         env.pushScope(argument_scope);
@@ -1911,6 +1927,11 @@ public:
         class_desc.setConstructor(desc);
 
         env.pushScope(argument_scope);
+            // this
+            auto this_desc = std::make_shared<Descriptor_Variable>("this", class_desc.getType());
+            env.getTopScope()->setVariableDescriptor("this", this_desc);
+            desc->addArgumentDescriptor(this_desc);
+
             formals->pass_2(env, desc);
         env.popScope();
     }
@@ -1925,8 +1946,12 @@ public:
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc) override {
         std::vector<llvm::Type*> argument_types;
-        for (auto arg : desc->getArgumentDescriptors())
-            argument_types.push_back(arg->getType()->getLLVMType(code));
+        for (auto arg : desc->getArgumentDescriptors()) {
+            llvm::Type *type = arg->getType()->getLLVMType(code);
+            if (type->isStructTy())
+                type = llvm::PointerType::getUnqual(type);
+            argument_types.push_back(type);
+        }
 
         llvm::FunctionType *FT = llvm::FunctionType::get(desc->getReturnType()->getLLVMType(code), argument_types, false);
         llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, id, code.getModule());
@@ -1940,13 +1965,17 @@ public:
             auto local_arg = desc->getArgumentDescriptors()[i];
             auto llvm_arg = F->getArg(i);
             
-            local_arg->setLLVMValue(code.getBuilder().CreateAlloca(local_arg->getType()->getLLVMType(code), nullptr, local_arg->getName()));
+            local_arg->setLLVMValue(code.getBuilder().CreateAlloca(llvm_arg->getType(), nullptr, local_arg->getName()));
             code.getBuilder().CreateStore(llvm_arg, local_arg->getLLVMValue());
         }
 
         auto locals = desc->getLocalVariableDescriptors();
         for (auto local : locals) {
-            local->setLLVMValue(code.getBuilder().CreateAlloca(local->getType()->getLLVMType(code), nullptr, local->getName()));
+            llvm::Type *type = local->getType()->getLLVMType(code);
+            if (type->isStructTy())
+                type = llvm::PointerType::getUnqual(type);
+
+            local->setLLVMValue(code.getBuilder().CreateAlloca(type, nullptr, local->getName()));
         }
 
         env.pushScope(argument_scope);
