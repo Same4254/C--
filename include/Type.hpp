@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <llvm-10/llvm/IR/Constants.h>
+#include <llvm-10/llvm/IR/Instruction.h>
 #include <memory>
 #include <ostream>
 #include <unordered_map>
@@ -264,11 +266,14 @@ private:
     std::vector<std::shared_ptr<Descriptor_Variable>> local_variable_descriptors;
     std::vector<std::shared_ptr<Descriptor_Variable>> argument_descriptors;
 
+    llvm::Function *llvm_function;
+    size_t vtable_offset;
+
     bool hasReturn;
 
 public:
     Descriptor_Method(std::string name, std::shared_ptr<Type> return_type) 
-        : return_type(return_type), name(name), hasReturn(false)
+        : return_type(return_type), name(name), llvm_function(nullptr), vtable_offset(-1), hasReturn(false)
     {
 
     }
@@ -289,6 +294,12 @@ public:
     void addLocalVariable(std::shared_ptr<Descriptor_Variable> local_variable) {
         local_variable_descriptors.push_back(local_variable);
     }
+
+    llvm::Function* getLLVMFunction() { return llvm_function; }
+    void setLLVMFuntion(llvm::Function *llvm_function) { this->llvm_function = llvm_function; }
+    
+    size_t getVtableOffset() { return vtable_offset; }
+    void setVtableOffset(size_t vtable_offset) { this->vtable_offset = vtable_offset; }
 
     void print(std::ostream &stream) const override { 
         stream << *return_type << ", ( ";
@@ -334,22 +345,65 @@ private:
     std::vector<llvm::Type*> field_types;
 
     std::vector<std::shared_ptr<Descriptor_Method>> desc_methods;
+    std::vector<std::shared_ptr<Descriptor_Method>> vtable_descriptors;
+
+    llvm::GlobalVariable *llvm_vtable;
 
     std::string name;
 
 public:
     Descriptor_Class(std::string name)
-        : type(std::make_shared<Type_Class>(name)), desc_constructor(nullptr), name(name)
+        : type(std::make_shared<Type_Class>(name)), desc_constructor(nullptr), llvm_vtable(nullptr), name(name)
     {
 
     }
-
-    void genCode(GeneratedCode &code) {
+    
+    void genLLVMType(GeneratedCode& code) {
+        field_types.push_back(llvm::PointerType::get(llvm::ArrayType::get(llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0), 0), 0));
         for (auto desc_field : desc_fields)
             field_types.push_back(desc_field->getType()->getLLVMType(code));
 
         ((llvm::StructType*) type->getLLVMType(code))->setBody(field_types);
     }
+
+    void genCode(GeneratedCode &code) {
+        if (llvm_vtable != nullptr)
+            return;
+
+        if (parent_class != nullptr) {
+            parent_class->genCode(code);
+            this->vtable_descriptors = parent_class->vtable_descriptors;
+            for (auto& my_method_desc : desc_methods) {
+                std::optional<int> vtable_index;
+                for (auto& parent_method_desc : parent_class->vtable_descriptors) {
+                    if (my_method_desc->getName() == parent_method_desc->getName())
+                        vtable_index.emplace(parent_method_desc->getVtableOffset());
+                }
+
+                if (vtable_index.has_value()) {
+                    vtable_descriptors[vtable_index.value()] = my_method_desc;
+                } else {
+                    my_method_desc->setVtableOffset(vtable_descriptors.size());
+                    vtable_descriptors.push_back(my_method_desc);
+                }
+            }
+        } else {
+            for (size_t i = 0; i < desc_methods.size(); i++) {
+                desc_methods[i]->setVtableOffset(i);
+                vtable_descriptors.push_back(desc_methods[i]);
+            }
+        }
+        
+        llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
+        std::vector<llvm::Constant*> addresses;
+        for (auto& desc : vtable_descriptors)
+            addresses.push_back(llvm::ConstantExpr::getCast(llvm::Instruction::BitCast, desc->getLLVMFunction(), func_ptr_type));
+        auto init =  llvm::ConstantArray::get(llvm::ArrayType::get(func_ptr_type, vtable_descriptors.size()), addresses);
+        llvm_vtable = (llvm::GlobalVariable*) code.getModule().getOrInsertGlobal(name + "_vtable", llvm::ArrayType::get(func_ptr_type, vtable_descriptors.size()));
+        llvm_vtable->setInitializer(init);
+    }
+    
+    llvm::Constant* getVtable() { return llvm_vtable; }
 
     void print(std::ostream &stream) const override;
     

@@ -1,22 +1,23 @@
 class X {
+    int a;
     X() {
-
     }
 
     int thing(int a) {
         return -a;
     }
+
+    void another() {
+
+    }
 };
 
 class Main {
+int test;
     Main() {
-        int a;
-        a = 1 + 2;
-
-        int b;
-        b = a;
-
         X x;
         x = new X();
+
+        x.another();
     }
 };

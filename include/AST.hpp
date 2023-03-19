@@ -998,6 +998,22 @@ public:
         }
     }
 
+    std::vector<llvm::Value*> genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) {
+        std::vector<llvm::Value*> toRet;
+
+        for (auto& node : expressions) {
+            llvm::Value *value = node->genCode(env, code, class_desc, method_desc);
+
+            // expression can be an identifier in the local scope which is a double pointer
+            if (value->getType()->isPointerTy() && value->getType()->getPointerElementType()->isPointerTy())
+                value = code.getBuilder().CreateLoad(value->getType()->getPointerElementType(), value);
+
+            toRet.push_back(value);
+        }
+
+        return toRet;
+    }
+
     void AddExpression(ASTNode_Expr *expr) {
         expressions.insert(expressions.begin(), std::unique_ptr<ASTNode_Expr>(expr));
     }
@@ -1050,12 +1066,24 @@ public:
         calling_class_desc->getType()->pushScope(env);
             llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
             llvm::Type* type = calling_class_desc->getType()->getLLVMType(code);
-            llvm::Constant* size = llvm::ConstantExpr::getSizeOf(type);
+            llvm::Constant* size = llvm::ConstantExpr::getBitCast(llvm::ConstantExpr::getSizeOf(type), llvm::Type::getInt32Ty(code.getContext()));
+
+            auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, size, nullptr, nullptr, "");
+            code.getBuilder().Insert(inst);
+ 
+            // store the vtabe
+            llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
+            llvm::Value* obj_vtable = code.getBuilder().CreateConstGEP2_32(inst->getType()->getPointerElementType(), inst, 0, 0);
+            // this cast is to ignore the size of the array that is the vtable (rather than figure it out explicitly)
+            obj_vtable = code.getBuilder().CreateBitCast(obj_vtable, llvm::PointerType::get(calling_class_desc->getVtable()->getType(), 0));
+            code.getBuilder().CreateStore(calling_class_desc->getVtable(), obj_vtable);
+
+            auto parameters = actuals->genCode(env, code, class_desc, method_desc);
+            parameters.insert(parameters.begin(), inst);
+
+            auto constructor_desc = env.getMethodDescriptor(this->type);
+            code.getBuilder().CreateCall(constructor_desc->getLLVMFunction()->getFunctionType(), constructor_desc->getLLVMFunction(), parameters);
         calling_class_desc->getType()->popScope(env);
-
-        auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, size, nullptr, nullptr, "");
-
-        code.getBuilder().Insert(inst);
 
         return inst;
     }
@@ -1270,6 +1298,8 @@ public:
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         for (auto& node : nodes)
             node->genCode(env, code, class_desc, method_desc);
+        if (method_desc.getReturnType()->getID() == TYPE_ID::VOID)
+            code.getBuilder().CreateRetVoid();
     }
 
     void AddStatement(ASTNode_Statement *statement) {
@@ -1555,7 +1585,29 @@ public:
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        return nullptr;
+        std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
+        callee_type->pushScope(env);
+            auto calling_method_desc = env.getMethodDescriptor(id);
+        callee_type->popScope(env);
+        
+        size_t vtable_index = calling_method_desc->getVtableOffset();
+
+        llvm::Value *obj = obj_lvalue->genCode(env, code, class_desc, method_desc);
+        obj = code.getBuilder().CreateLoad(obj->getType()->getPointerElementType(), obj);
+        
+        std::vector<llvm::Value*> parameters = actuals->genCode(env, code, class_desc, method_desc);
+        parameters.insert(parameters.begin(), obj);
+
+        llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
+
+        llvm::Value* adrVTBL = code.getBuilder().CreateConstGEP2_32(obj->getType()->getPointerElementType(), obj, 0, 0);
+        llvm::Value* basVTBL = code.getBuilder().CreateLoad(adrVTBL->getType()->getPointerElementType(), adrVTBL);
+        llvm::Value* adrEntr = code.getBuilder().CreateConstGEP2_32(basVTBL->getType()->getPointerElementType(), basVTBL, 0, vtable_index);
+        llvm::Value* mthPtr  = code.getBuilder().CreateLoad(func_ptr_type, adrEntr);
+        llvm::Type*  mthTy   = calling_method_desc->getLLVMFunction()->getType();
+        llvm::Value* func    = code.getBuilder().CreateBitCast(mthPtr, mthTy);
+
+        return code.getBuilder().CreateCall(calling_method_desc->getLLVMFunction()->getFunctionType(), func, parameters);
     }
 
     void print() override {
@@ -1746,7 +1798,7 @@ public:
 
 class ASTNode_MemberDeclaration : public ASTNode {
 public:
-    virtual void pass_2(Environment &env, Descriptor_Class &class_desc) = 0;
+    virtual void pass_2(Environment &env, Descriptor_Class &class_desc, GeneratedCode &code) = 0;
     virtual void pass_3(Environment &env, Descriptor_Class &class_desc) = 0;
 
     virtual void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc) = 0;
@@ -1764,7 +1816,7 @@ public:
 
     }
 
-    void pass_2(Environment &env, Descriptor_Class &class_desc) override {
+    void pass_2(Environment &env, Descriptor_Class &class_desc, GeneratedCode &code) override {
         auto type = type_ast->getType(env);
         if (type->getID() == TYPE_ID::VOID) {
             std::cout << "[Error]: Variable cannot be declared to have type void" << std::endl;
@@ -1815,7 +1867,7 @@ public:
 
     }
 
-    void pass_2(Environment &env, Descriptor_Class &class_desc) override {
+    void pass_2(Environment &env, Descriptor_Class &class_desc, GeneratedCode &code) override {
         desc = std::make_shared<Descriptor_Method>(id, type->getType(env));
         env.getTopScope()->setMethodDescriptor(id, desc);
         class_desc.addMethod(desc);
@@ -1828,6 +1880,19 @@ public:
 
             // actual formals
             formals->pass_2(env, desc);
+
+            std::vector<llvm::Type*> argument_types;
+            for (auto arg : desc->getArgumentDescriptors()) {
+                llvm::Type *type = arg->getType()->getLLVMType(code);
+                if (type->isStructTy())
+                    type = llvm::PointerType::getUnqual(type);
+                argument_types.push_back(type);
+            }
+
+            llvm::FunctionType *FT = llvm::FunctionType::get(desc->getReturnType()->getLLVMType(code), argument_types, false);
+            llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, id, code.getModule());
+            desc->setLLVMFuntion(F);
+
         env.popScope();
     }
 
@@ -1845,19 +1910,11 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc) override {
-        std::vector<llvm::Type*> argument_types;
-        for (auto arg : desc->getArgumentDescriptors()) {
-            llvm::Type *type = arg->getType()->getLLVMType(code);
-            if (type->isStructTy())
-                type = llvm::PointerType::getUnqual(type);
-            argument_types.push_back(type);
-        }
-
-        llvm::FunctionType *FT = llvm::FunctionType::get(desc->getReturnType()->getLLVMType(code), argument_types, false);
-        llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, id, code.getModule());
-
+        llvm::Function *F = desc->getLLVMFunction();
         llvm::BasicBlock *BB = llvm::BasicBlock::Create(code.getContext(), "entry", F);
         code.getBuilder().SetInsertPoint(BB);
+
+        desc->setLLVMFuntion(F);
         
         // *everything* goes on the stack, even the arguments...
         auto args = desc->getArgumentDescriptors();
@@ -1921,7 +1978,7 @@ public:
 
     }
 
-    void pass_2(Environment &env, Descriptor_Class &class_desc) override {
+    void pass_2(Environment &env, Descriptor_Class &class_desc, GeneratedCode &code) override {
         this->desc = std::make_shared<Descriptor_Constructor>(id);
         env.getTopScope()->setMethodDescriptor(id, desc);
         class_desc.setConstructor(desc);
@@ -1933,6 +1990,18 @@ public:
             desc->addArgumentDescriptor(this_desc);
 
             formals->pass_2(env, desc);
+
+            std::vector<llvm::Type*> argument_types;
+            for (auto arg : desc->getArgumentDescriptors()) {
+                llvm::Type *type = arg->getType()->getLLVMType(code);
+                if (type->isStructTy())
+                    type = llvm::PointerType::getUnqual(type);
+                argument_types.push_back(type);
+            }
+
+            llvm::FunctionType *FT = llvm::FunctionType::get(desc->getReturnType()->getLLVMType(code), argument_types, false);
+            llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, id, code.getModule());
+            desc->setLLVMFuntion(F);
         env.popScope();
     }
 
@@ -1945,17 +2014,7 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc) override {
-        std::vector<llvm::Type*> argument_types;
-        for (auto arg : desc->getArgumentDescriptors()) {
-            llvm::Type *type = arg->getType()->getLLVMType(code);
-            if (type->isStructTy())
-                type = llvm::PointerType::getUnqual(type);
-            argument_types.push_back(type);
-        }
-
-        llvm::FunctionType *FT = llvm::FunctionType::get(desc->getReturnType()->getLLVMType(code), argument_types, false);
-        llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, id, code.getModule());
-
+        llvm::Function *F = desc->getLLVMFunction();
         llvm::BasicBlock *BB = llvm::BasicBlock::Create(code.getContext(), "entry", F);
         code.getBuilder().SetInsertPoint(BB);
         
@@ -2016,9 +2075,9 @@ public:
         declarations.insert(declarations.begin(), std::unique_ptr<ASTNode_MemberDeclaration>(decl));
     }
 
-    void pass_2(Environment &env, Descriptor_Class &class_desc) {
+    void pass_2(Environment &env, Descriptor_Class &class_desc, GeneratedCode &code) {
         for (auto& decl : declarations)
-            decl->pass_2(env, class_desc);
+            decl->pass_2(env, class_desc, code);
     }
 
     void pass_3(Environment &env, Descriptor_Class &class_desc) {
@@ -2070,9 +2129,10 @@ public:
 
     }
 
-    virtual void pass_2(Environment & env) {
+    virtual void pass_2(Environment &env, GeneratedCode &code) {
+        this->desc->genLLVMType(code);
         this->desc->getType()->pushScope(env);
-            declarations->pass_2(env, *desc);
+            declarations->pass_2(env, *desc, code);
             //std::cout << *scope << std::endl;
             std::cout << *desc << std::endl << std::endl;
         this->desc->getType()->popScope(env);
@@ -2177,16 +2237,16 @@ public:
         //std::cout << *scope << std::endl;
     }
 
-    void pass_2(Environment & env) {
+    void pass_2(Environment &env, GeneratedCode &code) {
         env.pushScope(scope);
             for (auto& clazz : classes)
-                clazz->pass_2(env);
+                clazz->pass_2(env, code);
         env.popScope();
 
         //std::cout << *scope << std::endl;
     }
 
-    void pass_3(Environment & env) {
+    void pass_3(Environment &env) {
         env.pushScope(scope);
             if (env.hasClassDescriptor("Main")) {
                 for (auto& clazz : classes)
@@ -2239,8 +2299,8 @@ public:
         root.pass_1(env);
     }
 
-    void pass_2(Environment &env) {
-        root.pass_2(env);
+    void pass_2(Environment &env, GeneratedCode &code) {
+        root.pass_2(env, code);
     }
 
     void pass_3(Environment &env) { 

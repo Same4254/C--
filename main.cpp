@@ -21,16 +21,17 @@ int main() {
     std::cout << "----- Pass 1 -----" << std::endl;
     driver.ast.root.pass_1(env);
 
+    GeneratedCode code;
+    
     std::cout << "----- Pass 2 -----" << std::endl;
-    driver.ast.root.pass_2(env);
+    driver.ast.root.pass_2(env, code);
 
     std::cout << "----- Pass 3 -----" << std::endl;
     driver.ast.root.pass_3(env);
     std::cout << "Passed Semantic Analysis!!" << std::endl;
 
     std::cout << "---------- Code Generation ----------" << std::endl;
-    GeneratedCode code;
-    driver.ast.root.genCode(env, code);
 
-    code.getModule().print(llvm::errs(), nullptr);
+    driver.ast.root.genCode(env, code);
+    code.getModule().print(llvm::outs(), nullptr);
 }
