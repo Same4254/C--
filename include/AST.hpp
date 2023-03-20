@@ -1061,31 +1061,36 @@ public:
         return calling_class_desc->getType();
     }
 
+    static llvm::Value* genCodeCreateObject(GeneratedCode &code, Descriptor_Class &obj_class, std::vector<llvm::Value*> parameters) {
+        auto constructor_desc = obj_class.getConstructor();
+
+        llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
+        llvm::Type* type = obj_class.getType()->getLLVMType(code);
+        llvm::Constant* size = llvm::ConstantExpr::getBitCast(llvm::ConstantExpr::getSizeOf(type), llvm::Type::getInt32Ty(code.getContext()));
+
+        auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, size, nullptr, nullptr, "");
+        code.getBuilder().Insert(inst);
+
+        // store the vtabe
+        llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
+        llvm::Value* obj_vtable = code.getBuilder().CreateConstGEP2_32(inst->getType()->getPointerElementType(), inst, 0, 0);
+        // this cast is to ignore the size of the array that is the vtable (rather than figure it out explicitly)
+        obj_vtable = code.getBuilder().CreateBitCast(obj_vtable, llvm::PointerType::get(obj_class.getVtable()->getType(), 0));
+        code.getBuilder().CreateStore(obj_class.getVtable(), obj_vtable);
+
+        parameters.insert(parameters.begin(), inst);
+
+        code.getBuilder().CreateCall(constructor_desc->getLLVMFunction()->getFunctionType(), constructor_desc->getLLVMFunction(), parameters);
+        return inst;
+    }
+
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         auto calling_class_desc = env.getClassDescriptor(type);
         calling_class_desc->getType()->pushScope(env);
-            llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
-            llvm::Type* type = calling_class_desc->getType()->getLLVMType(code);
-            llvm::Constant* size = llvm::ConstantExpr::getBitCast(llvm::ConstantExpr::getSizeOf(type), llvm::Type::getInt32Ty(code.getContext()));
-
-            auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, size, nullptr, nullptr, "");
-            code.getBuilder().Insert(inst);
- 
-            // store the vtabe
-            llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
-            llvm::Value* obj_vtable = code.getBuilder().CreateConstGEP2_32(inst->getType()->getPointerElementType(), inst, 0, 0);
-            // this cast is to ignore the size of the array that is the vtable (rather than figure it out explicitly)
-            obj_vtable = code.getBuilder().CreateBitCast(obj_vtable, llvm::PointerType::get(calling_class_desc->getVtable()->getType(), 0));
-            code.getBuilder().CreateStore(calling_class_desc->getVtable(), obj_vtable);
-
             auto parameters = actuals->genCode(env, code, class_desc, method_desc);
-            parameters.insert(parameters.begin(), inst);
-
-            auto constructor_desc = env.getMethodDescriptor(this->type);
-            code.getBuilder().CreateCall(constructor_desc->getLLVMFunction()->getFunctionType(), constructor_desc->getLLVMFunction(), parameters);
         calling_class_desc->getType()->popScope(env);
 
-        return inst;
+        return genCodeCreateObject(code, *calling_class_desc, parameters);
     }
 
     void print() override {
@@ -2271,6 +2276,16 @@ public:
         env.pushScope(scope);
             for (auto& clazz : classes)
                 clazz->genCode(env, code);
+
+            llvm::FunctionType *FT = llvm::FunctionType::get(llvm::IntegerType::getInt32Ty(code.getContext()), {}, false);
+            llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, "main", code.getModule());
+            llvm::BasicBlock *BB = llvm::BasicBlock::Create(code.getContext(), "entry", F);
+            code.getBuilder().SetInsertPoint(BB);
+
+            auto class_desc = env.getClassDescriptor("Main");
+            ASTNode_Expr_New_Obj::genCodeCreateObject(code, *class_desc, {});
+
+            code.getBuilder().CreateRet(code.getNewLiteral(0));
         env.popScope();
     }
 

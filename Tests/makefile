@@ -9,7 +9,7 @@ LD=clang -g
 all: test2
 
 test2: $(OFILES)
-	$(LD) $(OFILES2) $(LIBS) -o $@
+	$(LD) $(OFILES) $(LIBS) -o $@
 
 %.o : %.s
 	$(AS) $< -o $@

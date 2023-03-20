@@ -432,6 +432,9 @@ public:
             exit(1);
         }
     }
+    
+    std::shared_ptr<Descriptor_Constructor> getConstructor() { return desc_constructor; }
+
 
     bool hasConstructor() { return desc_constructor != nullptr; }
 
