@@ -1488,6 +1488,77 @@ public:
     }
 };
 
+class ASTNode_LValue_Obj_MethodCall : public ASTNode_LValue {
+private:
+    std::unique_ptr<ASTNode_LValue> obj_lvalue;
+    std::string id;
+    std::unique_ptr<ASTNode_Actuals> actuals;
+
+public:
+    ASTNode_LValue_Obj_MethodCall(ASTNode_LValue *obj_lvalue, const char *id_c, ASTNode_Actuals *actuals)
+        : obj_lvalue(obj_lvalue), id(id_c), actuals(actuals)
+    {
+
+    }
+
+    std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
+
+        callee_type->pushScope(env);
+            std::shared_ptr<Descriptor_Method> desc = env.getMethodDescriptor(id);
+        callee_type->popScope(env);
+
+        actuals->checkTypes(env, class_desc, *desc);
+
+        return desc->getReturnType();
+    }
+
+    static llvm::Value* genVtableFuncCall(GeneratedCode &code, llvm::Value *obj, Descriptor_Method &calling_method_desc, std::vector<llvm::Value*> parameters) {
+        size_t vtable_index = calling_method_desc.getVtableOffset();
+ 
+        parameters.insert(parameters.begin(), obj);
+
+        llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
+
+        llvm::Value* adrVTBL = code.getBuilder().CreateConstGEP2_32(obj->getType()->getPointerElementType(), obj, 0, 0);
+        llvm::Value* basVTBL = code.getBuilder().CreateLoad(adrVTBL->getType()->getPointerElementType(), adrVTBL);
+        llvm::Value* adrEntr = code.getBuilder().CreateConstGEP2_32(basVTBL->getType()->getPointerElementType(), basVTBL, 0, vtable_index);
+        llvm::Value* mthPtr  = code.getBuilder().CreateLoad(func_ptr_type, adrEntr);
+        llvm::Type*  mthTy   = calling_method_desc.getLLVMFunction()->getType();
+        llvm::Value* func    = code.getBuilder().CreateBitCast(mthPtr, mthTy);
+
+        return code.getBuilder().CreateCall(calling_method_desc.getLLVMFunction()->getFunctionType(), func, parameters);
+    }
+
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
+        callee_type->pushScope(env);
+            auto calling_method_desc = env.getMethodDescriptor(id);
+        callee_type->popScope(env);
+        
+        llvm::Value *obj = obj_lvalue->genCode(env, code, class_desc, method_desc);
+        obj = code.getBuilder().CreateLoad(obj->getType()->getPointerElementType(), obj);
+        std::vector<llvm::Value*> parameters = actuals->genCode(env, code, class_desc, method_desc);
+
+        return genVtableFuncCall(code, obj, *calling_method_desc, parameters);
+    }
+
+    void print() override {
+        obj_lvalue->print();
+        std::cout << "." << id;
+        std::cout << "(";
+        actuals->print();
+        std::cout << ")";
+    }
+
+    void printTree(int level) override {
+        printIndent(level);
+        std::cout << "ASTNode_LValue_Obj_MethodCall: " << id << std::endl;
+        obj_lvalue->printTree(level + 1);
+        actuals->printTree(level + 1);
+    }
+};
+
 class ASTNode_LValue_MethodCall : public ASTNode_LValue {
 private:
     std::unique_ptr<ASTNode_Actuals> actuals;
@@ -1510,7 +1581,13 @@ public:
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        return nullptr;
+        auto obj = env.getVariableDescriptor("this")->getLLVMValue();
+        auto calling_method_desc = env.getMethodDescriptor(id);
+        
+        obj = code.getBuilder().CreateLoad(obj->getType()->getPointerElementType(), obj);
+        std::vector<llvm::Value*> parameters = actuals->genCode(env, code, class_desc, method_desc);
+
+        return ASTNode_LValue_Obj_MethodCall::genVtableFuncCall(code, obj, *calling_method_desc, parameters);
     }
 
     void print() override {
@@ -1562,73 +1639,6 @@ public:
         std::cout << "ASTNode_LValue_Obj_Access: " << id << std::endl;
         obj_lvalue->printTree(level + 1);
     }    
-};
-
-class ASTNode_LValue_Obj_MethodCall : public ASTNode_LValue {
-private:
-    std::unique_ptr<ASTNode_LValue> obj_lvalue;
-    std::string id;
-    std::unique_ptr<ASTNode_Actuals> actuals;
-
-public:
-    ASTNode_LValue_Obj_MethodCall(ASTNode_LValue *obj_lvalue, const char *id_c, ASTNode_Actuals *actuals)
-        : obj_lvalue(obj_lvalue), id(id_c), actuals(actuals)
-    {
-
-    }
-
-    std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
-
-        callee_type->pushScope(env);
-            std::shared_ptr<Descriptor_Method> desc = env.getMethodDescriptor(id);
-        callee_type->popScope(env);
-
-        actuals->checkTypes(env, class_desc, *desc);
-
-        return desc->getReturnType();
-    }
-
-    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
-        callee_type->pushScope(env);
-            auto calling_method_desc = env.getMethodDescriptor(id);
-        callee_type->popScope(env);
-        
-        size_t vtable_index = calling_method_desc->getVtableOffset();
-
-        llvm::Value *obj = obj_lvalue->genCode(env, code, class_desc, method_desc);
-        obj = code.getBuilder().CreateLoad(obj->getType()->getPointerElementType(), obj);
-        
-        std::vector<llvm::Value*> parameters = actuals->genCode(env, code, class_desc, method_desc);
-        parameters.insert(parameters.begin(), obj);
-
-        llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
-
-        llvm::Value* adrVTBL = code.getBuilder().CreateConstGEP2_32(obj->getType()->getPointerElementType(), obj, 0, 0);
-        llvm::Value* basVTBL = code.getBuilder().CreateLoad(adrVTBL->getType()->getPointerElementType(), adrVTBL);
-        llvm::Value* adrEntr = code.getBuilder().CreateConstGEP2_32(basVTBL->getType()->getPointerElementType(), basVTBL, 0, vtable_index);
-        llvm::Value* mthPtr  = code.getBuilder().CreateLoad(func_ptr_type, adrEntr);
-        llvm::Type*  mthTy   = calling_method_desc->getLLVMFunction()->getType();
-        llvm::Value* func    = code.getBuilder().CreateBitCast(mthPtr, mthTy);
-
-        return code.getBuilder().CreateCall(calling_method_desc->getLLVMFunction()->getFunctionType(), func, parameters);
-    }
-
-    void print() override {
-        obj_lvalue->print();
-        std::cout << "." << id;
-        std::cout << "(";
-        actuals->print();
-        std::cout << ")";
-    }
-
-    void printTree(int level) override {
-        printIndent(level);
-        std::cout << "ASTNode_LValue_Obj_MethodCall: " << id << std::endl;
-        obj_lvalue->printTree(level + 1);
-        actuals->printTree(level + 1);
-    }
 };
 
 class ASTNode_LValue_Array : public ASTNode_LValue {
