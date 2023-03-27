@@ -434,9 +434,9 @@ public:
     }
     
     std::shared_ptr<Descriptor_Constructor> getConstructor() { return desc_constructor; }
-
-
     bool hasConstructor() { return desc_constructor != nullptr; }
+
+    std::string getName() { return name; }
 
     void addField(std::shared_ptr<Descriptor_Variable> desc_field) {
         desc_fields.push_back(desc_field);

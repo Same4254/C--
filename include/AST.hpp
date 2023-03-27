@@ -1905,7 +1905,7 @@ public:
             }
 
             llvm::FunctionType *FT = llvm::FunctionType::get(desc->getReturnType()->getLLVMType(code), argument_types, false);
-            llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, id, code.getModule());
+            llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, class_desc.getName() + "_" + id, code.getModule());
             desc->setLLVMFuntion(F);
 
         env.popScope();
@@ -2015,7 +2015,7 @@ public:
             }
 
             llvm::FunctionType *FT = llvm::FunctionType::get(desc->getReturnType()->getLLVMType(code), argument_types, false);
-            llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, id, code.getModule());
+            llvm::Function *F = llvm::Function::Create(FT, llvm::Function::ExternalLinkage, class_desc.getName() + "_" + id, code.getModule());
             desc->setLLVMFuntion(F);
         env.popScope();
     }
@@ -2145,12 +2145,12 @@ public:
     }
 
     virtual void pass_2(Environment &env, GeneratedCode &code) {
-        this->desc->genLLVMType(code);
         this->desc->getType()->pushScope(env);
             declarations->pass_2(env, *desc, code);
             //std::cout << *scope << std::endl;
             std::cout << *desc << std::endl << std::endl;
         this->desc->getType()->popScope(env);
+        this->desc->genLLVMType(code);
     }
 
     virtual void pass_3(Environment &env) {
@@ -2202,7 +2202,7 @@ public:
     void pass_1(Environment &env) override {
         auto parent_desc = env.getClassDescriptor(parent_name);
 
-        desc->getType()->setParentClassType(parent_desc->getType());
+        desc->setParentClass(parent_desc);
         std::cout << *desc << std::endl << std::endl;
     }
 

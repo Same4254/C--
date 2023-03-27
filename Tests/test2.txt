@@ -1,14 +1,30 @@
 class X {
     int a;
-    X() {
-    }
 
-    int thing(int a) {
-        return -a;
+    X() {
+
+    }
+    
+    int func() {
+        return 10;
     }
 
     void another() {
+        int a;
+        a = 6;
+    }
+};
 
+class Y extends X {
+    bool b;
+    int c;
+
+    Y() {
+
+    }
+
+    int func() {
+        return 20;
     }
 };
 
@@ -17,7 +33,5 @@ int test;
     Main() {
         X x;
         x = new X();
-
-        x.another();
     }
 };
