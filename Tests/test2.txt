@@ -33,5 +33,11 @@ int test;
     Main() {
         X x;
         x = new X();
+        
+        Y y;
+        y = new Y();
+
+        y.func();
+        y.c = x.a;
     }
 };

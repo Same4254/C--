@@ -239,9 +239,11 @@ protected:
     std::shared_ptr<Type> type;
     llvm::Value *location;
 
+    int struct_index;
+
 public:
     Descriptor_Variable(std::string name, std::shared_ptr<Type> type)
-        : name(name), type(type)
+        : name(name), type(type), struct_index(-1)
     {
 
     }
@@ -250,6 +252,9 @@ public:
 
     void setLLVMValue(llvm::Value* location) { this->location = location; }
     llvm::Value* getLLVMValue() { return this->location; }
+
+    void setStructIndex(int struct_index) { this->struct_index = struct_index; }
+    int getStructIndex() { return struct_index; }
 
     std::string getName() { return name; }
 
@@ -342,7 +347,6 @@ private:
     std::shared_ptr<Descriptor_Constructor> desc_constructor;
 
     std::vector<std::shared_ptr<Descriptor_Variable>> desc_fields;
-    std::vector<llvm::Type*> field_types;
 
     std::vector<std::shared_ptr<Descriptor_Method>> desc_methods;
     std::vector<std::shared_ptr<Descriptor_Method>> vtable_descriptors;
@@ -358,10 +362,30 @@ public:
 
     }
     
+    void getAllVariables(std::vector<std::shared_ptr<Descriptor_Variable>> &variables) {
+        if (parent_class != nullptr)
+            parent_class->getAllVariables(variables);
+
+        for (auto var : desc_fields) {
+            // adding before setting the index is like doing + 1 which accounts for storing the vtable
+            variables.push_back(var);
+            var->setStructIndex(variables.size());
+        }
+    }
+    
     void genLLVMType(GeneratedCode& code) {
+        std::vector<llvm::Type*> field_types;
+        std::vector<std::shared_ptr<Descriptor_Variable>> all_fields;
+        getAllVariables(all_fields);
+
         field_types.push_back(llvm::PointerType::get(llvm::ArrayType::get(llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0), 0), 0));
-        for (auto desc_field : desc_fields)
-            field_types.push_back(desc_field->getType()->getLLVMType(code));
+        for (auto desc_field : all_fields) {
+            auto type = desc_field->getType()->getLLVMType(code);
+            if (type->isStructTy())
+                field_types.push_back(llvm::PointerType::get(type, 0));
+            else 
+                field_types.push_back(type);
+        }
 
         ((llvm::StructType*) type->getLLVMType(code))->setBody(field_types);
     }
@@ -381,6 +405,7 @@ public:
                 }
 
                 if (vtable_index.has_value()) {
+                    my_method_desc->setVtableOffset(vtable_index.value());
                     vtable_descriptors[vtable_index.value()] = my_method_desc;
                 } else {
                     my_method_desc->setVtableOffset(vtable_descriptors.size());

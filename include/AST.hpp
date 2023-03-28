@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <llvm-10/llvm/IR/DataLayout.h>
 #include <vector>
 #include <memory>
 
@@ -631,12 +632,12 @@ public:
         std::shared_ptr<Type> left_type = left->getType(env, class_desc, method_desc);
         std::shared_ptr<Type> right_type = right->getType(env, class_desc, method_desc);
 
-        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::INT) {
             std::cout << "[Error]: Cannot less or equal of " << left_type->getName() << " and " << right_type->getName() << std::endl;
             exit(1);
         }
         
-        return left_type;
+        return std::make_shared<Type_Bool>();
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
@@ -684,12 +685,12 @@ public:
         std::shared_ptr<Type> left_type = left->getType(env, class_desc, method_desc);
         std::shared_ptr<Type> right_type = right->getType(env, class_desc, method_desc);
 
-        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::INT) {
             std::cout << "[Error]: Cannot less than of " << left_type->getName() << " and " << right_type->getName() << std::endl;
             exit(1);
         }
         
-        return left_type;
+        return std::make_shared<Type_Bool>();
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
@@ -737,12 +738,12 @@ public:
         std::shared_ptr<Type> left_type = left->getType(env, class_desc, method_desc);
         std::shared_ptr<Type> right_type = right->getType(env, class_desc, method_desc);
 
-        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::INT) {
             std::cout << "[Error]: Cannot greater than or equal of " << left_type->getName() << " and " << right_type->getName() << std::endl;
             exit(1);
         }
         
-        return left_type;
+        return std::make_shared<Type_Bool>();
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
@@ -790,12 +791,12 @@ public:
         std::shared_ptr<Type> left_type = left->getType(env, class_desc, method_desc);
         std::shared_ptr<Type> right_type = right->getType(env, class_desc, method_desc);
 
-        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+        if (!left_type->typeEqual(right_type) || left_type->getID() != TYPE_ID::INT) {
             std::cout << "[Error]: Cannot greater than of " << left_type->getName() << " and " << right_type->getName() << std::endl;
             exit(1);
         }
         
-        return left_type;
+        return std::make_shared<Type_Bool>();
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
@@ -1066,12 +1067,14 @@ public:
 
         llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
         llvm::Type* type = obj_class.getType()->getLLVMType(code);
-        llvm::Constant* size = llvm::ConstantExpr::getBitCast(llvm::ConstantExpr::getSizeOf(type), llvm::Type::getInt32Ty(code.getContext()));
+        //llvm::Constant* size = llvm::ConstantExpr::getBitCast(llvm::ConstantExpr::getSizeOf(type), llvm::Type::getInt32Ty(code.getContext()));
+        int real_size = code.getModule().getDataLayout().getStructLayout((llvm::StructType*) type)->getSizeInBytes();
+        llvm::ConstantInt* size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), real_size);
 
         auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, size, nullptr, nullptr, "");
         code.getBuilder().Insert(inst);
 
-        // store the vtabe
+        // store the vtable
         llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
         llvm::Value* obj_vtable = code.getBuilder().CreateConstGEP2_32(inst->getType()->getPointerElementType(), inst, 0, 0);
         // this cast is to ignore the size of the array that is the vtable (rather than figure it out explicitly)
@@ -1350,7 +1353,19 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        
+        llvm::BasicBlock *after_block = llvm::BasicBlock::Create(code.getContext(), "after", method_desc.getLLVMFunction());
+        llvm::BasicBlock *while_do_block = llvm::BasicBlock::Create(code.getContext(), "while_do", method_desc.getLLVMFunction(), after_block);
+        llvm::BasicBlock *while_cond_block = llvm::BasicBlock::Create(code.getContext(), "while_cond", method_desc.getLLVMFunction(), while_do_block);
+
+        code.getBuilder().SetInsertPoint(while_cond_block);
+        llvm::Value* cmp_expr = condition_expr->genCode(env, code, class_desc, method_desc);
+        code.getBuilder().CreateCondBr(cmp_expr, while_do_block, after_block);
+
+        code.getBuilder().SetInsertPoint(while_do_block);
+        statement->genCode(env, code, class_desc, method_desc);
+        code.getBuilder().CreateBr(while_cond_block);
+
+        code.getBuilder().SetInsertPoint(after_block);
     }
 
     void print() override {
@@ -1391,7 +1406,17 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        
+        llvm::BasicBlock *after_block = llvm::BasicBlock::Create(code.getContext(), "after", method_desc.getLLVMFunction());
+        llvm::BasicBlock *if_block = llvm::BasicBlock::Create(code.getContext(), "if", method_desc.getLLVMFunction(), after_block);
+
+        llvm::Value* cmp_expr = condition_expr->genCode(env, code, class_desc, method_desc);
+        code.getBuilder().CreateCondBr(cmp_expr, if_block, after_block);
+
+        code.getBuilder().SetInsertPoint(if_block);
+        statement->genCode(env, code, class_desc, method_desc);
+        code.getBuilder().CreateBr(after_block);
+
+        code.getBuilder().SetInsertPoint(after_block);
     }
 
     void print() override {
@@ -1434,7 +1459,22 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        
+        llvm::BasicBlock *after_block = llvm::BasicBlock::Create(code.getContext(), "after", method_desc.getLLVMFunction());
+        llvm::BasicBlock *else_block = llvm::BasicBlock::Create(code.getContext(), "else", method_desc.getLLVMFunction(), after_block);
+        llvm::BasicBlock *if_block = llvm::BasicBlock::Create(code.getContext(), "if", method_desc.getLLVMFunction(), else_block);
+
+        llvm::Value* cmp_expr = condition_expr->genCode(env, code, class_desc, method_desc);
+        code.getBuilder().CreateCondBr(cmp_expr, if_block, else_block);
+
+        code.getBuilder().SetInsertPoint(if_block);
+        statement_true->genCode(env, code, class_desc, method_desc);
+        code.getBuilder().CreateBr(after_block);
+
+        code.getBuilder().SetInsertPoint(else_block);
+        statement_false->genCode(env, code, class_desc, method_desc);
+        code.getBuilder().CreateBr(after_block);
+
+        code.getBuilder().SetInsertPoint(after_block);
     }
 
     void print() override {
@@ -1626,7 +1666,19 @@ public:
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        return nullptr;
+        llvm::Value *obj_ptr = obj_lvalue->genCode(env, code, class_desc, method_desc);
+        if (obj_ptr->getType()->getPointerElementType()->isPointerTy())
+            obj_ptr = code.getBuilder().CreateLoad(obj_ptr->getType()->getPointerElementType(), obj_ptr);
+
+        std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
+        callee_type->pushScope(env);
+            auto var_desc = env.getVariableDescriptor(id);
+        callee_type->popScope(env);
+        
+        //int offset = code.getModule().getDataLayout().getStructLayout((llvm::StructType*) obj_ptr->getType()->getPointerElementType())->getElementOffset(var_desc->getStructIndex());
+        //return code.getBuilder().CreateConstGEP2_32(obj_ptr->getType()->getPointerElementType(), obj_ptr, 0, offset);
+
+        return code.getBuilder().CreateConstGEP2_32(obj_ptr->getType()->getPointerElementType(), obj_ptr, 0, var_desc->getStructIndex());
     }
 
     void print() override {
