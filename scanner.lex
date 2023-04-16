@@ -54,6 +54,10 @@ WHITESPACE [ \n\t\r]+
 "bool" { return KEYWORD_BOOL; }
 "void" { return KEYWORD_VOID; }
 
+"PRINT_INT" { return KEYWORD_PRINT_INT; }
+"PRINT_BOOL" { return KEYWORD_PRINT_BOOL; }
+"PRINT_LN" { return KEYWORD_PRINT_LN; }
+
 "true" { yylval->val = 1; return KEYWORD_TRUE; }
 "false" { yylval->val = 0; return KEYWORD_FALSE; }
 

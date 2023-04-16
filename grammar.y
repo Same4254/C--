@@ -43,6 +43,10 @@
 %token KEYWORD_NEW
 %token KEYWORD_RETURN
 
+%token KEYWORD_PRINT_INT
+%token KEYWORD_PRINT_BOOL
+%token KEYWORD_PRINT_LN
+
 %token OPEN_SQUARE
 %token CLOSE_SQUARE
 
@@ -169,7 +173,14 @@ statement:
     | OPEN_BRACE statement_klein CLOSE_BRACE { $$ = $2; }
 
     | KEYWORD_RETURN expr SEMICOLON { $$ = new ASTNode_Statement_Return($2); }
+    | KEYWORD_RETURN SEMICOLON { $$ = new ASTNode_Statement_ReturnVoid(); }
+    
+    | KEYWORD_PRINT_INT OPEN_PARENTHESIS expr CLOSE_PARENTHESIS SEMICOLON { $$ = new ASTNode_Statement_Print_Int($3); }
+    | KEYWORD_PRINT_BOOL OPEN_PARENTHESIS expr CLOSE_PARENTHESIS SEMICOLON { $$ = new ASTNode_Statement_Print_Bool($3); }
+    | KEYWORD_PRINT_LN OPEN_PARENTHESIS CLOSE_PARENTHESIS SEMICOLON { $$ = new ASTNode_Statement_Print_Line(); }
+
     | SEMICOLON { $$ = new ASTNode_Statement_Empty(); }
+
 
 statement_klein:
     statement statement_klein { $$ = $2; $$->AddStatement($1); }

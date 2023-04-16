@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.8.2.  */
+/* A Bison parser, made by GNU Bison 3.5.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,12 +31,11 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
-   especially those whose name start with YY_ or yy_.  They are
-   private implementation details that can be changed or removed.  */
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_HOME_SAM_CODINGPROJECTS_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED
-# define YY_YY_HOME_SAM_CODINGPROJECTS_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED
+#ifndef YY_YY_HOME_SAM_CODINGPROJECTS_COMP_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED
+# define YY_YY_HOME_SAM_CODINGPROJECTS_COMP_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
@@ -45,57 +44,55 @@
 extern int yydebug;
 #endif
 
-/* Token kinds.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    SEMICOLON = 258,               /* SEMICOLON  */
-    COMMA = 259,                   /* COMMA  */
-    KEYWORD_NEW = 260,             /* KEYWORD_NEW  */
-    KEYWORD_RETURN = 261,          /* KEYWORD_RETURN  */
-    OPEN_SQUARE = 262,             /* OPEN_SQUARE  */
-    CLOSE_SQUARE = 263,            /* CLOSE_SQUARE  */
-    ASSIGN = 264,                  /* ASSIGN  */
-    LESS_THAN_OR_EQUAL = 265,      /* LESS_THAN_OR_EQUAL  */
-    GREATER_THAN_OR_EQUAL = 266,   /* GREATER_THAN_OR_EQUAL  */
-    EQUIVALENT = 267,              /* EQUIVALENT  */
-    IS_NOT_EQUAL = 268,            /* IS_NOT_EQUAL  */
-    LESS_THAN = 269,               /* LESS_THAN  */
-    GREATER_THAN = 270,            /* GREATER_THAN  */
-    OR = 271,                      /* OR  */
-    AND = 272,                     /* AND  */
-    MINUS = 273,                   /* MINUS  */
-    PLUS = 274,                    /* PLUS  */
-    DIVIDE = 275,                  /* DIVIDE  */
-    TIMES = 276,                   /* TIMES  */
-    NEGATE = 277,                  /* NEGATE  */
-    DOT = 278,                     /* DOT  */
-    OPEN_PARENTHESIS = 279,        /* OPEN_PARENTHESIS  */
-    CLOSE_PARENTHESIS = 280,       /* CLOSE_PARENTHESIS  */
-    OPEN_BRACE = 281,              /* OPEN_BRACE  */
-    CLOSE_BRACE = 282,             /* CLOSE_BRACE  */
-    SQUARE_PAIR = 283,             /* SQUARE_PAIR  */
-    KEYWORD_WHILE = 284,           /* KEYWORD_WHILE  */
-    KEYWORD_IF = 285,              /* KEYWORD_IF  */
-    KEYWORD_ELSE = 286,            /* KEYWORD_ELSE  */
-    KEYWORD_THIS = 287,            /* KEYWORD_THIS  */
-    KEYWORD_CLASS = 288,           /* KEYWORD_CLASS  */
-    KEYWORD_EXTENDS = 289,         /* KEYWORD_EXTENDS  */
-    KEYWORD_INT = 290,             /* KEYWORD_INT  */
-    KEYWORD_BOOL = 291,            /* KEYWORD_BOOL  */
-    KEYWORD_VOID = 292,            /* KEYWORD_VOID  */
-    KEYWORD_TRUE = 293,            /* KEYWORD_TRUE  */
-    KEYWORD_FALSE = 294,           /* KEYWORD_FALSE  */
-    INTEGER = 295,                 /* INTEGER  */
-    ID = 296,                      /* ID  */
-    UNKOWN = 297                   /* UNKOWN  */
+    SEMICOLON = 258,
+    COMMA = 259,
+    KEYWORD_NEW = 260,
+    KEYWORD_RETURN = 261,
+    KEYWORD_PRINT_INT = 262,
+    KEYWORD_PRINT_BOOL = 263,
+    KEYWORD_PRINT_LN = 264,
+    OPEN_SQUARE = 265,
+    CLOSE_SQUARE = 266,
+    ASSIGN = 267,
+    LESS_THAN_OR_EQUAL = 268,
+    GREATER_THAN_OR_EQUAL = 269,
+    EQUIVALENT = 270,
+    IS_NOT_EQUAL = 271,
+    LESS_THAN = 272,
+    GREATER_THAN = 273,
+    OR = 274,
+    AND = 275,
+    MINUS = 276,
+    PLUS = 277,
+    DIVIDE = 278,
+    TIMES = 279,
+    NEGATE = 280,
+    DOT = 281,
+    OPEN_PARENTHESIS = 282,
+    CLOSE_PARENTHESIS = 283,
+    OPEN_BRACE = 284,
+    CLOSE_BRACE = 285,
+    SQUARE_PAIR = 286,
+    KEYWORD_WHILE = 287,
+    KEYWORD_IF = 288,
+    KEYWORD_ELSE = 289,
+    KEYWORD_THIS = 290,
+    KEYWORD_CLASS = 291,
+    KEYWORD_EXTENDS = 292,
+    KEYWORD_INT = 293,
+    KEYWORD_BOOL = 294,
+    KEYWORD_VOID = 295,
+    KEYWORD_TRUE = 296,
+    KEYWORD_FALSE = 297,
+    INTEGER = 298,
+    ID = 299,
+    UNKOWN = 300
   };
-  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
@@ -126,7 +123,7 @@ union YYSTYPE
     ASTNode_Class *clazz;
     ASTNode_Class_List *class_list;
 
-#line 130 "/home/sam/CodingProjects/Compiler-Assignments/src/grammar.h"
+#line 127 "/home/sam/CodingProjects/Comp/Compiler-Assignments/src/grammar.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -136,8 +133,6 @@ typedef union YYSTYPE YYSTYPE;
 
 
 
-
 int yyparse (Driver &driver);
 
-
-#endif /* !YY_YY_HOME_SAM_CODINGPROJECTS_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED  */
+#endif /* !YY_YY_HOME_SAM_CODINGPROJECTS_COMP_COMPILER_ASSIGNMENTS_SRC_GRAMMAR_H_INCLUDED  */

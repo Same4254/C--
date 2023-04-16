@@ -39,5 +39,7 @@ int test;
 
         y.func();
         y.c = x.a;
+ 
+        PRINT_INT(y.func());
     }
 };

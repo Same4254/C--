@@ -1111,24 +1111,36 @@ public:
 
 class ASTNode_Expr_New_Array : public ASTNode_Expr {
 private:
-    std::unique_ptr<ASTNode_Type> type;
+    std::unique_ptr<ASTNode_Type> type_ast;
     std::unique_ptr<ASTNode_Expr> expr;
 
 public:
     ASTNode_Expr_New_Array(ASTNode_Type *type, ASTNode_Expr *expr)
-        : type(type), expr(expr)
+        : type_ast(type), expr(expr)
     {
 
     }
 
     std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        auto arr_type = std::make_shared<Type_Array>(type->getType(env));
+        auto arr_type = std::make_shared<Type_Array>(type_ast->getType(env));
+        auto expr_type = expr->getType(env, class_desc, method_desc);
+
+        if (expr_type->getID() != TYPE_ID::INT) {
+            std::cout << "[Error]: Array cannot be accessed by a non-integer. Currently attempting: " << expr_type->getName() << std::endl;
+            exit(1);
+        }
+
         return arr_type;
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        // TODO
-        return nullptr;
+        llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
+        llvm::Type* type = type_ast->getType(env)->getLLVMType(code);
+        llvm::Value* expr_value = expr->genCode(env, code, class_desc, method_desc);
+
+        auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, expr_value, nullptr, nullptr, "");
+
+        return inst;
     }
 
     void print() override {
@@ -1140,7 +1152,7 @@ public:
     void printTree(int level) override {
         printIndent(level);
         std::cout << "ASTNode_Expr_New_Array" << std::endl;
-        type->printTree(level + 1);
+        type_ast->printTree(level + 1);
         expr->printTree(level + 1);
     }
 };
@@ -1246,6 +1258,125 @@ public:
     }
 };
 
+class ASTNode_Statement_Print_Int : public ASTNode_Statement {
+private:
+    std::unique_ptr<ASTNode_Expr> expr;
+
+public:
+    ASTNode_Statement_Print_Int(ASTNode_Expr *expr)
+        : expr(expr)
+    {
+
+    }
+
+    void pass_3(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        auto expr_type = expr->getType(env, class_desc, method_desc);
+        if (expr_type->getID() != TYPE_ID::INT) {
+            std::cout << "[Error]: print INT expects and int, got: " << expr_type->getName() << std::endl;
+            exit(1);
+        }
+    }
+
+    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value *int_str = code.getBuilder().CreateGlobalStringPtr("%d\n");
+        llvm::Value *expr_value = expr->genCode(env, code, class_desc, method_desc);
+        std::vector<llvm::Value*> args = { int_str, expr_value };
+
+        std::vector<llvm::Type *> printfArgsTypes({llvm::Type::getInt8PtrTy(code.getContext())});
+        llvm::FunctionType *printfType = llvm::FunctionType::get(llvm::Type::getInt32PtrTy(code.getContext()), printfArgsTypes, true);
+        auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
+
+        code.getBuilder().CreateCall(printfFunc, args);
+    }
+
+    void print() override {
+        std::cout << "PRINT_INT (";
+        expr->print();
+        std::cout << ")" << std::endl;
+    }
+
+    void printTree(int level) override {
+        printIndent(level);
+        std::cout << "ASTNode_Statement_Print_Int" << std::endl;
+        expr->printTree(level + 1);
+    }
+};
+
+class ASTNode_Statement_Print_Bool : public ASTNode_Statement {
+private:
+    std::unique_ptr<ASTNode_Expr> expr;
+
+public:
+    ASTNode_Statement_Print_Bool(ASTNode_Expr *expr)
+        : expr(expr)
+    {
+
+    }
+
+    void pass_3(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        auto expr_type = expr->getType(env, class_desc, method_desc);
+        if (expr_type->getID() != TYPE_ID::BOOL) {
+            std::cout << "[Error]: print BOOL expects and int, got: " << expr_type->getName() << std::endl;
+            exit(1);
+        }
+    }
+
+    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value *int_str = code.getBuilder().CreateGlobalStringPtr("%d\n");
+        llvm::Value *expr_value = expr->genCode(env, code, class_desc, method_desc);
+        std::vector<llvm::Value*> args = { expr_value };
+
+        std::vector<llvm::Type *> printfArgsTypes({llvm::Type::getInt8PtrTy(code.getContext())});
+        llvm::FunctionType *printfType = llvm::FunctionType::get(llvm::Type::getInt32PtrTy(code.getContext()), printfArgsTypes, true);
+        auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
+
+        code.getBuilder().CreateCall(printfFunc, args);
+    }
+
+    void print() override {
+        std::cout << "PRINT_BOOL (";
+        expr->print();
+        std::cout << ")" << std::endl;
+    }
+
+    void printTree(int level) override {
+        printIndent(level);
+        std::cout << "ASTNode_Statement_Print_Bool" << std::endl;
+        expr->printTree(level + 1);
+    }
+};
+
+class ASTNode_Statement_Print_Line : public ASTNode_Statement {
+public:
+    ASTNode_Statement_Print_Line()
+    {
+
+    }
+
+    void pass_3(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+
+    }
+
+    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        llvm::Value *int_str = code.getBuilder().CreateGlobalStringPtr("\n");
+
+        std::vector<llvm::Type *> printfArgsTypes({llvm::Type::getInt8PtrTy(code.getContext())});
+        llvm::FunctionType *printfType = llvm::FunctionType::get(llvm::Type::getInt32PtrTy(code.getContext()), printfArgsTypes, true);
+        auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
+
+        code.getBuilder().CreateCall(printfFunc, {});
+    }
+
+    void print() override {
+        std::cout << "PRINT_LINE(";
+        std::cout << ")" << std::endl;
+    }
+
+    void printTree(int level) override {
+        printIndent(level);
+        std::cout << "ASTNode_Statement_Print_Line" << std::endl;
+    }
+};
 class ASTNode_Statement_Return : public ASTNode_Statement {
 private:
     std::unique_ptr<ASTNode_Expr> expr;
@@ -1286,6 +1417,30 @@ public:
         printIndent(level);
         std::cout << "ASTNode_Statement_Return" << std::endl;
         expr->printTree(level + 1);
+    }
+};
+
+class ASTNode_Statement_ReturnVoid : public ASTNode_Statement {
+public:
+    void pass_3(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        if (method_desc.getReturnType()->getID() != TYPE_ID::VOID) {
+            std::cout << "[Error]: the function " << method_desc.getName() << " has return type " << method_desc.getReturnType()->getName() << " but used a void return!" << std::endl;
+            exit(1);
+        }
+    }
+
+    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        code.getBuilder().CreateRetVoid();
+    }
+
+    void print() override {
+        std::cout << "return ";
+        std::cout << ";" << std::endl;
+    }
+
+    void printTree(int level) override {
+        printIndent(level);
+        std::cout << "ASTNode_Statement_ReturnVoid" << std::endl;
     }
 };
 
@@ -1718,7 +1873,17 @@ public:
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        return nullptr;
+        llvm::Value* arr_ptr = lvalue->genCode(env, code, class_desc, method_desc);
+        arr_ptr = code.getBuilder().CreateLoad(arr_ptr);
+
+        llvm::Value* expr_value = expr->genCode(env, code, class_desc, method_desc);
+        
+        llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), code.getModule().getDataLayout().getTypeAllocSize(arr_ptr->getType()->getArrayElementType()));
+
+        llvm::Value *offset = code.getBuilder().CreateMul(size, expr_value);
+        llvm::Value* sum = code.getBuilder().CreateAdd(arr_ptr, offset);
+
+        return code.getBuilder().CreateLoad(sum);
     }
 
     void print() override {
@@ -1772,7 +1937,7 @@ public:
         auto lvalue_type = lvalue->getType(env, class_desc, method_desc);
         auto expr_type = expr->getType(env, class_desc, method_desc);
 
-        if (!lvalue_type->typeEqual(expr_type)) {
+        if (!lvalue_type->isSubtype(expr_type)) {
             std::cout << "[Error]: Cannot assign to a type " << lvalue_type->getName() << " with type " << expr_type->getName() << std::endl;
             exit(1);
         }

@@ -2,7 +2,6 @@ class Main {
     Main() {
         Y y;
 
-        // need to check that LHS matches RHS
         y = new Y(1);
 
         y.c = false;
