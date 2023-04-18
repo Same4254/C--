@@ -526,7 +526,7 @@ public:
         std::shared_ptr<Type> left_type = left->getType(env, class_desc, method_desc);
         std::shared_ptr<Type> right_type = right->getType(env, class_desc, method_desc);
 
-        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS || left_type->getID() == TYPE_ID::ARRAY) {
             std::cout << "[Error]: Cannot check equality of " << left_type->getName() << " and " << right_type->getName() << std::endl;
             exit(1);
         }
@@ -579,7 +579,7 @@ public:
         std::shared_ptr<Type> left_type = left->getType(env, class_desc, method_desc);
         std::shared_ptr<Type> right_type = right->getType(env, class_desc, method_desc);
 
-        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS) {
+        if (!left_type->typeEqual(right_type) || left_type->getID() == TYPE_ID::CLASS || left_type->getID() == TYPE_ID::ARRAY) {
             std::cout << "[Error]: Cannot check negated equality of " << left_type->getName() << " and " << right_type->getName() << std::endl;
             exit(1);
         }
@@ -1138,8 +1138,11 @@ public:
         llvm::Type* type = type_ast->getType(env)->getLLVMType(code);
         llvm::Value* expr_value = expr->genCode(env, code, class_desc, method_desc);
 
-        auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, expr_value, nullptr, nullptr, "");
+        llvm::Value* e_size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), code.getModule().getDataLayout().getTypeAllocSize(type));
+        llvm::Value *length = code.getBuilder().CreateMul(e_size, expr_value);
 
+        auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, length, nullptr, nullptr, "");
+        code.getBuilder().Insert(inst);
         return inst;
     }
 
@@ -1280,6 +1283,8 @@ public:
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value *int_str = code.getBuilder().CreateGlobalStringPtr("%d\n");
         llvm::Value *expr_value = expr->genCode(env, code, class_desc, method_desc);
+        if (expr_value->getType()->isPointerTy())
+            expr_value = code.getBuilder().CreateLoad(expr_value->getType()->getPointerElementType(), expr_value);
         std::vector<llvm::Value*> args = { int_str, expr_value };
 
         std::vector<llvm::Type *> printfArgsTypes({llvm::Type::getInt8PtrTy(code.getContext())});
@@ -1358,13 +1363,14 @@ public:
     }
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        llvm::Value *int_str = code.getBuilder().CreateGlobalStringPtr("\n");
+        llvm::Value *str = code.getBuilder().CreateGlobalStringPtr("\n");
+        std::vector<llvm::Value*> args = { str };
 
         std::vector<llvm::Type *> printfArgsTypes({llvm::Type::getInt8PtrTy(code.getContext())});
         llvm::FunctionType *printfType = llvm::FunctionType::get(llvm::Type::getInt32PtrTy(code.getContext()), printfArgsTypes, true);
         auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
 
-        code.getBuilder().CreateCall(printfFunc, {});
+        code.getBuilder().CreateCall(printfFunc, args);
     }
 
     void print() override {
@@ -1878,12 +1884,13 @@ public:
 
         llvm::Value* expr_value = expr->genCode(env, code, class_desc, method_desc);
         
-        llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), code.getModule().getDataLayout().getTypeAllocSize(arr_ptr->getType()->getArrayElementType()));
+        //llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), code.getModule().getDataLayout().getTypeAllocSize(arr_ptr->getType()->getPointerElementType()));
 
-        llvm::Value *offset = code.getBuilder().CreateMul(size, expr_value);
-        llvm::Value* sum = code.getBuilder().CreateAdd(arr_ptr, offset);
+        //llvm::Value *offset = code.getBuilder().CreateMul(size, expr_value);
+        //llvm::Value* sum = code.getBuilder().CreateAdd(arr_ptr, offset);
 
-        return code.getBuilder().CreateLoad(sum);
+        //return code.getBuilder().CreateLoad(sum);
+        return code.getBuilder().CreateInBoundsGEP(arr_ptr, expr_value);
     }
 
     void print() override {
@@ -1945,9 +1952,10 @@ public:
 
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value *expr_code = expr->genCode(env, code, class_desc, method_desc);
+        auto expr_type = expr->getType(env, class_desc, method_desc);
 
         // locals are pointers to somewhere on stack, must dereference
-        if (expr_code->getType()->isPointerTy() && !expr_code->getType()->getPointerElementType()->isStructTy())
+        if (expr_code->getType()->isPointerTy() && !expr_code->getType()->getPointerElementType()->isStructTy() && expr_type->getID() != TYPE_ID::ARRAY)
             expr_code = code.getBuilder().CreateLoad(expr_code->getType()->getPointerElementType(), expr_code);
 
         code.getBuilder().CreateStore(expr_code, lvalue->genCode(env, code, class_desc, method_desc));
@@ -2354,7 +2362,7 @@ public:
         env.setClassDescriptor(name, desc);
         this->desc->getType()->setScope(scope);
 
-        std::cout << *desc << std::endl << std::endl;
+        //std::cout << *desc << std::endl << std::endl;
     }
 
     virtual void pass_1(Environment &env) {
@@ -2365,7 +2373,7 @@ public:
         this->desc->getType()->pushScope(env);
             declarations->pass_2(env, *desc, code);
             //std::cout << *scope << std::endl;
-            std::cout << *desc << std::endl << std::endl;
+            //std::cout << *desc << std::endl << std::endl;
         this->desc->getType()->popScope(env);
         this->desc->genLLVMType(code);
     }
@@ -2420,7 +2428,7 @@ public:
         auto parent_desc = env.getClassDescriptor(parent_name);
 
         desc->setParentClass(parent_desc);
-        std::cout << *desc << std::endl << std::endl;
+        //std::cout << *desc << std::endl << std::endl;
     }
 
     void print() override {

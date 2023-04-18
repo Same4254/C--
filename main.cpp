@@ -8,29 +8,30 @@ int main() {
     yyparse(driver);
 
     //node->print();
-    std::cout << "---------- ABSTRACT SYNTAX TREE ----------" << std::endl;
-    driver.ast.root.printTree(0);
 
-    std::cout << std::endl;
-    std::cout << "---------- SEMANTIC ANALYSIS ----------" << std::endl;
+    //std::cout << "---------- ABSTRACT SYNTAX TREE ----------" << std::endl;
+    //driver.ast.root.printTree(0);
+
+    //std::cout << std::endl;
+    //std::cout << "---------- SEMANTIC ANALYSIS ----------" << std::endl;
     Environment env;
 
-    std::cout << "----- Pass 0 -----" << std::endl;
+    //std::cout << "----- Pass 0 -----" << std::endl;
     driver.ast.root.pass_0(env);
 
-    std::cout << "----- Pass 1 -----" << std::endl;
+    //std::cout << "----- Pass 1 -----" << std::endl;
     driver.ast.root.pass_1(env);
 
     GeneratedCode code;
     
-    std::cout << "----- Pass 2 -----" << std::endl;
+    //std::cout << "----- Pass 2 -----" << std::endl;
     driver.ast.root.pass_2(env, code);
 
-    std::cout << "----- Pass 3 -----" << std::endl;
+    //std::cout << "----- Pass 3 -----" << std::endl;
     driver.ast.root.pass_3(env);
-    std::cout << "Passed Semantic Analysis!!" << std::endl;
+    //std::cout << "Passed Semantic Analysis!!" << std::endl;
 
-    std::cout << "---------- Code Generation ----------" << std::endl;
+    //std::cout << "---------- Code Generation ----------" << std::endl;
 
     driver.ast.root.genCode(env, code);
     code.getModule().print(llvm::outs(), nullptr);

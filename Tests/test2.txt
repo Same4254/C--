@@ -1,45 +1,10 @@
-class X {
-    int a;
-
-    X() {
-
-    }
-    
-    int func() {
-        return 10;
-    }
-
-    void another() {
-        int a;
-        a = 6;
-    }
-};
-
-class Y extends X {
-    bool b;
-    int c;
-
-    Y() {
-
-    }
-
-    int func() {
-        return 20;
-    }
-};
-
 class Main {
 int test;
     Main() {
-        X x;
-        x = new X();
-        
-        Y y;
-        y = new Y();
+        int[] arr;
+        arr = new int[10];
 
-        y.func();
-        y.c = x.a;
- 
-        PRINT_INT(y.func());
+        arr[0] = 5;
+        PRINT_INT(arr[0]);
     }
 };

@@ -202,8 +202,7 @@ public:
     }
 
     llvm::Type* getLLVMType(GeneratedCode &code) override {
-        std::cout << "Array llvm type not implemented!" << std::endl;
-        exit(1);
+        return llvm::PointerType::get(composite_type->getLLVMType(code), 0);
     }
 
     bool typeEqual(const std::shared_ptr<Type> other) const override {

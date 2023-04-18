@@ -8,7 +8,10 @@ LD=clang -g
 
 all: test2
 
-test2: $(OFILES)
+comp:
+	../c-- < test2.txt > test2.ll
+
+test2: comp $(OFILES)
 	$(LD) $(OFILES) $(LIBS) -o $@
 
 %.o : %.s
@@ -21,4 +24,4 @@ test2: $(OFILES)
 	$(LLVMASY) $< -o $@
 
 clean:
-	rm *.o *.s *.bc test2
+	rm *.o *.s *.bc test2 *.ll
