@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <llvm-10/llvm/IR/DataLayout.h>
+#include <llvm/IR/DataLayout.h>
 #include <vector>
 #include <memory>
 
@@ -1137,6 +1137,8 @@ public:
         llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
         llvm::Type* type = type_ast->getType(env)->getLLVMType(code);
         llvm::Value* expr_value = expr->genCode(env, code, class_desc, method_desc);
+        if (expr_value->getType()->isPointerTy())
+            expr_value = code.getBuilder().CreateLoad(expr_value->getType()->getPointerElementType(), expr_value);
 
         llvm::Value* e_size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), code.getModule().getDataLayout().getTypeAllocSize(type));
         llvm::Value *length = code.getBuilder().CreateMul(e_size, expr_value);
@@ -1291,7 +1293,7 @@ public:
         llvm::FunctionType *printfType = llvm::FunctionType::get(llvm::Type::getInt32PtrTy(code.getContext()), printfArgsTypes, true);
         auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
 
-        code.getBuilder().CreateCall(printfFunc, args);
+        code.getBuilder().CreateCall(printfType, printfFunc, args);
     }
 
     void print() override {
@@ -1335,7 +1337,7 @@ public:
         llvm::FunctionType *printfType = llvm::FunctionType::get(llvm::Type::getInt32PtrTy(code.getContext()), printfArgsTypes, true);
         auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
 
-        code.getBuilder().CreateCall(printfFunc, args);
+        code.getBuilder().CreateCall(printfType, printfFunc, args);
     }
 
     void print() override {
@@ -1370,7 +1372,7 @@ public:
         llvm::FunctionType *printfType = llvm::FunctionType::get(llvm::Type::getInt32PtrTy(code.getContext()), printfArgsTypes, true);
         auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
 
-        code.getBuilder().CreateCall(printfFunc, args);
+        code.getBuilder().CreateCall(printfType, printfFunc, args);
     }
 
     void print() override {
@@ -1467,8 +1469,8 @@ public:
     void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         for (auto& node : nodes)
             node->genCode(env, code, class_desc, method_desc);
-        if (method_desc.getReturnType()->getID() == TYPE_ID::VOID)
-            code.getBuilder().CreateRetVoid();
+        // if (method_desc.getReturnType()->getID() == TYPE_ID::VOID)
+        //     code.getBuilder().CreateRetVoid();
     }
 
     void AddStatement(ASTNode_Statement *statement) {
@@ -1518,6 +1520,7 @@ public:
         llvm::BasicBlock *while_do_block = llvm::BasicBlock::Create(code.getContext(), "while_do", method_desc.getLLVMFunction(), after_block);
         llvm::BasicBlock *while_cond_block = llvm::BasicBlock::Create(code.getContext(), "while_cond", method_desc.getLLVMFunction(), while_do_block);
 
+        code.getBuilder().CreateBr(while_cond_block);
         code.getBuilder().SetInsertPoint(while_cond_block);
         llvm::Value* cmp_expr = condition_expr->genCode(env, code, class_desc, method_desc);
         code.getBuilder().CreateCondBr(cmp_expr, while_do_block, after_block);
@@ -1676,7 +1679,26 @@ public:
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        return env.getVariableDescriptor(id)->getLLVMValue();
+        auto desc = env.getVariableDescriptor(id);
+        if (desc->getLLVMValue() == nullptr) {
+            auto obj_ptr = env.getVariableDescriptor("this")->getLLVMValue();
+
+            //llvm::Value *obj_ptr = obj_lvalue->genCode(env, code, class_desc, method_desc);
+            if (obj_ptr->getType()->getPointerElementType()->isPointerTy())
+                obj_ptr = code.getBuilder().CreateLoad(obj_ptr->getType()->getPointerElementType(), obj_ptr);
+
+            //std::shared_ptr<Type> callee_type = obj_lvalue->getType(env, class_desc, method_desc);
+            //callee_type->pushScope(env);
+            //    auto var_desc = env.getVariableDescriptor(id);
+            //callee_type->popScope(env);
+            
+            //int offset = code.getModule().getDataLayout().getStructLayout((llvm::StructType*) obj_ptr->getType()->getPointerElementType())->getElementOffset(var_desc->getStructIndex());
+            //return code.getBuilder().CreateConstGEP2_32(obj_ptr->getType()->getPointerElementType(), obj_ptr, 0, offset);
+
+            return code.getBuilder().CreateConstGEP2_32(obj_ptr->getType()->getPointerElementType(), obj_ptr, 0, desc->getStructIndex());
+        } 
+
+        return desc->getLLVMValue();
     }
 
     void print() override {
@@ -1717,8 +1739,6 @@ public:
     static llvm::Value* genVtableFuncCall(GeneratedCode &code, llvm::Value *obj, Descriptor_Method &calling_method_desc, std::vector<llvm::Value*> parameters) {
         size_t vtable_index = calling_method_desc.getVtableOffset();
  
-        parameters.insert(parameters.begin(), obj);
-
         llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
 
         llvm::Value* adrVTBL = code.getBuilder().CreateConstGEP2_32(obj->getType()->getPointerElementType(), obj, 0, 0);
@@ -1727,6 +1747,9 @@ public:
         llvm::Value* mthPtr  = code.getBuilder().CreateLoad(func_ptr_type, adrEntr);
         llvm::Type*  mthTy   = calling_method_desc.getLLVMFunction()->getType();
         llvm::Value* func    = code.getBuilder().CreateBitCast(mthPtr, mthTy);
+
+        obj = code.getBuilder().CreateBitCast(obj, mthTy->getFunctionParamType(0));
+        parameters.insert(parameters.begin(), obj);
 
         return code.getBuilder().CreateCall(calling_method_desc.getLLVMFunction()->getFunctionType(), func, parameters);
     }
@@ -1880,9 +1903,11 @@ public:
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value* arr_ptr = lvalue->genCode(env, code, class_desc, method_desc);
-        arr_ptr = code.getBuilder().CreateLoad(arr_ptr);
+        arr_ptr = code.getBuilder().CreateLoad(arr_ptr->getType()->getPointerElementType(), arr_ptr);
 
         llvm::Value* expr_value = expr->genCode(env, code, class_desc, method_desc);
+        if (expr_value->getType()->isPointerTy())
+            expr_value = code.getBuilder().CreateLoad(expr_value->getType()->getPointerElementType(), expr_value);
         
         //llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), code.getModule().getDataLayout().getTypeAllocSize(arr_ptr->getType()->getPointerElementType()));
 
@@ -1890,7 +1915,7 @@ public:
         //llvm::Value* sum = code.getBuilder().CreateAdd(arr_ptr, offset);
 
         //return code.getBuilder().CreateLoad(sum);
-        return code.getBuilder().CreateInBoundsGEP(arr_ptr, expr_value);
+        return code.getBuilder().CreateInBoundsGEP(arr_ptr->getType()->getPointerElementType(), arr_ptr, expr_value);
     }
 
     void print() override {
@@ -2180,6 +2205,9 @@ public:
             body->genCode(env, code, class_desc, *desc);
         env.popScope();
         env.popScope();
+
+        if (!desc->hasReturnStmt() && desc->getReturnType()->getID() == TYPE_ID::VOID)
+            code.getBuilder().CreateRetVoid();
     }
 
     void print() override {
@@ -2282,6 +2310,9 @@ public:
             body->genCode(env, code, class_desc, *desc);
         env.popScope();
         env.popScope();
+
+        if (!desc->hasReturnStmt())
+            code.getBuilder().CreateRetVoid();
     }
 
     void print() override {

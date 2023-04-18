@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <llvm-10/llvm/IR/Constants.h>
-#include <llvm-10/llvm/IR/Instruction.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/Instruction.h>
 #include <memory>
 #include <ostream>
 #include <unordered_map>
@@ -242,7 +242,7 @@ protected:
 
 public:
     Descriptor_Variable(std::string name, std::shared_ptr<Type> type)
-        : name(name), type(type), struct_index(-1)
+        : name(name), type(type), location(nullptr), struct_index(-1)
     {
 
     }
