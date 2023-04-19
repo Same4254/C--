@@ -164,7 +164,7 @@ public:
     }
 
     std::shared_ptr<Type> getType(Environment &env) override {
-        return env.getClassDescriptor(id)->getType();
+        return std::make_shared<Type_Array>(env.getClassDescriptor(id)->getType());
     }
 
     void print() override {
@@ -531,7 +531,7 @@ public:
             exit(1);
         }
         
-        return left_type;
+        return std::make_shared<Type_Bool>();
     }
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
@@ -1039,76 +1039,6 @@ public:
     }
 };
 
-class ASTNode_Expr_New_Obj : public ASTNode_Expr {
-private:
-    std::unique_ptr<ASTNode_Actuals> actuals;
-    std::string type;
-
-public:
-    ASTNode_Expr_New_Obj(ASTNode_Actuals *actuals, const char *type_c)
-        : actuals(actuals), type(type_c)
-    {
-
-    }
-
-    std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        auto calling_class_desc = env.getClassDescriptor(type);
-        calling_class_desc->getType()->pushScope(env);
-        auto constructor_desc = env.getMethodDescriptor(type);
-        calling_class_desc->getType()->popScope(env);
-
-        actuals->checkTypes(env, class_desc, *constructor_desc);
-
-        return calling_class_desc->getType();
-    }
-
-    static llvm::Value* genCodeCreateObject(GeneratedCode &code, Descriptor_Class &obj_class, std::vector<llvm::Value*> parameters) {
-        auto constructor_desc = obj_class.getConstructor();
-
-        llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
-        llvm::Type* type = obj_class.getType()->getLLVMType(code);
-        //llvm::Constant* size = llvm::ConstantExpr::getBitCast(llvm::ConstantExpr::getSizeOf(type), llvm::Type::getInt32Ty(code.getContext()));
-        int real_size = code.getModule().getDataLayout().getStructLayout((llvm::StructType*) type)->getSizeInBytes();
-        llvm::ConstantInt* size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), real_size);
-
-        auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, size, nullptr, nullptr, "");
-        code.getBuilder().Insert(inst);
-
-        // store the vtable
-        llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
-        llvm::Value* obj_vtable = code.getBuilder().CreateConstGEP2_32(inst->getType()->getPointerElementType(), inst, 0, 0);
-        // this cast is to ignore the size of the array that is the vtable (rather than figure it out explicitly)
-        obj_vtable = code.getBuilder().CreateBitCast(obj_vtable, llvm::PointerType::get(obj_class.getVtable()->getType(), 0));
-        code.getBuilder().CreateStore(obj_class.getVtable(), obj_vtable);
-
-        parameters.insert(parameters.begin(), inst);
-
-        code.getBuilder().CreateCall(constructor_desc->getLLVMFunction()->getFunctionType(), constructor_desc->getLLVMFunction(), parameters);
-        return inst;
-    }
-
-    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        auto calling_class_desc = env.getClassDescriptor(type);
-        calling_class_desc->getType()->pushScope(env);
-            auto parameters = actuals->genCode(env, code, class_desc, method_desc);
-        calling_class_desc->getType()->popScope(env);
-
-        return genCodeCreateObject(code, *calling_class_desc, parameters);
-    }
-
-    void print() override {
-        std::cout << "new " << type << "( ";
-        actuals->print();
-        std::cout << " )";
-    }
-
-    void printTree(int level) override {
-        printIndent(level);
-        std::cout << "ASTNode_Expr_New_Obj: " << type << std::endl;
-        actuals->printTree(level + 1);
-    }
-};
-
 class ASTNode_Expr_New_Array : public ASTNode_Expr {
 private:
     std::unique_ptr<ASTNode_Type> type_ast;
@@ -1165,7 +1095,19 @@ public:
 class ASTNode_Statement : public ASTNode {
 public:
     virtual void pass_3(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) = 0;
-    virtual void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) = 0;
+
+    
+    /**
+     * @brief returns whether it hit a return statement. Needed to prevent unconditional breaks after control blocks like if statements
+     *
+     * @param env
+     * @param code
+     * @param class_desc
+     * @param method_desc
+     *
+     * @return 
+     */
+    virtual bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) = 0;
 };
 
 class ASTNode_Statement_ExprOnly : public ASTNode_Statement {
@@ -1183,8 +1125,9 @@ public:
         expr->getType(env, class_desc, method_desc);
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         expr->genCode(env, code, class_desc, method_desc);
+        return false;
     }
 
     void print() override {
@@ -1223,8 +1166,8 @@ public:
         method_desc.addLocalVariable(desc);
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        return false;
     }
 
     void print() override {
@@ -1249,8 +1192,8 @@ public:
 
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        return false;
     }
 
     void print() override {
@@ -1282,7 +1225,7 @@ public:
         }
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value *int_str = code.getBuilder().CreateGlobalStringPtr("%d\n");
         llvm::Value *expr_value = expr->genCode(env, code, class_desc, method_desc);
         if (expr_value->getType()->isPointerTy())
@@ -1294,6 +1237,8 @@ public:
         auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
 
         code.getBuilder().CreateCall(printfType, printfFunc, args);
+
+        return false;
     }
 
     void print() override {
@@ -1328,7 +1273,7 @@ public:
         }
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value *int_str = code.getBuilder().CreateGlobalStringPtr("%d\n");
         llvm::Value *expr_value = expr->genCode(env, code, class_desc, method_desc);
         std::vector<llvm::Value*> args = { expr_value };
@@ -1338,6 +1283,7 @@ public:
         auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
 
         code.getBuilder().CreateCall(printfType, printfFunc, args);
+        return false;
     }
 
     void print() override {
@@ -1364,7 +1310,7 @@ public:
 
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value *str = code.getBuilder().CreateGlobalStringPtr("\n");
         std::vector<llvm::Value*> args = { str };
 
@@ -1373,6 +1319,8 @@ public:
         auto *printfFunc = code.getModule().getOrInsertFunction("printf", printfType).getCallee();
 
         code.getBuilder().CreateCall(printfType, printfFunc, args);
+
+        return false;
     }
 
     void print() override {
@@ -1406,13 +1354,14 @@ public:
         }
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value *toRet = expr->genCode(env, code, class_desc, method_desc);
         if (toRet->getType()->isPointerTy()) {
             toRet = code.getBuilder().CreateLoad(toRet->getType()->getPointerElementType(), toRet);
         }
 
         code.getBuilder().CreateRet(toRet);
+        return true;
     }
 
     void print() override {
@@ -1437,8 +1386,9 @@ public:
         }
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         code.getBuilder().CreateRetVoid();
+        return true;
     }
 
     void print() override {
@@ -1466,11 +1416,15 @@ public:
             statement->pass_3(env, class_desc, method_desc);
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
-        for (auto& node : nodes)
-            node->genCode(env, code, class_desc, method_desc);
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        for (int i = 0; i < nodes.size(); i++) {
+            // break out early if we hit a return
+            if(nodes[i]->genCode(env, code, class_desc, method_desc))
+                return true;
+        }
         // if (method_desc.getReturnType()->getID() == TYPE_ID::VOID)
         //     code.getBuilder().CreateRetVoid();
+        return false;
     }
 
     void AddStatement(ASTNode_Statement *statement) {
@@ -1515,7 +1469,7 @@ public:
         statement->pass_3(env, class_desc, method_desc);
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::BasicBlock *after_block = llvm::BasicBlock::Create(code.getContext(), "after", method_desc.getLLVMFunction());
         llvm::BasicBlock *while_do_block = llvm::BasicBlock::Create(code.getContext(), "while_do", method_desc.getLLVMFunction(), after_block);
         llvm::BasicBlock *while_cond_block = llvm::BasicBlock::Create(code.getContext(), "while_cond", method_desc.getLLVMFunction(), while_do_block);
@@ -1526,10 +1480,12 @@ public:
         code.getBuilder().CreateCondBr(cmp_expr, while_do_block, after_block);
 
         code.getBuilder().SetInsertPoint(while_do_block);
-        statement->genCode(env, code, class_desc, method_desc);
-        code.getBuilder().CreateBr(while_cond_block);
+        if(!statement->genCode(env, code, class_desc, method_desc))
+            code.getBuilder().CreateBr(while_cond_block);
 
         code.getBuilder().SetInsertPoint(after_block);
+
+        return false;
     }
 
     void print() override {
@@ -1569,7 +1525,7 @@ public:
         statement->pass_3(env, class_desc, method_desc);
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::BasicBlock *after_block = llvm::BasicBlock::Create(code.getContext(), "after", method_desc.getLLVMFunction());
         llvm::BasicBlock *if_block = llvm::BasicBlock::Create(code.getContext(), "if", method_desc.getLLVMFunction(), after_block);
 
@@ -1577,10 +1533,12 @@ public:
         code.getBuilder().CreateCondBr(cmp_expr, if_block, after_block);
 
         code.getBuilder().SetInsertPoint(if_block);
-        statement->genCode(env, code, class_desc, method_desc);
-        code.getBuilder().CreateBr(after_block);
+        if(!statement->genCode(env, code, class_desc, method_desc))
+            code.getBuilder().CreateBr(after_block);
 
         code.getBuilder().SetInsertPoint(after_block);
+
+        return false;
     }
 
     void print() override {
@@ -1622,7 +1580,7 @@ public:
         statement_false->pass_3(env, class_desc, method_desc);
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::BasicBlock *after_block = llvm::BasicBlock::Create(code.getContext(), "after", method_desc.getLLVMFunction());
         llvm::BasicBlock *else_block = llvm::BasicBlock::Create(code.getContext(), "else", method_desc.getLLVMFunction(), after_block);
         llvm::BasicBlock *if_block = llvm::BasicBlock::Create(code.getContext(), "if", method_desc.getLLVMFunction(), else_block);
@@ -1631,14 +1589,16 @@ public:
         code.getBuilder().CreateCondBr(cmp_expr, if_block, else_block);
 
         code.getBuilder().SetInsertPoint(if_block);
-        statement_true->genCode(env, code, class_desc, method_desc);
-        code.getBuilder().CreateBr(after_block);
+        if(!statement_true->genCode(env, code, class_desc, method_desc))
+            code.getBuilder().CreateBr(after_block);
 
         code.getBuilder().SetInsertPoint(else_block);
-        statement_false->genCode(env, code, class_desc, method_desc);
-        code.getBuilder().CreateBr(after_block);
+        if(!statement_false->genCode(env, code, class_desc, method_desc))
+            code.getBuilder().CreateBr(after_block);
 
         code.getBuilder().SetInsertPoint(after_block);
+
+        return false;
     }
 
     void print() override {
@@ -1736,6 +1696,30 @@ public:
         return desc->getReturnType();
     }
 
+    static void prepareActuals(GeneratedCode &code, Descriptor_Method &calling_method_desc, std::vector<llvm::Value*> &parameters) {
+        for (int i = 0; i < parameters.size(); i++) {
+            // dereference the value until it is the correct type
+            // for example, an int could be either a double pointer to a local, or a pointer to a struct element
+            // methods will only pass 1d pointers or primitives
+            // an actual implementation would have every type overwrite how to make an instance get to a passable state
+            auto expected_type = calling_method_desc.getArgumentDescriptors()[i]->getType()->getLLVMType(code);
+            if (expected_type->isStructTy())
+                expected_type = llvm::PointerType::get(expected_type, 0);
+
+            bool is_1d_pointer = expected_type->isPointerTy();
+
+            while ((is_1d_pointer && parameters[i]->getType()->getPointerElementType()->isPointerTy()) ||
+                   (!is_1d_pointer && parameters[i]->getType()->isPointerTy())) 
+            {
+                parameters[i] = code.getBuilder().CreateLoad(parameters[i]->getType()->getPointerElementType(), parameters[i]);
+            }
+
+            // also forcefully cast if needed
+            if (expected_type->isPointerTy() && expected_type->getPointerElementType()->isStructTy())
+                parameters[i] = code.getBuilder().CreateBitCast(parameters[i], llvm::PointerType::get(calling_method_desc.getArgumentDescriptors()[i]->getType()->getLLVMType(code), 0));
+        }
+    }
+
     static llvm::Value* genVtableFuncCall(GeneratedCode &code, llvm::Value *obj, Descriptor_Method &calling_method_desc, std::vector<llvm::Value*> parameters) {
         size_t vtable_index = calling_method_desc.getVtableOffset();
  
@@ -1748,8 +1732,10 @@ public:
         llvm::Type*  mthTy   = calling_method_desc.getLLVMFunction()->getType();
         llvm::Value* func    = code.getBuilder().CreateBitCast(mthPtr, mthTy);
 
-        obj = code.getBuilder().CreateBitCast(obj, mthTy->getFunctionParamType(0));
+        obj = code.getBuilder().CreateBitCast(obj, llvm::PointerType::get(calling_method_desc.getArgumentDescriptors()[0]->getType()->getLLVMType(code), 0));
         parameters.insert(parameters.begin(), obj);
+
+        prepareActuals(code, calling_method_desc, parameters);
 
         return code.getBuilder().CreateCall(calling_method_desc.getLLVMFunction()->getFunctionType(), func, parameters);
     }
@@ -1761,7 +1747,8 @@ public:
         callee_type->popScope(env);
         
         llvm::Value *obj = obj_lvalue->genCode(env, code, class_desc, method_desc);
-        obj = code.getBuilder().CreateLoad(obj->getType()->getPointerElementType(), obj);
+        if (obj->getType()->getPointerElementType()->isPointerTy())
+            obj = code.getBuilder().CreateLoad(obj->getType()->getPointerElementType(), obj);
         std::vector<llvm::Value*> parameters = actuals->genCode(env, code, class_desc, method_desc);
 
         return genVtableFuncCall(code, obj, *calling_method_desc, parameters);
@@ -1782,6 +1769,79 @@ public:
         actuals->printTree(level + 1);
     }
 };
+
+class ASTNode_Expr_New_Obj : public ASTNode_Expr {
+private:
+    std::unique_ptr<ASTNode_Actuals> actuals;
+    std::string type;
+
+public:
+    ASTNode_Expr_New_Obj(ASTNode_Actuals *actuals, const char *type_c)
+        : actuals(actuals), type(type_c)
+    {
+
+    }
+
+    std::shared_ptr<Type> getType(Environment &env, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        auto calling_class_desc = env.getClassDescriptor(type);
+        calling_class_desc->getType()->pushScope(env);
+            auto constructor_desc = env.getMethodDescriptor(type);
+        calling_class_desc->getType()->popScope(env);
+
+        actuals->checkTypes(env, class_desc, *constructor_desc);
+
+        return calling_class_desc->getType();
+    }
+
+    static llvm::Value* genCodeCreateObject(GeneratedCode &code, Descriptor_Class &obj_class, std::vector<llvm::Value*> parameters) {
+        auto constructor_desc = obj_class.getConstructor();
+
+        llvm::Type* ptr_type = llvm::Type::getInt32Ty(code.getContext());
+        llvm::Type* type = obj_class.getType()->getLLVMType(code);
+        //llvm::Constant* size = llvm::ConstantExpr::getBitCast(llvm::ConstantExpr::getSizeOf(type), llvm::Type::getInt32Ty(code.getContext()));
+        int real_size = code.getModule().getDataLayout().getStructLayout((llvm::StructType*) type)->getSizeInBytes();
+        llvm::ConstantInt* size = llvm::ConstantInt::get(llvm::Type::getInt32Ty(code.getContext()), real_size);
+
+        auto inst = llvm::CallInst::CreateMalloc(code.getBuilder().GetInsertBlock(), ptr_type, type, size, nullptr, nullptr, "");
+        code.getBuilder().Insert(inst);
+
+        // store the vtable
+        llvm::Type *func_ptr_type = llvm::PointerType::get(llvm::IntegerType::get(code.getContext(), 32), 0);
+        llvm::Value* obj_vtable = code.getBuilder().CreateConstGEP2_32(inst->getType()->getPointerElementType(), inst, 0, 0);
+        // this cast is to ignore the size of the array that is the vtable (rather than figure it out explicitly)
+        obj_vtable = code.getBuilder().CreateBitCast(obj_vtable, llvm::PointerType::get(obj_class.getVtable()->getType(), 0));
+        code.getBuilder().CreateStore(obj_class.getVtable(), obj_vtable);
+
+        parameters.insert(parameters.begin(), inst);
+        ASTNode_LValue_Obj_MethodCall::prepareActuals(code, *constructor_desc, parameters);
+
+        code.getBuilder().CreateCall(constructor_desc->getLLVMFunction()->getFunctionType(), constructor_desc->getLLVMFunction(), parameters);
+        return inst;
+    }
+
+    llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+        auto calling_class_desc = env.getClassDescriptor(type);
+        //calling_class_desc->getType()->pushScope(env);
+            auto parameters = actuals->genCode(env, code, class_desc, method_desc);
+        //calling_class_desc->getType()->popScope(env);
+
+        return genCodeCreateObject(code, *calling_class_desc, parameters);
+    }
+
+    void print() override {
+        std::cout << "new " << type << "( ";
+        actuals->print();
+        std::cout << " )";
+    }
+
+    void printTree(int level) override {
+        printIndent(level);
+        std::cout << "ASTNode_Expr_New_Obj: " << type << std::endl;
+        actuals->printTree(level + 1);
+    }
+};
+
+
 
 class ASTNode_LValue_MethodCall : public ASTNode_LValue {
 private:
@@ -1903,7 +1963,8 @@ public:
 
     llvm::Value* genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value* arr_ptr = lvalue->genCode(env, code, class_desc, method_desc);
-        arr_ptr = code.getBuilder().CreateLoad(arr_ptr->getType()->getPointerElementType(), arr_ptr);
+        if (getType(env, class_desc, method_desc)->getID() != TYPE_ID::CLASS) 
+            arr_ptr = code.getBuilder().CreateLoad(arr_ptr->getType()->getPointerElementType(), arr_ptr);
 
         llvm::Value* expr_value = expr->genCode(env, code, class_desc, method_desc);
         if (expr_value->getType()->isPointerTy())
@@ -1969,21 +2030,28 @@ public:
         auto lvalue_type = lvalue->getType(env, class_desc, method_desc);
         auto expr_type = expr->getType(env, class_desc, method_desc);
 
-        if (!lvalue_type->isSubtype(expr_type)) {
+        if (!expr_type->isSubtype(lvalue_type)) {
             std::cout << "[Error]: Cannot assign to a type " << lvalue_type->getName() << " with type " << expr_type->getName() << std::endl;
             exit(1);
         }
     }
 
-    void genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
+    bool genCode(Environment &env, GeneratedCode &code, Descriptor_Class &class_desc, Descriptor_Method &method_desc) override {
         llvm::Value *expr_code = expr->genCode(env, code, class_desc, method_desc);
         auto expr_type = expr->getType(env, class_desc, method_desc);
+        auto lvalue_code = lvalue->genCode(env, code, class_desc, method_desc);
 
         // locals are pointers to somewhere on stack, must dereference
         if (expr_code->getType()->isPointerTy() && !expr_code->getType()->getPointerElementType()->isStructTy() && expr_type->getID() != TYPE_ID::ARRAY)
             expr_code = code.getBuilder().CreateLoad(expr_code->getType()->getPointerElementType(), expr_code);
 
-        code.getBuilder().CreateStore(expr_code, lvalue->genCode(env, code, class_desc, method_desc));
+        // if we are doing an OOP assignment where the lvalue is ** of a parent type, we need to cast the child to the parent
+        if (expr_code->getType()->isPointerTy())
+            expr_code = code.getBuilder().CreateBitCast(expr_code, lvalue_code->getType()->getPointerElementType());
+
+        code.getBuilder().CreateStore(expr_code, lvalue_code);
+
+        return false;
     }
 
     void print() override {

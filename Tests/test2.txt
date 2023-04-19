@@ -1,10 +1,159 @@
-class Main {
-int test;
-    Main() {
-        int[] arr;
-        arr = new int[10];
+class Animal {
+    int x;
 
-        arr[0] = 5;
-        PRINT_INT(arr[0]);
+    Animal() {
+        this.x = 10;
+    }
+
+    void func() {
+        PRINT_INT(x);
+    }
+
+    void speak() {
+        PRINT_INT(0);
+    }
+};
+
+class Dog extends Animal {
+
+    Dog() {
+        this.x = 100;
+    }
+
+    void speak() {
+        PRINT_INT(1);
+    }
+};
+
+class Cat extends Animal {
+    
+    Cat() {
+        this.x = 200;
+    }
+
+    void speak() {
+        PRINT_INT(2);
+    }
+
+    void inc() {
+        x = x + 1;
+    }
+};
+
+class X {
+    int n;
+    int[] arr;
+
+    X(int n) {
+        this.n = n;
+        this.arr = new int[n];
+
+        int i;
+        i = 0;
+        while (i < n) {
+            arr[i] = i;
+            i = i + 1; 
+        }
+    }
+
+    void printArr() {
+        int i;
+        i = 0;
+
+        PRINT_LN();
+        while (i < n) {
+            PRINT_INT(arr[i]);
+            i = i + 1; 
+        }
+        PRINT_LN();
+    }
+};
+
+class Y {
+    int n;
+    X[] xs;
+
+    Y(int n) {
+        this.n = n;
+        this.xs = new X[n];
+
+        int i;
+        i = 0;
+        while (i < n) {
+            xs[i] = new X(i + 1);
+            i = i + 1;
+        }
+    }
+
+    void printArrs() {
+        int i;
+        i = 0;
+        while (i < n) {
+            xs[i].printArr();
+            i = i + 1;
+        }
+    }
+};
+
+class Main {
+    int fib(int n) {
+        if (n == 0) {
+            return 0;
+        }
+
+        if (n == 1) {
+            return 1;
+        }
+
+        return fib(n - 1) + fib(n - 2);
+    }
+
+    Main() {
+        Dog dog;
+        dog = new Dog();
+
+        dog.func();
+        dog.speak();
+
+        PRINT_LN();
+
+        Cat cat;
+        cat = new Cat();
+
+        cat.func();
+        cat.speak();
+        cat.inc(); 
+        cat.func();
+
+        X x;
+        x = new X(10);
+
+        x.printArr();
+
+        int n;
+        n = 5;
+
+        Y y;
+        y = new Y(n);
+
+        y.printArrs();
+
+        Animal[] animals;
+        animals = new Animal[2];
+
+        animals[0] = new Dog();
+        animals[1] = new Cat();
+
+        animals[0].speak();
+        animals[1].speak();
+
+        PRINT_LN();
+
+        int i;
+        i = 0;
+        while (i < 10) {
+            PRINT_INT(fib(i));
+            i = i + 1;
+        }
     }
 };
