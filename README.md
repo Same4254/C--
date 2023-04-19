@@ -24,7 +24,7 @@ This will output the LLVM IR to stdout in all its glory. If you wish to skip thi
 
 ## Example
 
-The following is an example program included in the project which demonstrates it can do the basic features set out by the language.
+The following is an example program included in the project which demonstrates it can do the basic features set out by the language. It's worth noting as well that the entry point to the program is the Main class' constructor. For a valid C-- program, there must be a Main class present. 
 
 ```java
 class Animal {
