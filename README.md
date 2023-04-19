@@ -12,6 +12,8 @@ C-- is a very simple language with the grammar as shown below. The language is m
 
 ![](/Language.png)
 
+It's also worth noting that this language itself does not immediately allow for parsing with only 1 lookahead token. To allow Flex to generate a parser without conflicts, parts of the grammar had to be inlined, so to speak. In addition, associativity rules had to be given in order for it to resolve other conflicts. The only conflict that remains now is the infamous if-else ambiguity. This is conflict is automatically handled by the parser, however, so the langauge itself needs no change.
+
 ## Usage
 
 After compiling with CMake, the compiler takes the input source code through stdin. Thus to run the compiler do the following:
