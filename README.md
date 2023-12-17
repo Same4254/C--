@@ -1,8 +1,8 @@
 # C--
 
-This is a compiler for the language C-- made with Flex, Bison, and LLVM (See [The Language](#The Language)). This was an independent study done in one semester with Professor Laurent Michel. No starting code provided, everything here is of my own work and understanding from *Compilers: Principles, Techniques, & Tools" by Aho et al.  
+This is a compiler for the language C-- made with Flex, Bison, and LLVM (See [The Language](#The-Language)). This was an independent study done in one semester with Professor Laurent Michel. No starting code provided, everything here is of my own work and understanding from "Compilers: Principles, Techniques, & Tools" by Aho et al.  
 
-I make no promise that this compiler is 100% correct nor do I attest to the quality of the code thereof. The intent of this project was to learn about how compilers work and the challenges an implementation faces. In the long-term I wish to gain a further understanding of compiler optimizations; this progject was the first step to that end. 
+I make no promise that this compiler is 100% correct nor do I attest to the quality of the code thereof. The intent of this project was to learn about how compilers work and the challenges an implementation faces. In the long-term I wish to gain a further understanding of compiler optimizations; this project was the first step to that end. 
 
 However, core features and concepts of the language to function properly. OOP inheritence of classes allows for a child class to inherit member variables and methods from its parent, while also allowing the child to overwrite the parent method. Basic computation such as calculating the fibonacci sequence recursively also works. Arrays of primitive values and classes also function similarly to how they behave in Java, where the list declares to store parent type, but does allow child instances to be inserted into the list. These objects each have a ***vtable*** to dispatch functions. 
 
